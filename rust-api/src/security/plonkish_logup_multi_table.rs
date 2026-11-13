@@ -116,7 +116,7 @@ impl LogupEngine {
             challenge_gamma,
             fractional_sum_lhs: sum_lhs as u64,
             fractional_sum_rhs: sum_rhs as u64,
-            proof_digest: format!("{:x}", proof_h),
+            proof_digest: format!("{}", proof_h),
         })
     }
 

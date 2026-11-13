@@ -11,6 +11,7 @@ use axum::{
     response::IntoResponse,
     Json,
 };
+use sha2::Digest;
 use std::collections::HashMap;
 use std::env;
 use uuid::Uuid;

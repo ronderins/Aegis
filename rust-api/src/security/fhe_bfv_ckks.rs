@@ -460,7 +460,7 @@ impl BlindedIdentityAttributeAggregator {
             acc.noise_budget_estimate,
             ciphertexts.len()
         );
-        let digest = format!("{:x}", blake3::hash(hash_input.as_bytes()));
+        let digest = format!("{}", blake3::hash(hash_input.as_bytes()));
 
         Ok(Self {
             attribute_count: ciphertexts.len(),

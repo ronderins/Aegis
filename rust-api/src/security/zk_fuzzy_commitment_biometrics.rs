@@ -44,7 +44,7 @@ impl FuzzyCommitmentEngine {
         biometric_template: &[u8; 32],
         template_id: &str,
     ) -> FuzzyBiometricCommitment {
-        let key_hash = format!("{:x}", blake3::hash(secret_key));
+        let key_hash = format!("{}", blake3::hash(secret_key));
 
         // Helper data: W = b ^ c
         let mut helper = vec![0u8; 32];
@@ -81,7 +81,7 @@ impl FuzzyCommitmentEngine {
             hamming_dist += diff.count_ones() as usize;
         }
 
-        let cand_hash = format!("{:x}", blake3::hash(&candidate_codeword));
+        let cand_hash = format!("{}", blake3::hash(&candidate_codeword));
 
         if cand_hash == commitment.key_commitment_hash {
             FuzzyUnlockResult {

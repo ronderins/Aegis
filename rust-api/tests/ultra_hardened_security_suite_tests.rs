@@ -109,7 +109,7 @@ fn test_e2e_bls_threshold_aggregation_suite() {
             y: ("s1_y0".into(), "s1_y1".into()),
             is_infinity: false,
         },
-        signed_message_digest: format!("{:x}", blake3::hash(msg)),
+        signed_message_digest: format!("{}", blake3::hash(msg)),
     };
     let share2 = BlsSignatureShare {
         signer_index: 2,
@@ -118,7 +118,7 @@ fn test_e2e_bls_threshold_aggregation_suite() {
             y: ("s2_y0".into(), "s2_y1".into()),
             is_infinity: false,
         },
-        signed_message_digest: format!("{:x}", blake3::hash(msg)),
+        signed_message_digest: format!("{}", blake3::hash(msg)),
     };
 
     let agg_sig = agg.aggregate_shares(&[share1, share2], msg).unwrap();

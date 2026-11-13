@@ -36,7 +36,7 @@ impl EcvrfEngine {
         let pk_h = blake3::hash(format!("edwards_pk_{}", secret_key).as_bytes());
         Self {
             secret_key_scalar: secret_key,
-            public_key_point: format!("PK_{:x}", pk_h),
+            public_key_point: format!("PK_{}", pk_h),
         }
     }
 
@@ -51,22 +51,22 @@ impl EcvrfEngine {
 
         // Gamma = SK * H
         let gamma_h = blake3::hash(format!("{}_{}", h_digest, self.secret_key_scalar).as_bytes());
-        let gamma = format!("Gamma_{:x}", gamma_h);
+        let gamma = format!("Gamma_{}", gamma_h);
 
         // Ephemeral nonce k
         let k_nonce = (self.secret_key_scalar.wrapping_add(1337)).wrapping_mul(0x9E3779B97F4A7C15);
 
         // Challenge c = Hash(H, Gamma, k*G, k*H)
         let c_h = blake3::hash(format!("{}_{}_{}", h_digest, gamma, k_nonce).as_bytes());
-        let c_hex = format!("c_{:x}", c_h);
+        let c_hex = format!("c_{}", c_h);
 
         // Response s = (k + c * SK) mod q
         let s_h =
             blake3::hash(format!("{}_{}_{}", k_nonce, c_hex, self.secret_key_scalar).as_bytes());
-        let s_hex = format!("s_{:x}", s_h);
+        let s_hex = format!("s_{}", s_h);
 
         // Output hash Y = Hash(Gamma)
-        let output_y = format!("{:x}", blake3::hash(gamma.as_bytes()));
+        let output_y = format!("{}", blake3::hash(gamma.as_bytes()));
 
         let proof = EcvrfProof {
             gamma_point_hex: gamma,
@@ -77,7 +77,7 @@ impl EcvrfEngine {
         EcvrfOutput {
             pseudorandom_output_hash: output_y,
             proof,
-            input_alpha: format!("{:x}", blake3::hash(alpha)),
+            input_alpha: format!("{}", blake3::hash(alpha)),
             public_key_hex: self.public_key_point.clone(),
         }
     }
@@ -97,7 +97,7 @@ impl EcvrfEngine {
 
         // Verify output Y matches Hash(Gamma)
         let expected_y = format!(
-            "{:x}",
+            "{}",
             blake3::hash(output.proof.gamma_point_hex.as_bytes())
         );
         if expected_y != output.pseudorandom_output_hash {

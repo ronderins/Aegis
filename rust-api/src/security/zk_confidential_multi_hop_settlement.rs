@@ -50,7 +50,7 @@ impl MultiHopSettlementEngine {
         sender: &str,
         receiver: &str,
     ) -> (HtlcPaymentLock, String) {
-        let h = format!("{:x}", blake3::hash(payment_preimage));
+        let h = format!("{}", blake3::hash(payment_preimage));
         (
             HtlcPaymentLock {
                 payment_hash_h: h.clone(),
@@ -74,7 +74,7 @@ impl MultiHopSettlementEngine {
             return Err("HTLC Expired: Funds refunded to sender due to timeout");
         }
 
-        let computed_h = format!("{:x}", blake3::hash(revealed_preimage));
+        let computed_h = format!("{}", blake3::hash(revealed_preimage));
         if computed_h != lock.payment_hash_h {
             return Err("Invalid preimage: Hash does not match HTLC lock condition");
         }
@@ -88,10 +88,10 @@ impl MultiHopSettlementEngine {
             mac_hasher.update(&step.blinded_amount.to_le_bytes());
         }
 
-        let final_mac = format!("{:x}", mac_hasher.finalize());
+        let final_mac = format!("{}", mac_hasher.finalize());
 
         Ok(MultiHopSettlementReceipt {
-            payment_identifier: format!("pay_{:x}", blake3::hash(lock.payment_hash_h.as_bytes())),
+            payment_identifier: format!("pay_{}", blake3::hash(lock.payment_hash_h.as_bytes())),
             total_hops: hops.len(),
             revealed_preimage_digest: computed_h,
             final_settlement_mac: final_mac,

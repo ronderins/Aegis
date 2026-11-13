@@ -161,7 +161,7 @@ impl StarkFriEngine {
         for e in evals {
             hasher.update(&e.value.to_le_bytes());
         }
-        format!("{:x}", hasher.finalize())
+        format!("{}", hasher.finalize())
     }
 
     /// Folds a polynomial layer in half using Fiat-Shamir challenge alpha:
@@ -232,9 +232,9 @@ impl StarkFriEngine {
                     evaluation_point: eval_pt,
                     evaluation_value: eval_val,
                     sibling_hashes: vec![
-                        format!("sibling_{:x}", blake3::hash(&query_pos.to_le_bytes())),
+                        format!("sibling_{}", blake3::hash(&query_pos.to_le_bytes())),
                         format!(
-                            "sibling_{:x}",
+                            "sibling_{}",
                             blake3::hash(&layer.domain_size.to_le_bytes())
                         ),
                     ],

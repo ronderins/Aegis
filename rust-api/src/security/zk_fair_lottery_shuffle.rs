@@ -64,18 +64,18 @@ impl FairLotteryShuffleEngine {
             perm_hasher.update(&perm_idx.to_le_bytes());
 
             shuffled.push(ShuffleElGamalCiphertext {
-                c1_hex: format!("c1_{:x}", new_c1),
-                c2_hex: format!("c2_{:x}", new_c2),
+                c1_hex: format!("c1_{}", new_c1),
+                c2_hex: format!("c2_{}", new_c2),
             });
         }
 
-        let perm_root = format!("{:x}", perm_hasher.finalize());
+        let perm_root = format!("{}", perm_hasher.finalize());
         let challenge_c = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("{}_{}", perm_root, n).as_bytes())
         );
         let response_s = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("{}_{}", challenge_c, rerandomization_factors[0]).as_bytes())
         );
 
@@ -99,7 +99,7 @@ impl FairLotteryShuffleEngine {
         }
 
         let expected_c = format!(
-            "{:x}",
+            "{}",
             blake3::hash(
                 format!("{}_{}", proof.permutation_commitment_root, proof.batch_size).as_bytes()
             )

@@ -47,7 +47,7 @@ impl VectorCommitmentEngine {
             hasher.update(&i.to_le_bytes());
             hasher.update(&val.to_le_bytes());
         }
-        let cm_hex = format!("vc_{:x}", hasher.finalize());
+        let cm_hex = format!("vc_{}", hasher.finalize());
 
         VectorCommitment {
             commitment_c: cm_hex,
@@ -71,7 +71,7 @@ impl VectorCommitmentEngine {
         hasher.update(b"VC_OPEN_POSITION");
         hasher.update(&pos.to_le_bytes());
         hasher.update(&val.to_le_bytes());
-        let pi = format!("pi_{:x}", hasher.finalize());
+        let pi = format!("pi_{}", hasher.finalize());
 
         Ok(VectorPositionOpening {
             position_index: pos,
@@ -94,7 +94,7 @@ impl VectorCommitmentEngine {
         hasher.update(b"VC_OPEN_POSITION");
         hasher.update(&opening.position_index.to_le_bytes());
         hasher.update(&opening.claimed_value.to_le_bytes());
-        let expected_pi = format!("pi_{:x}", hasher.finalize());
+        let expected_pi = format!("pi_{}", hasher.finalize());
 
         Ok(opening.opening_proof_pi == expected_pi)
     }
@@ -116,7 +116,7 @@ impl VectorCommitmentEngine {
         hasher.update(commitment.commitment_c.as_bytes());
         hasher.update(&pos.to_le_bytes());
         hasher.update(&delta.to_le_bytes());
-        let new_c = format!("vc_{:x}", hasher.finalize());
+        let new_c = format!("vc_{}", hasher.finalize());
 
         Ok(VectorCommitment {
             commitment_c: new_c,

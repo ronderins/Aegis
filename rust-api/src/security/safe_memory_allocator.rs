@@ -99,7 +99,7 @@ impl SafeMemoryBuffer {
                 ptr::write_volatile(prefix_ptr, CANARY_PREFIX);
 
                 let suffix_ptr = raw_ptr.add(data_offset + capacity) as *mut u64;
-                ptr::write_volatile(suffix_ptr, CANARY_SUFFIX);
+                ptr::write_unaligned(suffix_ptr, CANARY_SUFFIX);
             }
         }
 
@@ -169,7 +169,7 @@ impl SafeMemoryBuffer {
             }
 
             let suffix_ptr = self.raw_ptr.add(self.data_offset + self.capacity) as *const u64;
-            let current_suffix = ptr::read_volatile(suffix_ptr);
+            let current_suffix = ptr::read_unaligned(suffix_ptr);
             if current_suffix != CANARY_SUFFIX {
                 return Err("CRITICAL: Overflow corruption detected! Suffix canary destroyed.");
             }

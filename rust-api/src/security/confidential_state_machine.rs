@@ -151,7 +151,7 @@ impl ConfidentialStateMachine {
         signer.update(&proof.zkp_satisfaction_token);
         let expected_sig = *signer.finalize().as_bytes();
 
-        if !proof.signature_hmac.ct_eq(&expected_sig).into() {
+        if !bool::from(proof.signature_hmac.ct_eq(&expected_sig)) {
             return Err("STATE MACHINE VIOLATION: Invalid transition proof signature");
         }
 

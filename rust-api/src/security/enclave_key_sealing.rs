@@ -81,7 +81,7 @@ impl EnclaveKeySealingEngine {
         let ct_digest = enc_hasher.finalize();
 
         let tag = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("{}_{}", ct_digest, seal_key[0]).as_bytes())
         );
 
@@ -91,7 +91,7 @@ impl EnclaveKeySealingEngine {
                 EnclaveSealingPolicy::ExactEnclaveMeasurement => self.current_mrenclave.clone(),
                 EnclaveSealingPolicy::EnclaveSignerAuthority => self.current_mrsigner.clone(),
             },
-            ciphertext_hex: format!("{:x}", ct_digest),
+            ciphertext_hex: format!("{}", ct_digest),
             authentication_tag: tag,
             derivation_nonce: *nonce,
             cpu_svn: self.cpu_security_version,
@@ -116,7 +116,7 @@ impl EnclaveKeySealingEngine {
 
         let seal_key = self.derive_seal_key(sealed.policy, &sealed.derivation_nonce);
         let expected_tag = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("{}_{}", sealed.ciphertext_hex, seal_key[0]).as_bytes())
         );
 

@@ -105,7 +105,7 @@ impl CredentialFederationEngine {
             source_domain: source.to_string(),
             target_domain: target.to_string(),
             credential_digest: cred_digest.to_string(),
-            cross_signature_proof: format!("fed_sig_{:x}", sig_h),
+            cross_signature_proof: format!("fed_sig_{}", sig_h),
             synchronization_timestamp: 1775000000,
         })
     }

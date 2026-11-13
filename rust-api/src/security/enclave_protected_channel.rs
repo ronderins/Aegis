@@ -50,7 +50,7 @@ impl EnclaveProtectedChannel {
         let pub_h = blake3::hash(format!("noise_pk_{}", static_priv).as_bytes());
         Self {
             local_static_priv: static_priv,
-            local_static_pub: format!("pk_{:x}", pub_h),
+            local_static_pub: format!("pk_{}", pub_h),
             remote_attestation_quote: attestation_quote.to_string(),
             state: NoiseHandshakeState::Uninitialized,
         }
@@ -58,7 +58,7 @@ impl EnclaveProtectedChannel {
 
     /// Step 1: Initiator sends ephemeral public key (-> e)
     pub fn send_handshake_1(&mut self, ephemeral_priv: u64) -> NoiseHandshakeMessage {
-        let e_pub = format!("e_{:x}", blake3::hash(&ephemeral_priv.to_le_bytes()));
+        let e_pub = format!("e_{}", blake3::hash(&ephemeral_priv.to_le_bytes()));
         self.state = NoiseHandshakeState::Message1Sent;
 
         NoiseHandshakeMessage {
@@ -79,14 +79,14 @@ impl EnclaveProtectedChannel {
             return Err("Invalid handshake step 1 message");
         }
 
-        let resp_e_pub = format!("e_{:x}", blake3::hash(&resp_ephemeral_priv.to_le_bytes()));
+        let resp_e_pub = format!("e_{}", blake3::hash(&resp_ephemeral_priv.to_le_bytes()));
         let shared_ee = blake3::hash(
             format!("{}_{}", msg1.ephemeral_public_key, resp_ephemeral_priv).as_bytes(),
         );
 
         // Encrypt responder static identity under shared_ee
         let enc_static = format!(
-            "enc_s_{:x}",
+            "enc_s_{}",
             blake3::hash(format!("{}_{}", self.local_static_pub, shared_ee).as_bytes())
         );
 
@@ -112,14 +112,14 @@ impl EnclaveProtectedChannel {
         let session_h = blake3::hash(
             format!("{}_{}", self.local_static_pub, msg2.ephemeral_public_key).as_bytes(),
         );
-        let session_id = format!("sess_{:x}", session_h);
+        let session_id = format!("sess_{}", session_h);
 
         let tx_key = format!(
-            "tx_key_{:x}",
+            "tx_key_{}",
             blake3::hash(format!("tx_{}", session_id).as_bytes())
         );
         let rx_key = format!(
-            "rx_key_{:x}",
+            "rx_key_{}",
             blake3::hash(format!("rx_{}", session_id).as_bytes())
         );
 

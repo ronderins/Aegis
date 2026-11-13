@@ -51,13 +51,13 @@ impl SingleServerPirEngine {
         for i in 0..database_size {
             let val = if i == target_index { 1u64 } else { 0u64 };
             let enc = format!(
-                "enc_q_{:x}",
+                "enc_q_{}",
                 blake3::hash(format!("{}_{}_{}", val, blinding_key, i).as_bytes())
             );
             unit_vector.push(enc);
         }
 
-        let q_id = format!("pir_q_{:x}", blake3::hash(&blinding_key.to_le_bytes()));
+        let q_id = format!("pir_q_{}", blake3::hash(&blinding_key.to_le_bytes()));
 
         Ok(PirQueryVector {
             query_id: q_id,
@@ -82,9 +82,9 @@ impl SingleServerPirEngine {
             dot_product_hasher.update(self.database_records[i].as_bytes());
         }
 
-        let eval_ct = format!("pir_eval_{:x}", dot_product_hasher.finalize());
+        let eval_ct = format!("pir_eval_{}", dot_product_hasher.finalize());
         let mac = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("{}_{}", query.query_id, eval_ct).as_bytes())
         );
 

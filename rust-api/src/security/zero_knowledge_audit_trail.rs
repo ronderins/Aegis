@@ -135,7 +135,7 @@ impl ForwardSecureAuditTrail {
             }
 
             // Verify hash chain link
-            if !curr.previous_block_hash.ct_eq(&prev.block_hash).into() {
+            if !bool::from(curr.previous_block_hash.ct_eq(&prev.block_hash)) {
                 return false;
             }
 
@@ -146,7 +146,7 @@ impl ForwardSecureAuditTrail {
             signer.update(&curr.block_hash);
             let expected_sig = *signer.finalize().as_bytes();
 
-            if !curr.signature_hmac.ct_eq(&expected_sig).into() {
+            if !bool::from(curr.signature_hmac.ct_eq(&expected_sig)) {
                 return false;
             }
         }

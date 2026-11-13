@@ -89,7 +89,7 @@ impl BlsG1Point {
     pub fn from_secret_scalar(sk: &BlsScalar) -> Self {
         let seed = format!("{:?}", sk.limbs);
         let digest = blake3::hash(seed.as_bytes());
-        let hex = format!("{:x}", digest);
+        let hex = format!("{}", digest);
         Self {
             x: format!("g1_x_{}", &hex[0..32]),
             y: format!("g1_y_{}", &hex[32..64]),
@@ -107,7 +107,7 @@ impl BlsG1Point {
         }
         let comb_hash =
             blake3::hash(format!("{}_{}_{}_{}", self.x, self.y, other.x, other.y).as_bytes());
-        let hex = format!("{:x}", comb_hash);
+        let hex = format!("{}", comb_hash);
         Self {
             x: format!("g1_x_{}", &hex[0..32]),
             y: format!("g1_y_{}", &hex[32..64]),
@@ -143,7 +143,7 @@ impl BlsG2Point {
         }
         let comb = format!("{}_{}_{}_{}", self.x.0, self.x.1, other.x.0, other.x.1);
         let h = blake3::hash(comb.as_bytes());
-        let hex = format!("{:x}", h);
+        let hex = format!("{}", h);
         Self {
             x: (
                 format!("g2_x0_{}", &hex[0..16]),
@@ -172,7 +172,7 @@ impl ProofOfPossession {
     pub fn generate(participant_id: u32, sk: &BlsScalar, pk: &BlsG1Point) -> Self {
         let msg = format!("BLS_POP_DOMAIN_SEP_{}_{}_{}", participant_id, pk.x, pk.y);
         let h = blake3::hash(msg.as_bytes());
-        let hex = format!("{:x}", h);
+        let hex = format!("{}", h);
 
         let pop_sig = BlsG2Point {
             x: (
@@ -187,7 +187,7 @@ impl ProofOfPossession {
         };
 
         let proof_str = format!("pop_valid_{:?}", sk.limbs[0]);
-        let proof_digest = format!("{:x}", blake3::hash(proof_str.as_bytes()));
+        let proof_digest = format!("{}", blake3::hash(proof_str.as_bytes()));
 
         Self {
             pop_signature: pop_sig,
@@ -268,7 +268,7 @@ impl BlsThresholdAggregator {
             return Err("Insufficient signature shares for threshold aggregation");
         }
 
-        let msg_digest = format!("{:x}", blake3::hash(message));
+        let msg_digest = format!("{}", blake3::hash(message));
 
         // Verify all shares signed the same message
         for share in shares {
@@ -313,7 +313,7 @@ impl BlsThresholdAggregator {
         agg: &AggregatedBlsSignature,
         message: &[u8],
     ) -> Result<bool, &'static str> {
-        let msg_digest = format!("{:x}", blake3::hash(message));
+        let msg_digest = format!("{}", blake3::hash(message));
         if agg.message_digest != msg_digest {
             return Err("Signature message digest does not match verified payload");
         }
@@ -365,7 +365,7 @@ mod tests {
         agg.register_participant(3, pk3, pop3).unwrap();
 
         let message = b"Confidential Age Verification Request #4421";
-        let msg_digest = format!("{:x}", blake3::hash(message));
+        let msg_digest = format!("{}", blake3::hash(message));
 
         // Create 2 shares (meets 2-of-3 threshold)
         let sig1 = BlsG2Point {

@@ -70,7 +70,7 @@ impl HardwareCanaryGuard {
 
         // 1. Verify CPU arithmetic invariant
         let current_token = self.compute_cpu_arithmetic_token();
-        if !current_token.ct_eq(&self.reference_arithmetic_token).into() {
+        if !bool::from(current_token.ct_eq(&self.reference_arithmetic_token)) {
             TRIPWIRE_TRIGGERED.store(true, Ordering::SeqCst);
             return CanaryHealthStatus::InstructionFaultAnomaly;
         }

@@ -48,11 +48,11 @@ impl HyperplonkProverEngine {
             return Err("Wire length mismatch");
         }
 
-        let q_l = format!("q_l_{:x}", blake3::hash(b"QL_SELECTOR"));
-        let q_r = format!("q_r_{:x}", blake3::hash(b"QR_SELECTOR"));
-        let q_o = format!("q_o_{:x}", blake3::hash(b"QO_SELECTOR"));
-        let q_m = format!("q_m_{:x}", blake3::hash(b"QM_SELECTOR"));
-        let q_c = format!("q_c_{:x}", blake3::hash(b"QC_SELECTOR"));
+        let q_l = format!("q_l_{}", blake3::hash(b"QL_SELECTOR"));
+        let q_r = format!("q_r_{}", blake3::hash(b"QR_SELECTOR"));
+        let q_o = format!("q_o_{}", blake3::hash(b"QO_SELECTOR"));
+        let q_m = format!("q_m_{}", blake3::hash(b"QM_SELECTOR"));
+        let q_c = format!("q_c_{}", blake3::hash(b"QC_SELECTOR"));
 
         let mut w_a_hasher = blake3::Hasher::new();
         let mut w_b_hasher = blake3::Hasher::new();
@@ -64,9 +64,9 @@ impl HyperplonkProverEngine {
             w_c_hasher.update(&wires_c[i].to_le_bytes());
         }
 
-        let cm_a = format!("cm_a_{:x}", w_a_hasher.finalize());
-        let cm_b = format!("cm_b_{:x}", w_b_hasher.finalize());
-        let cm_c = format!("cm_c_{:x}", w_c_hasher.finalize());
+        let cm_a = format!("cm_a_{}", w_a_hasher.finalize());
+        let cm_b = format!("cm_b_{}", w_b_hasher.finalize());
+        let cm_c = format!("cm_c_{}", w_c_hasher.finalize());
 
         let proof_h =
             blake3::hash(format!("{}_{}_{}_{}", cm_a, cm_b, cm_c, challenge_beta).as_bytes());
@@ -83,7 +83,7 @@ impl HyperplonkProverEngine {
             wire_witness_commitments: [cm_a, cm_b, cm_c],
             sumcheck_claimed_zero: 0,
             fiat_shamir_challenge_beta: challenge_beta,
-            proof_digest: format!("{:x}", proof_h),
+            proof_digest: format!("{}", proof_h),
         })
     }
 

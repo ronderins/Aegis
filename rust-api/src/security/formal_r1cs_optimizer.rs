@@ -5,6 +5,7 @@
 //! that the solution space (soundness and completeness) remains mathematically equivalent.
 
 use serde::{Deserialize, Serialize};
+use sha2::Digest;
 use std::collections::{HashMap, HashSet};
 
 /// An optimized R1CS term: coefficient * variable_id

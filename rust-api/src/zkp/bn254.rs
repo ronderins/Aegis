@@ -16,9 +16,7 @@ pub const FR_MODULUS_HEX: &str = "30644e72e131a029b85045b68181585d2833e84879b970
 pub const FP_MODULUS_HEX: &str = "30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47";
 
 /// 256-bit unsigned integer represented in 4 64-bit limbs (little-endian)
-#[derive(
-    Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, Zeroize, ZeroizeOnDrop,
-)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, Zeroize)]
 pub struct U256(pub [u64; 4]);
 
 impl U256 {
@@ -95,9 +93,7 @@ impl U256 {
 }
 
 /// BN254 Base Field Element Fp in Montgomery form
-#[derive(
-    Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, Zeroize, ZeroizeOnDrop,
-)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, Zeroize)]
 pub struct Fp(pub U256);
 
 impl Fp {
@@ -209,9 +205,7 @@ impl Fp {
 }
 
 /// BN254 Quadratic Extension Field Fp2 = Fp[u] / (u^2 + 1)
-#[derive(
-    Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, Zeroize, ZeroizeOnDrop,
-)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, Zeroize)]
 pub struct Fp2 {
     pub c0: Fp,
     pub c1: Fp,
@@ -274,9 +268,7 @@ impl Fp2 {
 }
 
 /// G1 Affine Point on BN254: y^2 = x^3 + 3
-#[derive(
-    Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, Zeroize, ZeroizeOnDrop,
-)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, Zeroize)]
 pub struct G1Affine {
     pub x: Fp,
     pub y: Fp,
@@ -314,9 +306,7 @@ impl G1Affine {
 }
 
 /// G2 Affine Point on BN254 (Twisted Curve over Fp2)
-#[derive(
-    Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, Zeroize, ZeroizeOnDrop,
-)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, Zeroize)]
 pub struct G2Affine {
     pub x: Fp2,
     pub y: Fp2,

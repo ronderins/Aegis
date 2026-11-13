@@ -113,11 +113,11 @@ impl PlonkFriComposer {
             wire_hasher.update(&gate.wire_c_val.to_le_bytes());
         }
 
-        let sel_root = format!("{:x}", selector_hasher.finalize());
-        let wire_root = format!("{:x}", wire_hasher.finalize());
+        let sel_root = format!("{}", selector_hasher.finalize());
+        let wire_root = format!("{}", wire_hasher.finalize());
 
         let quot_h = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("{}_{}", sel_root, wire_root).as_bytes())
         );
 
@@ -141,7 +141,7 @@ impl PlonkFriComposer {
         }
 
         let expected_quot = format!(
-            "{:x}",
+            "{}",
             blake3::hash(
                 format!(
                     "{}_{}",

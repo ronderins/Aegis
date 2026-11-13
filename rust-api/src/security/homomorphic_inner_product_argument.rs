@@ -65,8 +65,8 @@ impl HomomorphicIpaEngine {
                 c_r = (c_r + (current_a[half + i] as u128 * current_b[i] as u128)) % p;
             }
 
-            let l_cm = format!("L_cm_{:x}", blake3::hash(&c_l.to_le_bytes()));
-            let r_cm = format!("R_cm_{:x}", blake3::hash(&c_r.to_le_bytes()));
+            let l_cm = format!("L_cm_{}", blake3::hash(&c_l.to_le_bytes()));
+            let r_cm = format!("R_cm_{}", blake3::hash(&c_r.to_le_bytes()));
 
             // Fiat-Shamir challenge u
             let u_h = blake3::hash(format!("{}_{}_{}", l_cm, r_cm, round_idx).as_bytes());
@@ -98,7 +98,7 @@ impl HomomorphicIpaEngine {
         }
 
         let p_cm = format!(
-            "P_cm_{:x}",
+            "P_cm_{}",
             blake3::hash(format!("ipa_{}_{}", n, claim_c).as_bytes())
         );
 

@@ -364,7 +364,7 @@ impl HardenedZkvmSandbox {
 
             let stack_top = self.operand_stack.last().copied().unwrap_or(0);
             let mem_state_str = format!("pages_{}", self.mpu.allocated_pages.len());
-            let mem_root = format!("{:x}", blake3::hash(mem_state_str.as_bytes()));
+            let mem_root = format!("{}", blake3::hash(mem_state_str.as_bytes()));
 
             self.execution_trace.push(ZkvmExecutionStepWitness {
                 step_index: cycle_count,
@@ -388,7 +388,7 @@ impl HardenedZkvmSandbox {
             hasher.update(&step.pc.to_le_bytes());
             hasher.update(&step.stack_top.to_le_bytes());
         }
-        let trace_root = format!("{:x}", hasher.finalize());
+        let trace_root = format!("{}", hasher.finalize());
 
         let total_gas = self.execution_trace.iter().map(|s| s.gas_consumed).sum();
 
@@ -433,7 +433,7 @@ impl ZkvmTraceVerifier {
             hasher.update(&step.stack_top.to_le_bytes());
         }
 
-        let recomputed_root = format!("{:x}", hasher.finalize());
+        let recomputed_root = format!("{}", hasher.finalize());
         if recomputed_root != trace.trace_blake3_root {
             return Err("Trace Blake3 integrity commitment mismatch");
         }

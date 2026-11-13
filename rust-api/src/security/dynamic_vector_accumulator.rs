@@ -35,7 +35,7 @@ pub struct DynamicVectorAccumulator {
 impl DynamicVectorAccumulator {
     /// Initializes an empty dynamic vector accumulator with base generator state
     pub fn new() -> Self {
-        let initial_root = format!("{:x}", blake3::hash(b"ACCUMULATOR_GENESIS_ROOT"));
+        let initial_root = format!("{}", blake3::hash(b"ACCUMULATOR_GENESIS_ROOT"));
         Self {
             current_state: DynamicAccumulatorState {
                 accumulator_value_g1: "g1_gen_init".to_string(),
@@ -79,8 +79,8 @@ impl DynamicVectorAccumulator {
             .as_bytes(),
         );
 
-        self.current_state.accumulator_value_g1 = format!("g1_acc_{:x}", new_g1_hash);
-        self.current_state.accumulator_value_g2 = format!("g2_acc_{:x}", new_g2_hash);
+        self.current_state.accumulator_value_g1 = format!("g1_acc_{}", new_g1_hash);
+        self.current_state.accumulator_value_g2 = format!("g2_acc_{}", new_g2_hash);
 
         // Derive state root
         let root_str = format!(
@@ -89,7 +89,7 @@ impl DynamicVectorAccumulator {
             self.current_state.accumulator_value_g1,
             self.current_state.element_count
         );
-        self.current_state.state_root_blake3 = format!("{:x}", blake3::hash(root_str.as_bytes()));
+        self.current_state.state_root_blake3 = format!("{}", blake3::hash(root_str.as_bytes()));
 
         Ok(())
     }
@@ -121,8 +121,8 @@ impl DynamicVectorAccumulator {
 
         Ok(DynamicNonMembershipWitness {
             target_credential_digest: credential_digest.to_string(),
-            witness_d_g1: format!("wit_d_{:x}", w_g1_hash),
-            witness_c_scalar: format!("scal_c_{:x}", c_scalar_hash),
+            witness_d_g1: format!("wit_d_{}", w_g1_hash),
+            witness_c_scalar: format!("scal_c_{}", c_scalar_hash),
             evaluated_epoch: self.current_state.state_epoch,
         })
     }

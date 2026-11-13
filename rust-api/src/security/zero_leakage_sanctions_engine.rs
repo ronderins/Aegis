@@ -248,7 +248,7 @@ mod tests {
         let mut filter = BlindedCuckooFilter::new(100);
 
         // Sanctioned entity hash
-        let bad_actor_hash = Sha256::digest(b"sanctioned_entity_mallory_target").into();
+        let bad_actor_hash: [u8; 32] = Sha256::digest(b"sanctioned_entity_mallory_target").into();
         filter.insert(&bad_actor_hash);
 
         assert!(filter.contains(&bad_actor_hash));

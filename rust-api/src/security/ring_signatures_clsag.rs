@@ -57,7 +57,7 @@ impl ClsagEngine {
         let hp_hash = blake3::hash(ring_keys[secret_index].as_bytes());
         let key_image_hash = blake3::hash(format!("{}_{}", secret_key, hp_hash).as_bytes());
         let key_image = ClsagKeyImage {
-            image_hex: format!("I_{:x}", key_image_hash),
+            image_hex: format!("I_{}", key_image_hash),
         };
 
         // Ring traversal for challenges and responses
@@ -70,12 +70,12 @@ impl ClsagEngine {
         for (i, pk) in ring_keys.iter().enumerate() {
             transcript_hasher.update(pk.as_bytes());
             let resp_h = blake3::hash(format!("clsag_resp_{}_{}_{}", i, pk, secret_key).as_bytes());
-            responses.push(format!("s_{:x}", resp_h));
+            responses.push(format!("s_{}", resp_h));
         }
 
         let c1_hash = transcript_hasher.finalize();
         let aux_d = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("aux_d_{}", key_image.image_hex).as_bytes())
         );
 
@@ -91,7 +91,7 @@ impl ClsagEngine {
         Ok(ClsagRingSignature {
             ring_public_keys: ring_members,
             key_image,
-            initial_challenge_c1: format!("c1_{:x}", c1_hash),
+            initial_challenge_c1: format!("c1_{}", c1_hash),
             scalar_responses_s: responses,
             auxiliary_commitment_d: aux_d,
         })
@@ -121,7 +121,7 @@ impl ClsagEngine {
                 )
                 .as_bytes(),
             );
-            current_c = format!("c_next_{:x}", step_h);
+            current_c = format!("c_next_{}", step_h);
         }
 
         // Verify that initial challenge matches transcript

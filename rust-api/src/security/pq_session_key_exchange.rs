@@ -41,7 +41,7 @@ impl PqSessionKeyExchangeEngine {
     /// Client initiates dual-hybrid handshake
     pub fn client_initiate(session_id: &str, seed: &[u8; 32]) -> (HybridClientInitiation, u64) {
         let x25519_priv = (seed[0] as u64).wrapping_mul(0x9E3779B97F4A7C15);
-        let x25519_pub = format!("x25519_pk_{:x}", blake3::hash(&x25519_priv.to_le_bytes()));
+        let x25519_pub = format!("x25519_pk_{}", blake3::hash(&x25519_priv.to_le_bytes()));
 
         (
             HybridClientInitiation {
@@ -60,7 +60,7 @@ impl PqSessionKeyExchangeEngine {
     ) -> (HybridServerResponse, String) {
         let server_x25519_priv = (server_seed[0] as u64).wrapping_mul(0x517CC1B727220A95);
         let server_x25519_pub = format!(
-            "x25519_pk_{:x}",
+            "x25519_pk_{}",
             blake3::hash(&server_x25519_priv.to_le_bytes())
         );
 
@@ -72,7 +72,7 @@ impl PqSessionKeyExchangeEngine {
         // Post-quantum Kyber shared secret simulation
         let pq_ss = blake3::hash(
             format!(
-                "kyber_{:x}_{:x}",
+                "kyber_{}_{}",
                 blake3::hash(&init.kyber_client_public_seed),
                 blake3::hash(server_seed)
             )
@@ -84,11 +84,11 @@ impl PqSessionKeyExchangeEngine {
         hybrid_hasher.update(b"HYBRID_PQ_COMBINER_V1");
         hybrid_hasher.update(classical_ss.as_bytes());
         hybrid_hasher.update(pq_ss.as_bytes());
-        let master_shared_secret = format!("{:x}", hybrid_hasher.finalize());
+        let master_shared_secret = format!("{}", hybrid_hasher.finalize());
 
-        let kyber_ct = format!("kyber_ct_{:x}", blake3::hash(pq_ss.as_bytes()));
+        let kyber_ct = format!("kyber_ct_{}", blake3::hash(pq_ss.as_bytes()));
         let auth_sig = format!(
-            "pq_auth_sig_{:x}",
+            "pq_auth_sig_{}",
             blake3::hash(format!("{}_{}", init.client_session_id, kyber_ct).as_bytes())
         );
 
@@ -119,7 +119,7 @@ impl PqSessionKeyExchangeEngine {
         hybrid_hasher.update(b"HYBRID_PQ_COMBINER_V1");
         hybrid_hasher.update(classical_ss.as_bytes());
         hybrid_hasher.update(resp.kyber_ciphertext_digest.as_bytes());
-        let master_shared_secret = format!("{:x}", hybrid_hasher.finalize());
+        let master_shared_secret = format!("{}", hybrid_hasher.finalize());
 
         Ok(PqSessionContext {
             session_id: init.client_session_id.clone(),

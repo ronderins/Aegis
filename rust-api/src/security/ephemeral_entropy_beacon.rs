@@ -245,6 +245,6 @@ mod tests {
             HardenedHmacDrbg::instantiate(&seed, b"aegis_zero_knowledge_session").unwrap();
         let mut out = [0u8; 32];
         assert!(drbg.generate_bytes(&mut out).is_ok());
-        assert!(!out.ct_eq(&[0u8; 32]).into());
+        assert!(!bool::from(out.ct_eq(&[0u8; 32])));
     }
 }

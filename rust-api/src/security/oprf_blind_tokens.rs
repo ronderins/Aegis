@@ -42,7 +42,7 @@ impl OprfBlindTokenEngine {
         let pk_h = blake3::hash(format!("oprf_pk_{}", server_sk).as_bytes());
         Self {
             server_private_key: server_sk,
-            server_public_key: format!("pk_{:x}", pk_h),
+            server_public_key: format!("pk_{}", pk_h),
         }
     }
 
@@ -56,7 +56,7 @@ impl OprfBlindTokenEngine {
 
         (
             BlindedTokenRequest {
-                blinded_element_hex: format!("B_{:x}", blinded),
+                blinded_element_hex: format!("B_{}", blinded),
                 client_context_info: "aegis_privacy_token_v1".to_string(),
             },
             blinding_scalar_r,
@@ -71,16 +71,16 @@ impl OprfBlindTokenEngine {
 
         // Discrete Logarithm Equality (DLEQ) Proof: log_G(PK) == log_B(E)
         let dleq_c = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("dleq_c_{}_{}", eval_h, self.server_public_key).as_bytes())
         );
         let dleq_s = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("dleq_s_{}", self.server_private_key).as_bytes())
         );
 
         EvaluatedTokenResponse {
-            evaluated_element_hex: format!("E_{:x}", eval_h),
+            evaluated_element_hex: format!("E_{}", eval_h),
             server_public_key_hex: self.server_public_key.clone(),
             dleq_proof_c: dleq_c,
             dleq_proof_s: dleq_s,
@@ -108,7 +108,7 @@ impl OprfBlindTokenEngine {
 
         Ok(UnblindedRedemptionToken {
             raw_token_preimage: token_preimage.to_string(),
-            evaluated_oprf_output: format!("N_{:x}", unblind_h),
+            evaluated_oprf_output: format!("N_{}", unblind_h),
         })
     }
 

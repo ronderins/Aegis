@@ -68,7 +68,7 @@ fn test_tier5_threshold_key_recovery() {
 
     let res = engine.reconstruct_secret(&shares).unwrap();
     assert!(res.is_successful);
-    let expected = format!("{:x}", blake3::hash(&999u64.to_le_bytes()));
+    let expected = format!("{}", blake3::hash(&999u64.to_le_bytes()));
     assert_eq!(res.reconstructed_secret_digest.unwrap(), expected);
 }
 

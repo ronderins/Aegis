@@ -62,7 +62,7 @@ impl ProactiveSecretSharingEngine {
                 to_node: j,
                 epoch_target: target_epoch,
                 subshare_delta: delta,
-                commitment_hash: format!("{:x}", cm),
+                commitment_hash: format!("{}", cm),
             });
         }
 

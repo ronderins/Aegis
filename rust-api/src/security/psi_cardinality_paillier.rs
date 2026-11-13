@@ -69,7 +69,7 @@ impl PsiCardinalityPaillierEngine {
             total_accumulated_weight, query.paillier_public_key_n
         );
         let zk_receipt = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("{}_{}_{}", query.query_id, match_count, sum_ct).as_bytes())
         );
 

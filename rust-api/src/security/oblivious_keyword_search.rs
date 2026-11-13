@@ -27,10 +27,10 @@ impl BlindedSearchTrapdoor {
         hasher.update(b"SSE_TRAPDOOR_V1");
         hasher.update(keyword.as_bytes());
         hasher.update(&epoch.to_le_bytes());
-        let token = format!("{:x}", hasher.finalize());
+        let token = format!("{}", hasher.finalize());
 
         let mac = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("mac_{}_{}", token, epoch).as_bytes())
         );
 
@@ -79,7 +79,7 @@ impl SearchableSymmetricVault {
 
         for &kw in keywords {
             let trapdoor = BlindedSearchTrapdoor::generate(kw, master_key, 1);
-            let tag = format!("{:x}", blake3::hash(trapdoor.trapdoor_token.as_bytes()));
+            let tag = format!("{}", blake3::hash(trapdoor.trapdoor_token.as_bytes()));
             tag_hashes.push(tag.clone());
 
             // Set bits in Bloom filter
@@ -92,7 +92,7 @@ impl SearchableSymmetricVault {
             }
         }
 
-        let enc_payload = format!("{:x}", blake3::hash(payload));
+        let enc_payload = format!("{}", blake3::hash(payload));
 
         self.entries.push(EncryptedIndexEntry {
             document_id: doc_id.to_string(),
@@ -105,7 +105,7 @@ impl SearchableSymmetricVault {
     /// Performs oblivious keyword search using the client's blinded trapdoor.
     /// The server evaluates matching entries without learning which keyword was queried.
     pub fn search_oblivious(&self, trapdoor: &BlindedSearchTrapdoor) -> Vec<String> {
-        let tag = format!("{:x}", blake3::hash(trapdoor.trapdoor_token.as_bytes()));
+        let tag = format!("{}", blake3::hash(trapdoor.trapdoor_token.as_bytes()));
         let mut matching_doc_ids = Vec::new();
 
         for entry in &self.entries {

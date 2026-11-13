@@ -54,7 +54,9 @@ impl BrowserProverEngine {
         };
 
         let table = circuit.generate_witness(&cs, &witness)?;
-        let is_satisfied = cs.is_satisfied(&table.values)?;
+        let is_satisfied = cs
+            .is_satisfied(&table.values)
+            .map_err(|_| "R1CS constraint evaluation failed")?;
 
         if !is_satisfied {
             return Err("R1CS constraints not satisfied for witness");

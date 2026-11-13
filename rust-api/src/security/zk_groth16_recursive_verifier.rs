@@ -60,9 +60,9 @@ impl RecursiveGroth16Engine {
         let new_c =
             blake3::hash(format!("{}_{}_{}", acc.accumulated_c, proof_c, challenge_r).as_bytes());
 
-        acc.accumulated_a = format!("A_fold_{:x}", new_a);
-        acc.accumulated_b = format!("B_fold_{:x}", new_b);
-        acc.accumulated_c = format!("C_fold_{:x}", new_c);
+        acc.accumulated_a = format!("A_fold_{}", new_a);
+        acc.accumulated_b = format!("B_fold_{}", new_b);
+        acc.accumulated_c = format!("C_fold_{}", new_c);
 
         let new_inputs = blake3::hash(
             format!(
@@ -71,7 +71,7 @@ impl RecursiveGroth16Engine {
             )
             .as_bytes(),
         );
-        acc.accumulated_public_inputs_digest = format!("{:x}", new_inputs);
+        acc.accumulated_public_inputs_digest = format!("{}", new_inputs);
 
         acc.folded_proof_count += 1;
         acc.accumulator_epoch += 1;

@@ -178,7 +178,7 @@ impl TlsSessionTicketArmor {
         tag_hasher.update(&ticket.encrypted_session_state);
         let expected_tag = *tag_hasher.finalize().as_bytes();
 
-        if !ticket.auth_tag_hmac.ct_eq(&expected_tag).into() {
+        if !bool::from(ticket.auth_tag_hmac.ct_eq(&expected_tag)) {
             return Err("Tampered session ticket detected (integrity tag verification failed)");
         }
 

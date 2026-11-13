@@ -49,7 +49,7 @@ pub fn benchmark_bls_aggregation_latency() -> u128 {
             y: ("y0".into(), "y1".into()),
             is_infinity: false,
         },
-        signed_message_digest: format!("{:x}", blake3::hash(msg)),
+        signed_message_digest: format!("{}", blake3::hash(msg)),
     };
     let share2 = BlsSignatureShare {
         signer_index: 2,
@@ -58,7 +58,7 @@ pub fn benchmark_bls_aggregation_latency() -> u128 {
             y: ("y0".into(), "y1".into()),
             is_infinity: false,
         },
-        signed_message_digest: format!("{:x}", blake3::hash(msg)),
+        signed_message_digest: format!("{}", blake3::hash(msg)),
     };
 
     let start = Instant::now();

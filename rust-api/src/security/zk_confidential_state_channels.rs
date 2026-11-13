@@ -90,14 +90,14 @@ impl ConfidentialStateChannel {
             )
             .as_bytes(),
         );
-        let state_hex = format!("{:x}", state_h);
+        let state_hex = format!("{}", state_h);
 
         let sig_a = format!(
-            "sig_a_{:x}",
+            "sig_a_{}",
             blake3::hash(format!("{}_{}", state_hex, sk_a).as_bytes())
         );
         let sig_b = format!(
-            "sig_b_{:x}",
+            "sig_b_{}",
             blake3::hash(format!("{}_{}", state_hex, sk_b).as_bytes())
         );
 

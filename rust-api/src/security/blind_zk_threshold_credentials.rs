@@ -78,14 +78,14 @@ impl BlindThresholdCredentialsEngine {
         for &attr in attributes {
             hasher.update(&attr.to_le_bytes());
         }
-        let cm = format!("cm_{:x}", hasher.finalize());
+        let cm = format!("cm_{}", hasher.finalize());
 
         let pok = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("pok_{}_{}", cm, blinding_scalar_r).as_bytes())
         );
         let nonce = format!(
-            "{:x}",
+            "{}",
             blake3::hash(blinding_scalar_r.to_le_bytes().as_ref())
         );
 
@@ -108,7 +108,7 @@ impl BlindThresholdCredentialsEngine {
         }
 
         let sig_a = format!(
-            "sig_a_{:x}",
+            "sig_a_{}",
             blake3::hash(
                 format!(
                     "{}_{}_{}",
@@ -118,7 +118,7 @@ impl BlindThresholdCredentialsEngine {
             )
         );
         let sig_b = format!(
-            "sig_b_{:x}",
+            "sig_b_{}",
             blake3::hash(format!("{}_{}_{}", authority_secret_key, sig_a, epoch).as_bytes())
         );
 
@@ -145,7 +145,7 @@ impl BlindThresholdCredentialsEngine {
         for &a in attributes {
             attr_hasher.update(&a.to_le_bytes());
         }
-        let attr_root = format!("{:x}", attr_hasher.finalize());
+        let attr_root = format!("{}", attr_hasher.finalize());
 
         let mut comb_a_hasher = blake3::Hasher::new();
         let mut comb_b_hasher = blake3::Hasher::new();
@@ -155,8 +155,8 @@ impl BlindThresholdCredentialsEngine {
         }
 
         Ok(AnonymousMasterCredential {
-            master_signature_a: format!("master_a_{:x}", comb_a_hasher.finalize()),
-            master_signature_b: format!("master_b_{:x}", comb_b_hasher.finalize()),
+            master_signature_a: format!("master_a_{}", comb_a_hasher.finalize()),
+            master_signature_b: format!("master_b_{}", comb_b_hasher.finalize()),
             committed_attributes_root: attr_root,
             issuance_timestamp: 1775000000,
         })
@@ -170,16 +170,16 @@ impl BlindThresholdCredentialsEngine {
         predicates: &[&str],
     ) -> AnonymousPresentationProof {
         let rand_a = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("{}_{}", cred.master_signature_a, randomizer_t).as_bytes())
         );
         let rand_b = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("{}_{}", cred.master_signature_b, randomizer_t).as_bytes())
         );
 
         let s_resp = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("{}_{}_{}", rand_a, rand_b, session_nonce).as_bytes())
         );
 
@@ -206,7 +206,7 @@ impl BlindThresholdCredentialsEngine {
         }
 
         let expected_s = format!(
-            "{:x}",
+            "{}",
             blake3::hash(
                 format!(
                     "{}_{}_{}",

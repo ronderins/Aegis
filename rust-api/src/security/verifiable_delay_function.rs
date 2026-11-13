@@ -151,7 +151,7 @@ impl WesolowskiVdf {
     /// Evaluates sequential modular squarings: y = x^{2^T} mod N.
     /// This step CANNOT be parallelized, enforcing the exact time delay T.
     pub fn evaluate(&self, input_data: &[u8]) -> VdfProof {
-        let input_hash = format!("{:x}", blake3::hash(input_data));
+        let input_hash = format!("{}", blake3::hash(input_data));
         let x = VdfBigInt::from_hex(&input_hash);
 
         // Sequential squaring loop
@@ -238,9 +238,9 @@ impl TimedCredentialEscrow {
     /// Locks an identity proof with a time delay so it cannot be decrypted before delay expires.
     pub fn lock(vdf: &WesolowskiVdf, payload: &[u8], duration_seconds: u64) -> Self {
         let proof = vdf.evaluate(payload);
-        let enc = format!("{:x}", blake3::hash(payload));
+        let enc = format!("{}", blake3::hash(payload));
         Self {
-            escrow_id: format!("escrow_{:x}", blake3::hash(&enc.as_bytes())),
+            escrow_id: format!("escrow_{}", blake3::hash(&enc.as_bytes())),
             encrypted_payload: enc,
             vdf_challenge: proof,
             unlock_timestamp_epoch: duration_seconds,

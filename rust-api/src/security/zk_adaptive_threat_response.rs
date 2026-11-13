@@ -86,7 +86,7 @@ impl AdaptiveThreatEngine {
                 .insert(nullifier.to_string(), 1775000000);
 
             self.anomaly_history.push(SecurityAnomalyEvent {
-                event_id: format!("anom_{:x}", blake3::hash(nullifier.as_bytes())),
+                event_id: format!("anom_{}", blake3::hash(nullifier.as_bytes())),
                 source_fingerprint: client_fingerprint.to_string(),
                 anomaly_type: "ENTROPY_DEGRADATION_DETECTED".to_string(),
                 detected_entropy_bits: sample_entropy,

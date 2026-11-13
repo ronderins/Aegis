@@ -54,15 +54,15 @@ impl ThresholdSchnorrBlindEngine {
         let blinded_h = blake3::hash(format!("{}_{}", msg_h, blinding_scalar_alpha).as_bytes());
 
         let pok = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("pok_{}", blinding_scalar_alpha).as_bytes())
         );
 
         (
             BlindedSchnorrRequest {
-                blinded_message_hash: format!("bm_{:x}", blinded_h),
+                blinded_message_hash: format!("bm_{}", blinded_h),
                 proof_of_knowledge_r: pok,
-                user_session_id: format!("sess_{:x}", blake3::hash(msg_h.as_bytes())),
+                user_session_id: format!("sess_{}", blake3::hash(msg_h.as_bytes())),
             },
             blinding_scalar_alpha,
         )
@@ -75,7 +75,7 @@ impl ThresholdSchnorrBlindEngine {
         req: &BlindedSchnorrRequest,
         nonce_k: u64,
     ) -> PartialBlindSchnorrSignature {
-        let r_pt = format!("R_{:x}", blake3::hash(&nonce_k.to_le_bytes()));
+        let r_pt = format!("R_{}", blake3::hash(&nonce_k.to_le_bytes()));
         let e_h = blake3::hash(format!("{}_{}", r_pt, req.blinded_message_hash).as_bytes());
         let mut e_bytes = [0u8; 8];
         e_bytes.copy_from_slice(&e_h.as_bytes()[0..8]);
@@ -109,10 +109,10 @@ impl ThresholdSchnorrBlindEngine {
         // Unblind: s = (s_sum - alpha) mod p
         let unblinded_s = (s_sum + 65537 - (blinding_alpha % 65537)) % 65537;
         let r_combined = format!(
-            "R_comb_{:x}",
+            "R_comb_{}",
             blake3::hash(partials[0].public_nonce_r.as_bytes())
         );
-        let msg_h = format!("{:x}", blake3::hash(original_message));
+        let msg_h = format!("{}", blake3::hash(original_message));
 
         Ok(UnblindedSchnorrSignature {
             r_point_hex: r_combined,

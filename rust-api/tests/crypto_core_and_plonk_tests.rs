@@ -65,9 +65,9 @@ fn test_plonk_prover_and_verifier_pipeline() {
 
 #[test]
 fn test_differential_privacy_laplace() {
-    let stat = DifferentialPrivacyEngine::privatize_count(100, 1.0);
-    assert_eq!(stat.raw_count, 100);
-    assert!(stat.noisy_count > 0.0);
+    let engine = DifferentialPrivacyEngine::new(1.0);
+    let stat = engine.perturb_count(100, 1.0, None);
+    assert!(stat.noisy_value > 0.0);
     assert_eq!(stat.epsilon, 1.0);
 }
 

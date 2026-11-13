@@ -180,7 +180,7 @@ impl HomomorphicTallyEngine {
         challenge_hasher.update(&message_val.to_be_bytes());
         let challenge = *challenge_hasher.finalize().as_bytes();
 
-        !challenge.ct_eq(&[0u8; 32]).into() && !proof.response_z.ct_eq(&[0u8; 32]).into()
+        !bool::from(challenge.ct_eq(&[0u8; 32])) && !bool::from(proof.response_z.ct_eq(&[0u8; 32]))
     }
 }
 

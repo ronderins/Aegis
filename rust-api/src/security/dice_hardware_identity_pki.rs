@@ -59,14 +59,14 @@ impl DiceHardwareEngine {
     ) -> DiceHardwareChain {
         let mut layers = Vec::new();
         let mut current_secret = *uds;
-        let mut current_key_id = format!("uds_root_{:x}", blake3::hash(uds));
+        let mut current_key_id = format!("uds_root_{}", blake3::hash(uds));
 
         for (idx, meas) in stage_measurements.iter().enumerate() {
             let next_cdi = Self::derive_cdi(&current_secret, meas);
-            let next_key_id = format!("cdi_key_{}_{:x}", idx, blake3::hash(&next_cdi));
+            let next_key_id = format!("cdi_key_{}_{}", idx, blake3::hash(&next_cdi));
 
             let sig = format!(
-                "dice_sig_{:x}",
+                "dice_sig_{}",
                 blake3::hash(format!("{}_{}_{}", current_key_id, next_key_id, idx).as_bytes())
             );
 
@@ -74,7 +74,7 @@ impl DiceHardwareEngine {
                 layer_index: idx,
                 authority_key_identifier: current_key_id,
                 subject_key_identifier: next_key_id.clone(),
-                firmware_measurement_hash: format!("{:x}", blake3::hash(meas)),
+                firmware_measurement_hash: format!("{}", blake3::hash(meas)),
                 security_version_number: (idx as u32) + 1,
                 signature_hex: sig,
             });
@@ -83,11 +83,11 @@ impl DiceHardwareEngine {
             current_key_id = next_key_id;
         }
 
-        let alias_pk = format!("alias_pk_{:x}", blake3::hash(&current_secret));
+        let alias_pk = format!("alias_pk_{}", blake3::hash(&current_secret));
 
         DiceHardwareChain {
             device_hardware_id: self.hardware_device_id.clone(),
-            root_uds_digest: format!("{:x}", blake3::hash(uds)),
+            root_uds_digest: format!("{}", blake3::hash(uds)),
             layers,
             final_alias_public_key: alias_pk,
         }

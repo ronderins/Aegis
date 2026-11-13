@@ -79,7 +79,7 @@ fn test_pedersen_commitment_homomorphism_and_opening() {
     let val = b"confidential-attribute-payload";
     let blinding = BlindingFactor::random();
 
-    let commitment = PedersenCommitment::commit(&gens, val, &blinding);
+    let commitment = PedersenCommitment::commit_bytes(&gens, val, &blinding);
     assert!(commitment.verify_opening(&gens, val, &blinding));
 
     let wrong_val = b"tampered-attribute-payload";

@@ -66,7 +66,7 @@ impl HardwareTeeKeystore {
         }
 
         self.monotonic_counter += 1;
-        let pk_h = blake3::hash(format!("{}_{:x}", alias, blake3::hash(key_seed)).as_bytes());
+        let pk_h = blake3::hash(format!("{}_{}", alias, blake3::hash(key_seed)).as_bytes());
 
         let slot = TeeKeySlot {
             slot_index: slot_id,
@@ -74,7 +74,7 @@ impl HardwareTeeKeystore {
             tee_type: self.tee_type,
             is_hardware_backed: true,
             monotonic_counter_value: self.monotonic_counter,
-            public_key_hex: format!("0x{:x}", pk_h),
+            public_key_hex: format!("0x{}", pk_h),
         };
 
         self.slots.insert(slot_id, slot.clone());
@@ -84,13 +84,13 @@ impl HardwareTeeKeystore {
     /// Generates hardware attestation quote bound to a fresh session challenge
     pub fn generate_attestation_quote(&self, challenge_nonce: &str) -> TeeAttestationReport {
         let pcr0 = format!(
-            "pcr0_{:x}",
+            "pcr0_{}",
             blake3::hash(format!("{}_build_meas", self.slots.len()).as_bytes())
         );
-        let pcr1 = format!("pcr1_{:x}", blake3::hash(b"FIRMWARE_VERIFIED_BOOT"));
+        let pcr1 = format!("pcr1_{}", blake3::hash(b"FIRMWARE_VERIFIED_BOOT"));
 
         let sig = format!(
-            "tee_sig_{:x}",
+            "tee_sig_{}",
             blake3::hash(
                 format!("{:?}_{}_{}_{}", self.tee_type, pcr0, pcr1, challenge_nonce).as_bytes()
             )

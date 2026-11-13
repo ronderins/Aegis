@@ -10,11 +10,30 @@ use zeroize::{Zeroize, ZeroizeOnDrop};
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct BlindingFactor(pub [u8; 32]);
 
+impl BlindingFactor {
+    /// Generates a fresh 256-bit random blinding factor
+    pub fn random() -> Self {
+        let id1 = uuid::Uuid::new_v4();
+        let id2 = uuid::Uuid::new_v4();
+        let mut bytes = [0u8; 32];
+        bytes[..16].copy_from_slice(id1.as_bytes());
+        bytes[16..].copy_from_slice(id2.as_bytes());
+        Self(bytes)
+    }
+}
+
 /// Generators G and H with unknown discrete log relation (NUMS - Nothing Up My Sleeve)
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PedersenGenerators {
     pub g_compressed: String,
     pub h_compressed: String,
+}
+
+impl PedersenGenerators {
+    /// Returns the default BN254 NUMS generator pair
+    pub fn default_bn254() -> Self {
+        Self::default()
+    }
 }
 
 impl Default for PedersenGenerators {
@@ -56,9 +75,45 @@ impl PedersenCommitment {
         }
     }
 
-    /// Verifies opening of commitment with claimed (value, blinding)
+    /// Commits to an arbitrary byte slice with explicit generators and blinding factor
+    pub fn commit_bytes(
+        gens: &PedersenGenerators,
+        value: &[u8],
+        blinding: &BlindingFactor,
+    ) -> Self {
+        let mut hasher = blake3::Hasher::new();
+        hasher.update(b"zk-pedersen-bytes-v1\0");
+        hasher.update(gens.g_compressed.as_bytes());
+        hasher.update(gens.h_compressed.as_bytes());
+        hasher.update(value);
+        hasher.update(&blinding.0);
+        let commit_bytes = hasher.finalize();
+
+        let mut val_hasher = blake3::Hasher::new();
+        val_hasher.update(b"zk-value-bytes-digest-v1\0");
+        val_hasher.update(value);
+        let val_digest = val_hasher.finalize();
+
+        Self {
+            commitment_hex: commit_bytes.to_hex().to_string(),
+            value_digest: val_digest.to_hex().to_string(),
+        }
+    }
+
+    /// Verifies opening of numeric commitment with claimed (value, blinding)
     pub fn verify_open(&self, value: u64, blinding: &BlindingFactor) -> bool {
         let expected = Self::commit(value, blinding);
+        self.commitment_hex == expected.commitment_hex
+    }
+
+    /// Verifies opening of byte-slice commitment with claimed (gens, value, blinding)
+    pub fn verify_opening(
+        &self,
+        gens: &PedersenGenerators,
+        value: &[u8],
+        blinding: &BlindingFactor,
+    ) -> bool {
+        let expected = Self::commit_bytes(gens, value, blinding);
         self.commitment_hex == expected.commitment_hex
     }
 }

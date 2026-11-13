@@ -21,8 +21,8 @@ impl PedersenCommitment {
         let raw = format!("pedersen_v{}_b{}", value, blinding_factor);
         let h = blake3::hash(raw.as_bytes());
         Self {
-            point_hex: format!("pt_{:x}", h),
-            value_commitment: format!("cm_{:x}", blake3::hash(h.as_bytes())),
+            point_hex: format!("pt_{}", h),
+            value_commitment: format!("cm_{}", blake3::hash(h.as_bytes())),
         }
     }
 }
@@ -92,8 +92,8 @@ impl BulletproofsPlusEngine {
             let r_h = blake3::hash(format!("bp_r_{}_{}", round_idx, blinding).as_bytes());
 
             rounds.push(InnerProductRound {
-                l_point: format!("L_{:x}", l_h),
-                r_point: format!("R_{:x}", r_h),
+                l_point: format!("L_{}", l_h),
+                r_point: format!("R_{}", r_h),
             });
 
             current_len /= 2;
@@ -106,8 +106,8 @@ impl BulletproofsPlusEngine {
 
         Ok(BulletproofsPlusProof {
             commitment_v: commitment,
-            a_point: format!("A_{:x}", a_hash),
-            b_point: format!("B_{:x}", b_hash),
+            a_point: format!("A_{}", a_hash),
+            b_point: format!("B_{}", b_hash),
             ip_rounds: rounds,
             scalar_alpha: alpha,
             scalar_r: r,
@@ -164,11 +164,11 @@ impl BulletproofsPlusEngine {
         }
 
         let agg_a = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("agg_a_{}", values.len()).as_bytes())
         );
         let agg_b = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("agg_b_{}", values.len()).as_bytes())
         );
 
@@ -183,7 +183,7 @@ impl BulletproofsPlusEngine {
         }
 
         let digest = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("{}_{}", agg_a, agg_b).as_bytes())
         );
 

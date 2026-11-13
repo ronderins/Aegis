@@ -101,9 +101,9 @@ impl OtExtensionEngine {
 
         Ok(EvaluatedExtendedOtBatch {
             batch_size: target_messages.len(),
-            receiver_choice_bits_digest: format!("{:x}", choice_hasher.finalize()),
+            receiver_choice_bits_digest: format!("{}", choice_hasher.finalize()),
             transferred_ciphertexts: transfers,
-            consistency_hash: format!("{:x}", consistency_hasher.finalize()),
+            consistency_hash: format!("{}", consistency_hasher.finalize()),
         })
     }
 

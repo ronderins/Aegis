@@ -132,9 +132,9 @@ impl ZkKycComplianceMatrix {
         proof_hasher.update(policy_id.as_bytes());
         proof_hasher.update(&[if overall_compliant { 1 } else { 0 }]);
         proof_hasher.update(witness.blinding_salt.as_bytes());
-        let proof_hash = format!("{:x}", proof_hasher.finalize());
+        let proof_hash = format!("{}", proof_hasher.finalize());
 
-        let receipt_id = format!("comp_rec_{:x}", blake3::hash(proof_hash.as_bytes()));
+        let receipt_id = format!("comp_rec_{}", blake3::hash(proof_hash.as_bytes()));
 
         Ok(ZkComplianceReceipt {
             receipt_id,

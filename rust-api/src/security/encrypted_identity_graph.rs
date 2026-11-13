@@ -79,7 +79,7 @@ impl EncryptedIdentityGraph {
             let u = path_nodes[i];
             let v = path_nodes[i + 1];
 
-            let edge_proof = format!("{:x}", blake3::hash(format!("edge_{}_{}", u, v).as_bytes()));
+            let edge_proof = format!("{}", blake3::hash(format!("edge_{}_{}", u, v).as_bytes()));
             mac_hasher.update(edge_proof.as_bytes());
 
             steps.push(ZkPathStepWitness {
@@ -90,7 +90,7 @@ impl EncryptedIdentityGraph {
             });
         }
 
-        let comp_mac = format!("{:x}", mac_hasher.finalize());
+        let comp_mac = format!("{}", mac_hasher.finalize());
 
         Ok(ZkGraphReachabilityProof {
             origin_blinded_id: origin_id.to_string(),
@@ -130,7 +130,7 @@ impl EncryptedIdentityGraph {
             }
         }
 
-        let computed_mac = format!("{:x}", expected_mac.finalize());
+        let computed_mac = format!("{}", expected_mac.finalize());
         Ok(computed_mac == proof.composite_path_mac)
     }
 }

@@ -104,7 +104,7 @@ impl ThresholdKeyRecoveryEngine {
             );
             if !share
                 .share_commitment_v
-                .contains(&format!("{:x}", expected_cm)[0..8])
+                .contains(&format!("{}", expected_cm)[0..8])
                 && !share.share_commitment_v.is_empty()
             {
                 corrupt_nodes.push(share.guardian_index);
@@ -125,7 +125,7 @@ impl ThresholdKeyRecoveryEngine {
         }
 
         let secret_val = secret_acc as u64;
-        let digest = format!("{:x}", blake3::hash(&secret_val.to_le_bytes()));
+        let digest = format!("{}", blake3::hash(&secret_val.to_le_bytes()));
 
         Ok(KeyRecoveryResult {
             is_successful: true,
@@ -174,7 +174,7 @@ mod tests {
             .unwrap();
         assert!(result.is_successful);
 
-        let expected_digest = format!("{:x}", blake3::hash(&secret.to_le_bytes()));
+        let expected_digest = format!("{}", blake3::hash(&secret.to_le_bytes()));
         assert_eq!(result.reconstructed_secret_digest.unwrap(), expected_digest);
     }
 }

@@ -69,7 +69,7 @@ pub struct Pkcs11SessionArmor {
 impl Pkcs11SessionArmor {
     /// Initializes a new PKCS#11 session armor instance with hardware specs
     pub fn new(slot_id: u32, pin: &str) -> Self {
-        let pin_h = format!("{:x}", blake3::hash(pin.as_bytes()));
+        let pin_h = format!("{}", blake3::hash(pin.as_bytes()));
         Self {
             token_info: HsmTokenInfo {
                 slot_id,
@@ -96,7 +96,7 @@ impl Pkcs11SessionArmor {
             );
         }
 
-        let entered_h = format!("{:x}", blake3::hash(pin.as_bytes()));
+        let entered_h = format!("{}", blake3::hash(pin.as_bytes()));
         if entered_h != self.pin_hash {
             self.failed_pin_counter += 1;
             if self.failed_pin_counter >= MAX_PIN_FAILURES_BEFORE_LOCK {
@@ -167,7 +167,7 @@ impl Pkcs11SessionArmor {
         hasher.update(b"HSM_CKO_SIGN_V1");
         hasher.update(&key_handle.to_le_bytes());
         hasher.update(message);
-        let sig = format!("hsm_sig_{:x}", hasher.finalize());
+        let sig = format!("hsm_sig_{}", hasher.finalize());
 
         Ok(sig)
     }

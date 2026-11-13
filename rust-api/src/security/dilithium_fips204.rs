@@ -222,7 +222,9 @@ impl MlDsaEngine {
                 row_acc = row_acc.add(&prod);
             }
             let t_i = row_acc.add(&s2[i]);
-            let t_digest = hex::encode(Sha256::digest(serde_json::to_string(&t_i.coeffs).unwrap()));
+            let t_digest = hex::encode(Sha256::digest(
+                serde_json::to_string(t_i.coeffs.as_slice()).unwrap(),
+            ));
             t1_commitments.push(t_digest);
         }
 
@@ -298,7 +300,11 @@ impl MlDsaEngine {
 
             let response_vector_z: Vec<String> = z
                 .iter()
-                .map(|p| hex::encode(Sha256::digest(serde_json::to_string(&p.coeffs).unwrap())))
+                .map(|p| {
+                    hex::encode(Sha256::digest(
+                        serde_json::to_string(p.coeffs.as_slice()).unwrap(),
+                    ))
+                })
                 .collect();
 
             return MlDsaSignature {

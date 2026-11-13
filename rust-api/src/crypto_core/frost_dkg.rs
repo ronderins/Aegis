@@ -217,7 +217,7 @@ impl FrostCoordinator {
         let challenge = *challenge_hasher.finalize().as_bytes();
 
         // Verification check: H(R || PK || M) != 0
-        !challenge.ct_eq(&[0u8; 32]).into()
+        !bool::from(challenge.ct_eq(&[0u8; 32]))
     }
 }
 

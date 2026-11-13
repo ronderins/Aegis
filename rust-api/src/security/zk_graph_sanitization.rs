@@ -91,7 +91,7 @@ impl GraphSanitizationEngine {
             evaluated_k_anonymity: min_degree,
             consumed_epsilon: self.policy.max_epsilon_budget * 0.75,
             spectral_gap_valid: spectral_valid,
-            proof_digest: format!("{:x}", proof_h),
+            proof_digest: format!("{}", proof_h),
         })
     }
 }

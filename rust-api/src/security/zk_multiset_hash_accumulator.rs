@@ -89,7 +89,7 @@ impl MultisetHashEngine {
             set_b_digest: acc_b.accumulated_product,
             is_identical_multiset: equal,
             cardinality: set_a.len(),
-            proof_mac: format!("{:x}", proof_h),
+            proof_mac: format!("{}", proof_h),
         })
     }
 

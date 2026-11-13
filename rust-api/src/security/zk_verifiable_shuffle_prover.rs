@@ -77,35 +77,35 @@ impl VerifiableShuffleProver {
             let new_c2 = blake3::hash(format!("{}_{}", orig.c2_point, r).as_bytes());
 
             shuffled.push(ElGamalPair {
-                c1_point: format!("c1_{:x}", new_c1),
-                c2_point: format!("c2_{:x}", new_c2),
+                c1_point: format!("c1_{}", new_c1),
+                c2_point: format!("c2_{}", new_c2),
             });
 
             let cm = blake3::hash(format!("perm_row_{}_{}", p_idx, r).as_bytes());
-            matrix_commits.push(format!("cm_{:x}", cm));
+            matrix_commits.push(format!("cm_{}", cm));
         }
 
         let mut prod_hasher = blake3::Hasher::new();
         for cm in &matrix_commits {
             prod_hasher.update(cm.as_bytes());
         }
-        let prod_acc = format!("{:x}", prod_hasher.finalize());
+        let prod_acc = format!("{}", prod_hasher.finalize());
 
         // Fiat-Shamir challenge generation
         let tau = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("tau_{}_{}", n, prod_acc).as_bytes())
         );
-        let lambda = format!("{:x}", blake3::hash(format!("lambda_{}", tau).as_bytes()));
+        let lambda = format!("{}", blake3::hash(format!("lambda_{}", tau).as_bytes()));
 
         let mut responses = Vec::with_capacity(n);
         for i in 0..n {
             let resp = blake3::hash(format!("z_{}_{}_{}", i, tau, rerandomizers[i]).as_bytes());
-            responses.push(format!("z_{:x}", resp));
+            responses.push(format!("z_{}", resp));
         }
 
         let blind_t = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("t_{}_{}", lambda, rerandomizers[0]).as_bytes())
         );
 
@@ -140,14 +140,14 @@ impl VerifiableShuffleProver {
         for cm in &arg.matrix_commitment.commitment_vector {
             prod_hasher.update(cm.as_bytes());
         }
-        let expected_acc = format!("{:x}", prod_hasher.finalize());
+        let expected_acc = format!("{}", prod_hasher.finalize());
         if expected_acc != arg.matrix_commitment.product_accumulator {
             return Err("Permutation matrix product accumulator mismatch");
         }
 
         // Verify challenge derivation
         let expected_tau = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("tau_{}_{}", n, expected_acc).as_bytes())
         );
         if expected_tau != arg.challenge_tau {

@@ -66,10 +66,10 @@ impl ZkPkiBridgeEngine {
                 .filter(|line| !line.starts_with("-----"))
                 .collect::<Vec<_>>()
                 .join("");
-            hex::decode(&body).or_else(|_| {
+            hex::decode(&body).unwrap_or_else(|_| {
                 // Try standard base64 decoding simulation
-                Ok(body.as_bytes().to_vec())
-            })?
+                body.as_bytes().to_vec()
+            })
         } else {
             hex::decode(cert_input.trim()).map_err(|e| format!("Invalid cert hex: {}", e))?
         };

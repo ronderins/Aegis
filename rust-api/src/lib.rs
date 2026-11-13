@@ -9,6 +9,7 @@ pub mod cli;
 pub mod compliance;
 pub mod crypto;
 pub mod crypto_core;
+pub mod error;
 pub mod handlers;
 pub mod hsm;
 pub mod identity;
@@ -41,7 +42,7 @@ pub use compliance::{
     Iso29115AssuranceEngine, LevelOfAssurance, Soc2AttestationReport, Soc2ComplianceEngine,
     Soc2ControlEvaluation, Soc2ControlStatus,
 };
-pub use crypto::{EphemeralSensitiveWitness, Nullifier, ZkCommitment, ZkProofEngine};
+pub use crypto::EphemeralSensitiveWitness;
 pub use crypto_core::{
     AggregatedSchnorrSignature, BlsG1Affine, BlsScalar, DkgRound1Commitment, DkgRound2Share,
     FeldmanVssEngine, Fp12, Fp6, FrostCoordinator, JubjubPoint, OptimalAtePairing, PastaPoint,

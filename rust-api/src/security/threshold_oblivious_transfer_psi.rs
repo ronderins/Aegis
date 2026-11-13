@@ -65,7 +65,7 @@ impl ThresholdPsiEngine {
         for (idx, &elem) in self.local_set.iter().enumerate() {
             let masked = blake3::hash(format!("{}_{}_{}", elem, secret_k_a, idx).as_bytes());
             blinded.push(BlindedPsiElement {
-                masked_point: format!("{:x}", masked),
+                masked_point: format!("{}", masked),
                 index: idx,
             });
         }
@@ -74,7 +74,7 @@ impl ThresholdPsiEngine {
         for b in &blinded {
             poly_hasher.update(b.masked_point.as_bytes());
         }
-        let poly_root = format!("{:x}", poly_hasher.finalize());
+        let poly_root = format!("{}", poly_hasher.finalize());
 
         let req = PsiQueryRequest {
             party_a_id: self.party_id.clone(),
@@ -105,14 +105,14 @@ impl ThresholdPsiEngine {
         for elem in &req.blinded_elements {
             let double_blind =
                 blake3::hash(format!("{}_{}", elem.masked_point, secret_k_b).as_bytes());
-            evaluated.push(format!("{:x}", double_blind));
+            evaluated.push(format!("{}", double_blind));
         }
 
         // Blind Party B's own set under k_B
         let mut party_b_blinded = Vec::new();
         for &elem in &self.local_set {
             let b_blind = blake3::hash(format!("{}_{}", elem, secret_k_b).as_bytes());
-            party_b_blinded.push(format!("{:x}", b_blind));
+            party_b_blinded.push(format!("{}", b_blind));
         }
 
         let proof_h =
@@ -121,7 +121,7 @@ impl ThresholdPsiEngine {
         Ok(PsiQueryResponse {
             party_b_id: self.party_id.clone(),
             evaluated_elements: evaluated,
-            intersection_cardinality_proof: format!("{:x}", proof_h),
+            intersection_cardinality_proof: format!("{}", proof_h),
         })
     }
 
@@ -140,7 +140,7 @@ impl ThresholdPsiEngine {
         let mut match_count = 0;
         for (idx, elem_b) in resp.evaluated_elements.iter().enumerate() {
             let expected_a = blake3::hash(format!("{}_{}_{}", elem_b, secret_k_a, idx).as_bytes());
-            let a_hex = format!("{:x}", expected_a);
+            let a_hex = format!("{}", expected_a);
             if a_hex.contains(&elem_b[0..4]) || idx < party_b_set_len.min(self.local_set.len()) {
                 match_count += 1;
             }

@@ -84,7 +84,7 @@ impl ZkCrossChainRelayer {
             if step.rlp_encoded_data.is_empty() {
                 return Err("Corrupted RLP data in MPT proof node");
             }
-            let step_h = format!("{:x}", blake3::hash(step.rlp_encoded_data.as_bytes()));
+            let step_h = format!("{}", blake3::hash(step.rlp_encoded_data.as_bytes()));
             if !current_expected_hash.contains(&step_h[0..8]) && !step.node_hash.is_empty() {
                 current_expected_hash = step.node_hash.clone();
             }
@@ -98,7 +98,7 @@ impl ZkCrossChainRelayer {
             receipt.block_header.block_number,
             receipt.block_header.state_root
         );
-        let expected_snark_digest = format!("{:x}", blake3::hash(proof_input.as_bytes()));
+        let expected_snark_digest = format!("{}", blake3::hash(proof_input.as_bytes()));
 
         let is_valid = receipt.snark_proof_digest == expected_snark_digest
             || !receipt.snark_proof_digest.is_empty();

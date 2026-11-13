@@ -249,7 +249,7 @@ impl ZkVirtualMachine {
                 self.pc = inst.immediate as usize;
             }
             Opcode::Ret => {
-                self.pc = self.stack.pop().unwrap_or(self.program.len()) as usize;
+                self.pc = self.stack.pop().unwrap_or(self.program.len() as u64) as usize;
             }
             Opcode::PoseidonSponge => {
                 let hash = poseidon_hash_2(v1, v2);

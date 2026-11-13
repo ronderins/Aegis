@@ -79,7 +79,7 @@ impl CancelableBioMatrix {
     /// If compromised, the user simply rotates their salt to generate a brand new template!
     pub fn project(&self, raw: &BiometricEmbedding128) -> BiometricEmbedding128 {
         let mut projected = [0i32; 128];
-        for i in 0..128 {
+        for i in 0usize..128 {
             let mut h = Sha256::new();
             h.update(&self.projection_seed);
             h.update(&i.to_be_bytes());
@@ -87,7 +87,7 @@ impl CancelableBioMatrix {
 
             let mut sum = 0i64;
             for j in 0..128 {
-                let weight = (d[(j % 32)] as i8) as i64;
+                let weight = (d[j % 32] as i8) as i64;
                 sum += (raw.values[j] as i64) * weight;
             }
             projected[i] = (sum / 128) as i32;

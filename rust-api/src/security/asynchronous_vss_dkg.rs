@@ -143,7 +143,7 @@ impl AsynchronousVssEngine {
         let mut proposals = Vec::with_capacity(self.total_nodes);
 
         let root_hash = format!(
-            "{:x}",
+            "{}",
             blake3::hash(format!("avss_{}_{}", session_id, secret).as_bytes())
         );
 

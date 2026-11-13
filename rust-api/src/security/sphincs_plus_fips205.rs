@@ -107,12 +107,12 @@ impl SphincsEngine {
 
         for i in 0..4 {
             let tree_h = blake3::hash(format!("{}_{}_{}", i, message.len(), r[0]).as_bytes());
-            fors_roots.push(format!("fors_root_{:x}", tree_h));
+            fors_roots.push(format!("fors_root_{}", tree_h));
 
             let mut path = Vec::new();
             for step in 0..4 {
                 let p_h = blake3::hash(format!("fors_path_{}_{}_{}", i, step, r[1]).as_bytes());
-                path.push(format!("path_{:x}", p_h));
+                path.push(format!("path_{}", p_h));
             }
             fors_paths.push(path);
         }
@@ -121,7 +121,7 @@ impl SphincsEngine {
         for layer in 0..SPHINCS_D {
             let layer_h =
                 blake3::hash(format!("ht_layer_{}_{}", layer, sk.public_key.root[0]).as_bytes());
-            hypertree_nodes.push(format!("ht_{:x}", layer_h));
+            hypertree_nodes.push(format!("ht_{}", layer_h));
         }
 
         SphincsSignature {

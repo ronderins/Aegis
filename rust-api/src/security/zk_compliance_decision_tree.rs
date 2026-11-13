@@ -122,7 +122,7 @@ impl ComplianceDecisionTree {
                         node_id: current_node_id,
                         feature_index: *feature_index,
                         branch_taken_left: go_left,
-                        comparison_proof_digest: format!("{:x}", step_h),
+                        comparison_proof_digest: format!("{}", step_h),
                     });
 
                     current_node_id = if go_left {
@@ -135,7 +135,7 @@ impl ComplianceDecisionTree {
                     is_approved,
                     risk_tier,
                 } => {
-                    let final_mac = format!("{:x}", mac_hasher.finalize());
+                    let final_mac = format!("{}", mac_hasher.finalize());
                     return Ok(ZkDecisionTreeProof {
                         tree_id: self.tree_id.clone(),
                         reached_leaf_approved: *is_approved,
@@ -173,7 +173,7 @@ impl ComplianceDecisionTree {
             expected_mac.update(step_h.as_bytes());
         }
 
-        let comp_mac = format!("{:x}", expected_mac.finalize());
+        let comp_mac = format!("{}", expected_mac.finalize());
         Ok(comp_mac == proof.composite_path_mac)
     }
 }

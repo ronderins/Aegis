@@ -55,11 +55,11 @@ impl CpAbeEngine {
         master_public_key: &str,
     ) -> CpAbeCiphertext {
         let enc_h = blake3::hash(format!("{}_{}", master_public_key, payload.len()).as_bytes());
-        let ct_id = format!("abe_ct_{:x}", blake3::hash(enc_h.as_bytes()));
+        let ct_id = format!("abe_ct_{}", blake3::hash(enc_h.as_bytes()));
 
         CpAbeCiphertext {
             ciphertext_id: ct_id,
-            encrypted_payload: format!("{:x}", enc_h),
+            encrypted_payload: format!("{}", enc_h),
             policy_tree: policy,
             public_pairing_root: master_public_key.to_string(),
         }
@@ -101,7 +101,7 @@ impl CpAbeEngine {
         ZkPolicySatisfactionProof {
             ciphertext_id: ct.ciphertext_id.clone(),
             is_policy_satisfied: satisfied,
-            proof_digest: format!("{:x}", proof_h),
+            proof_digest: format!("{}", proof_h),
         }
     }
 

@@ -45,7 +45,7 @@ impl Blake3StreamingTree {
         let chunk_hash = blake3::hash(chunk_bytes);
         let mut current_node = StreamingTreeNode {
             height: 0,
-            hash_hex: format!("{:x}", chunk_hash),
+            hash_hex: format!("{}", chunk_hash),
         };
 
         // Merge peaks of the same height
@@ -58,7 +58,7 @@ impl Blake3StreamingTree {
                 );
                 current_node = StreamingTreeNode {
                     height: current_node.height + 1,
-                    hash_hex: format!("{:x}", parent_h),
+                    hash_hex: format!("{}", parent_h),
                 };
             } else {
                 break;
@@ -72,13 +72,13 @@ impl Blake3StreamingTree {
     /// Computes the current root hash by bagging all peaks from right to left
     pub fn get_current_root(&self) -> String {
         if self.peak_stack.is_empty() {
-            return format!("{:x}", blake3::hash(b"EMPTY_STREAMING_TREE_ROOT"));
+            return format!("{}", blake3::hash(b"EMPTY_STREAMING_TREE_ROOT"));
         }
 
         let mut acc = self.peak_stack.last().unwrap().hash_hex.clone();
         for peak in self.peak_stack.iter().rev().skip(1) {
             let combined = blake3::hash(format!("{}_{}", peak.hash_hex, acc).as_bytes());
-            acc = format!("{:x}", combined);
+            acc = format!("{}", combined);
         }
 
         acc
@@ -90,7 +90,7 @@ impl Blake3StreamingTree {
         chunk_index: u64,
         chunk_bytes: &[u8],
     ) -> StreamingInclusionProof {
-        let chunk_h = format!("{:x}", blake3::hash(chunk_bytes));
+        let chunk_h = format!("{}", blake3::hash(chunk_bytes));
         let root = self.get_current_root();
 
         let mut siblings = Vec::new();

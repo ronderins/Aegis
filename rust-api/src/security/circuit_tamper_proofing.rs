@@ -191,7 +191,7 @@ impl CircuitSafetyVerifier {
         let total_constraints = self.gates.len();
         let degree_of_freedom = total_wires as isize - total_constraints as isize;
 
-        if degree_of_freedom > (self.public_inputs.len() as isize) {
+        if degree_of_freedom > (self.is_public.len() as isize) {
             recommendations.push(format!(
                 "Circuit has positive unconstrained degree of freedom (+{}). Review witness allocation to ensure non-redundancy.",
                 degree_of_freedom

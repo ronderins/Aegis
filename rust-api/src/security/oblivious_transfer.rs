@@ -199,7 +199,7 @@ impl ObliviousTransferEngine {
         let mut wire_keys = Vec::new();
 
         // 8 input wires for age byte
-        for i in 0..8 {
+        for i in 0usize..8 {
             let mut h0 = Sha256::new();
             h0.update(seed);
             h0.update(&i.to_be_bytes());
@@ -231,7 +231,7 @@ impl ObliviousTransferEngine {
         let label_true = hex::encode(out_true_hasher.finalize());
 
         let mut gates = Vec::new();
-        for g in 0..7 {
+        for g in 0usize..7 {
             let mut g_hasher = Sha256::new();
             g_hasher.update(seed);
             g_hasher.update(&g.to_be_bytes());

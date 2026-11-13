@@ -139,7 +139,7 @@ impl HypercubeSumcheckEngine {
             num_rounds: mle.num_variables,
             round_messages: rounds,
             final_evaluation_point: challenges,
-            proof_digest: format!("{:x}", proof_h),
+            proof_digest: format!("{}", proof_h),
         }
     }
 

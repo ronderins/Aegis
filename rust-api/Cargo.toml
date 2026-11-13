@@ -30,7 +30,7 @@ tower-http = { version = "0.5.2", features = ["cors", "trace"] }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 subtle = "2.5.0"
-jwt-simple = "0.12.9"
+jwt-simple = { version = "0.12.9", default-features = false, features = ["pure-rust"] }
 sqlx = { version = "0.7", features = ["runtime-tokio", "sqlite"] }
 zeroize = { version = "1.8", features = ["derive"] }
 blake3 = "1.5"

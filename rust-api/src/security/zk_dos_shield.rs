@@ -137,7 +137,7 @@ impl ZkDosShield {
         signer.update(&challenge.random_salt);
         let expected_hmac = *signer.finalize().as_bytes();
 
-        if !challenge.server_hmac.ct_eq(&expected_hmac).into() {
+        if !bool::from(challenge.server_hmac.ct_eq(&expected_hmac)) {
             return Err("Tampered challenge token detected");
         }
 

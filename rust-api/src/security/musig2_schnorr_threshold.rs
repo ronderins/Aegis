@@ -65,7 +65,7 @@ impl Musig2Engine {
         for k in keys {
             list_hasher.update(k.as_bytes());
         }
-        let list_root = format!("{:x}", list_hasher.finalize());
+        let list_root = format!("{}", list_hasher.finalize());
 
         let mut agg_hasher = blake3::Hasher::new();
         agg_hasher.update(list_root.as_bytes());
@@ -75,7 +75,7 @@ impl Musig2Engine {
             agg_hasher.update(a_i.as_bytes());
         }
 
-        let agg_point = format!("Q_{:x}", agg_hasher.finalize());
+        let agg_point = format!("Q_{}", agg_hasher.finalize());
 
         Ok(AggregatedMusig2PublicKey {
             aggregated_point_hex: agg_point,
@@ -92,8 +92,8 @@ impl Musig2Engine {
         let n1 = (seed[0] as u64).wrapping_mul(0x9E3779B97F4A7C15) ^ 0x1111;
         let n2 = (seed[16] as u64).wrapping_mul(0x517CC1B727220A95) ^ 0x2222;
 
-        let p1 = format!("R1_{:x}", blake3::hash(&n1.to_le_bytes()));
-        let p2 = format!("R2_{:x}", blake3::hash(&n2.to_le_bytes()));
+        let p1 = format!("R1_{}", blake3::hash(&n1.to_le_bytes()));
+        let p2 = format!("R2_{}", blake3::hash(&n2.to_le_bytes()));
 
         (
             Musig2SecretNonce {
@@ -148,7 +148,7 @@ impl Musig2Engine {
         }
 
         let r_point = format!(
-            "R_agg_{:x}",
+            "R_agg_{}",
             blake3::hash(agg_pk.aggregated_point_hex.as_bytes())
         );
 
