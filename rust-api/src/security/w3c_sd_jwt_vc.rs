@@ -105,13 +105,13 @@ impl SdJwtEngine {
             disclosures.push(disclosure);
         }
 
-        // Generate decoys to resist frequency analysis (minimum 5 decoys enforced)
+        // Enforce the security contract: never emit fewer than 5 decoys
         let effective_decoy_count = decoy_count.max(5);
         let mut decoy_digests = Vec::with_capacity(effective_decoy_count);
         for d in 0..effective_decoy_count {
             let mut decoy_hasher = Sha256::new();
             decoy_hasher.update(b"AEGIS_SD_JWT_DECOY_DIGEST");
-            decoy_hasher.update(&d.to_be_bytes());
+            decoy_hasher.update(&(d as u64).to_be_bytes());
             decoy_hasher.update(&now.to_be_bytes());
             let decoy_hex = hex::encode(decoy_hasher.finalize());
             decoy_digests.push(decoy_hex.clone());
@@ -311,10 +311,11 @@ mod tests {
             "did:aegis:holder:alice42",
             claims,
             86400,
-            2, // 2 decoys
+            2, // Minimum 5 decoys enforced by security contract
             b"test_issuer_secret_signing_key_2026",
         )
         .unwrap();
+        assert!(cred.decoy_digests.len() >= 5);
 
         // Reveal ONLY "age_over_21", concealing name, passport, and address
         let presentation =
