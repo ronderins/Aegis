@@ -17,11 +17,15 @@ impl Ed25519Field {
     }
 
     pub fn one() -> Self {
-        Self { limbs: [1, 0, 0, 0, 0] }
+        Self {
+            limbs: [1, 0, 0, 0, 0],
+        }
     }
 
     pub fn from_u64(val: u64) -> Self {
-        Self { limbs: [val, 0, 0, 0, 0] }
+        Self {
+            limbs: [val, 0, 0, 0, 0],
+        }
     }
 
     pub fn add(&self, other: &Self) -> Self {

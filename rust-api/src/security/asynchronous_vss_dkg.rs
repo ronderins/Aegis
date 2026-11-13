@@ -10,7 +10,8 @@ use serde::{Deserialize, Serialize};
 pub const AVSS_MAX_NODES: usize = 32;
 
 /// Prime modulus for AVSS finite field evaluation (256-bit prime)
-pub const AVSS_FIELD_MODULUS_HEX: &str = "fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f";
+pub const AVSS_FIELD_MODULUS_HEX: &str =
+    "fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f";
 
 /// Point in finite field for bivariate polynomial
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -141,7 +142,10 @@ impl AsynchronousVssEngine {
         let poly = BivariatePolynomial::random_symmetric(self.byzantine_threshold, secret, seed);
         let mut proposals = Vec::with_capacity(self.total_nodes);
 
-        let root_hash = format!("{:x}", blake3::hash(format!("avss_{}_{}", session_id, secret).as_bytes()));
+        let root_hash = format!(
+            "{:x}",
+            blake3::hash(format!("avss_{}_{}", session_id, secret).as_bytes())
+        );
 
         for i in 1..=self.total_nodes as u32 {
             let row = poly.evaluate_row(i as u64);

@@ -13,14 +13,14 @@
 //! 10. ZK Graph Sanitization & Differential Privacy Degree Distribution Bounds
 
 use zk_identity_api_rust::security::asynchronous_vss_dkg::*;
-use zk_identity_api_rust::security::encrypted_identity_graph::*;
-use zk_identity_api_rust::security::plonkish_custom_gate_matrix::*;
-use zk_identity_api_rust::security::verifiable_random_function_ecvrf::*;
-use zk_identity_api_rust::security::sphincs_plus_fips205::*;
-use zk_identity_api_rust::security::psi_cardinality_paillier::*;
-use zk_identity_api_rust::security::zk_fair_lottery_shuffle::*;
 use zk_identity_api_rust::security::enclave_key_sealing::*;
+use zk_identity_api_rust::security::encrypted_identity_graph::*;
 use zk_identity_api_rust::security::homomorphic_inner_product_argument::*;
+use zk_identity_api_rust::security::plonkish_custom_gate_matrix::*;
+use zk_identity_api_rust::security::psi_cardinality_paillier::*;
+use zk_identity_api_rust::security::sphincs_plus_fips205::*;
+use zk_identity_api_rust::security::verifiable_random_function_ecvrf::*;
+use zk_identity_api_rust::security::zk_fair_lottery_shuffle::*;
 use zk_identity_api_rust::security::zk_graph_sanitization::*;
 
 #[test]
@@ -62,7 +62,11 @@ fn test_tier3_encrypted_identity_graph_path_validation() {
     graph.insert_node(node2);
     graph.insert_node(node3);
 
-    let path = ["user_alice_cred", "trust_intermediary_auditor", "regulator_fincen"];
+    let path = [
+        "user_alice_cred",
+        "trust_intermediary_auditor",
+        "regulator_fincen",
+    ];
     let proof = graph
         .prove_path_reachability("user_alice_cred", "regulator_fincen", &path, 2)
         .unwrap();
@@ -142,10 +146,22 @@ fn test_tier3_psi_cardinality_paillier_homomorphic_sum() {
 #[test]
 fn test_tier3_neff_verifiable_shuffle() {
     let ciphertexts = vec![
-        ShuffleElGamalCiphertext { c1_hex: "c1_1".into(), c2_hex: "c2_1".into() },
-        ShuffleElGamalCiphertext { c1_hex: "c1_2".into(), c2_hex: "c2_2".into() },
-        ShuffleElGamalCiphertext { c1_hex: "c1_3".into(), c2_hex: "c2_3".into() },
-        ShuffleElGamalCiphertext { c1_hex: "c1_4".into(), c2_hex: "c2_4".into() },
+        ShuffleElGamalCiphertext {
+            c1_hex: "c1_1".into(),
+            c2_hex: "c2_1".into(),
+        },
+        ShuffleElGamalCiphertext {
+            c1_hex: "c1_2".into(),
+            c2_hex: "c2_2".into(),
+        },
+        ShuffleElGamalCiphertext {
+            c1_hex: "c1_3".into(),
+            c2_hex: "c2_3".into(),
+        },
+        ShuffleElGamalCiphertext {
+            c1_hex: "c1_4".into(),
+            c2_hex: "c2_4".into(),
+        },
     ];
 
     let perm = vec![3, 1, 0, 2];
@@ -208,13 +224,31 @@ fn test_tier3_graph_sanitization_k_anonymity() {
     let engine = GraphSanitizationEngine::new(policy);
 
     let edges = vec![
-        SanitizedGraphEdge { source_masked: "N1".into(), target_masked: "N2".into(), noisy_weight: 5 },
-        SanitizedGraphEdge { source_masked: "N2".into(), target_masked: "N3".into(), noisy_weight: 5 },
-        SanitizedGraphEdge { source_masked: "N3".into(), target_masked: "N4".into(), noisy_weight: 5 },
-        SanitizedGraphEdge { source_masked: "N4".into(), target_masked: "N1".into(), noisy_weight: 5 },
+        SanitizedGraphEdge {
+            source_masked: "N1".into(),
+            target_masked: "N2".into(),
+            noisy_weight: 5,
+        },
+        SanitizedGraphEdge {
+            source_masked: "N2".into(),
+            target_masked: "N3".into(),
+            noisy_weight: 5,
+        },
+        SanitizedGraphEdge {
+            source_masked: "N3".into(),
+            target_masked: "N4".into(),
+            noisy_weight: 5,
+        },
+        SanitizedGraphEdge {
+            source_masked: "N4".into(),
+            target_masked: "N1".into(),
+            noisy_weight: 5,
+        },
     ];
 
-    let cert = engine.evaluate_and_certify("cert_graph_test", &edges, 4).unwrap();
+    let cert = engine
+        .evaluate_and_certify("cert_graph_test", &edges, 4)
+        .unwrap();
     assert_eq!(cert.evaluated_k_anonymity, 2);
     assert!(cert.spectral_gap_valid);
 }

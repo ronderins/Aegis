@@ -76,7 +76,8 @@ impl FuzzyCommitmentEngine {
         // Measure bit differences (Hamming distance)
         let mut hamming_dist = 0usize;
         for i in 0..32 {
-            let diff = candidate_codeword[i] ^ noisy_query_template[i] ^ commitment.helper_data_delta[i];
+            let diff =
+                candidate_codeword[i] ^ noisy_query_template[i] ^ commitment.helper_data_delta[i];
             hamming_dist += diff.count_ones() as usize;
         }
 

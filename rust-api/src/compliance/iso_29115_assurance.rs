@@ -80,7 +80,9 @@ impl Iso29115AssuranceEngine {
         // - Multi-factor or hardware token
         // - Anti-replay nonce
         // - Key length >= 128 bits
-        if (evidence.has_hardware_token || evidence.has_biometric_match || evidence.has_zkp_predicate)
+        if (evidence.has_hardware_token
+            || evidence.has_biometric_match
+            || evidence.has_zkp_predicate)
             && evidence.has_anti_replay_nonce
             && evidence.key_length_bits >= 128
         {
@@ -110,7 +112,11 @@ impl Iso29115AssuranceEngine {
             .map_err(|_| "Clock drift error")?
             .as_secs();
 
-        let assertion_id = format!("loa_{}_{}", loa as u8, hex::encode(&blake3::hash(subject_commitment.as_bytes()).as_bytes()[..8]));
+        let assertion_id = format!(
+            "loa_{}_{}",
+            loa as u8,
+            hex::encode(&blake3::hash(subject_commitment.as_bytes()).as_bytes()[..8])
+        );
 
         let mut signer = blake3::Hasher::new_keyed(&self.trusted_signing_secret);
         signer.update(b"iso-29115-assertion-token-v1:");
@@ -134,7 +140,11 @@ impl Iso29115AssuranceEngine {
     }
 
     /// Verifies the authenticity and expiration of an ISO 29115 Assertion Token.
-    pub fn verify_assertion_token(&self, token: &Iso29115AssertionToken, expected_nonce: Option<&str>) -> bool {
+    pub fn verify_assertion_token(
+        &self,
+        token: &Iso29115AssertionToken,
+        expected_nonce: Option<&str>,
+    ) -> bool {
         let now = match SystemTime::now().duration_since(UNIX_EPOCH) {
             Ok(d) => d.as_secs(),
             Err(_) => return false,
@@ -186,7 +196,12 @@ mod tests {
         assert_eq!(loa, LevelOfAssurance::Loa4VeryHigh);
 
         let token = engine
-            .issue_assertion_token("commit_user_99a8b7c6", &high_sec_evidence, "nonce_session_123", 300)
+            .issue_assertion_token(
+                "commit_user_99a8b7c6",
+                &high_sec_evidence,
+                "nonce_session_123",
+                300,
+            )
             .unwrap();
 
         assert_eq!(token.achieved_loa, LevelOfAssurance::Loa4VeryHigh);

@@ -49,7 +49,10 @@ pub struct EidasVerifier;
 impl EidasVerifier {
     /// Validates compliance metadata and proof envelope
     pub fn validate_eidas_envelope(vc: &EidasVerifiableCredential) -> bool {
-        if !vc.credential_types.contains(&"VerifiableCredential".to_string()) {
+        if !vc
+            .credential_types
+            .contains(&"VerifiableCredential".to_string())
+        {
             return false;
         }
 

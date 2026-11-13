@@ -47,7 +47,10 @@ impl OprfBlindTokenEngine {
     }
 
     /// Client: Blinds token preimage with random scalar r
-    pub fn client_blind(token_preimage: &str, blinding_scalar_r: u64) -> (BlindedTokenRequest, u64) {
+    pub fn client_blind(
+        token_preimage: &str,
+        blinding_scalar_r: u64,
+    ) -> (BlindedTokenRequest, u64) {
         let h_token = blake3::hash(token_preimage.as_bytes());
         let blinded = blake3::hash(format!("{}_{}", h_token, blinding_scalar_r).as_bytes());
 
@@ -62,11 +65,19 @@ impl OprfBlindTokenEngine {
 
     /// Server: Evaluates blinded element using secret key k and attaches DLEQ zero-knowledge proof
     pub fn server_evaluate(&self, req: &BlindedTokenRequest) -> EvaluatedTokenResponse {
-        let eval_h = blake3::hash(format!("{}_{}", req.blinded_element_hex, self.server_private_key).as_bytes());
+        let eval_h = blake3::hash(
+            format!("{}_{}", req.blinded_element_hex, self.server_private_key).as_bytes(),
+        );
 
         // Discrete Logarithm Equality (DLEQ) Proof: log_G(PK) == log_B(E)
-        let dleq_c = format!("{:x}", blake3::hash(format!("dleq_c_{}_{}", eval_h, self.server_public_key).as_bytes()));
-        let dleq_s = format!("{:x}", blake3::hash(format!("dleq_s_{}", self.server_private_key).as_bytes()));
+        let dleq_c = format!(
+            "{:x}",
+            blake3::hash(format!("dleq_c_{}_{}", eval_h, self.server_public_key).as_bytes())
+        );
+        let dleq_s = format!(
+            "{:x}",
+            blake3::hash(format!("dleq_s_{}", self.server_private_key).as_bytes())
+        );
 
         EvaluatedTokenResponse {
             evaluated_element_hex: format!("E_{:x}", eval_h),
@@ -87,7 +98,13 @@ impl OprfBlindTokenEngine {
         }
 
         // Unblind: N = r^(-1) * E
-        let unblind_h = blake3::hash(format!("{}_{}_{}", resp.evaluated_element_hex, token_preimage, blinding_scalar_r).as_bytes());
+        let unblind_h = blake3::hash(
+            format!(
+                "{}_{}_{}",
+                resp.evaluated_element_hex, token_preimage, blinding_scalar_r
+            )
+            .as_bytes(),
+        );
 
         Ok(UnblindedRedemptionToken {
             raw_token_preimage: token_preimage.to_string(),

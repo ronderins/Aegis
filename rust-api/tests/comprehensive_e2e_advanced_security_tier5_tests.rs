@@ -12,23 +12,32 @@
 //! 9. Single-Server Private Information Retrieval (PIR)
 //! 10. ZK Compliance Decision Tree & AML Risk Traversal
 
-use zk_identity_api_rust::security::zk_verifiable_shuffle_prover::*;
-use zk_identity_api_rust::security::threshold_key_recovery_engine::*;
 use zk_identity_api_rust::security::differential_privacy_advanced::*;
+use zk_identity_api_rust::security::enclave_protected_channel::*;
 use zk_identity_api_rust::security::homomorphic_vector_commitments::*;
 use zk_identity_api_rust::security::musig2_schnorr_threshold::*;
-use zk_identity_api_rust::security::enclave_protected_channel::*;
 use zk_identity_api_rust::security::path_oram_memory_engine::*;
 use zk_identity_api_rust::security::plonkish_logup_multi_table::*;
 use zk_identity_api_rust::security::single_server_private_information_retrieval::*;
+use zk_identity_api_rust::security::threshold_key_recovery_engine::*;
 use zk_identity_api_rust::security::zk_compliance_decision_tree::*;
+use zk_identity_api_rust::security::zk_verifiable_shuffle_prover::*;
 
 #[test]
 fn test_tier5_verifiable_shuffle_argument() {
     let list = vec![
-        ElGamalPair { c1_point: "pt1_c1".into(), c2_point: "pt1_c2".into() },
-        ElGamalPair { c1_point: "pt2_c1".into(), c2_point: "pt2_c2".into() },
-        ElGamalPair { c1_point: "pt3_c1".into(), c2_point: "pt3_c2".into() },
+        ElGamalPair {
+            c1_point: "pt1_c1".into(),
+            c2_point: "pt1_c2".into(),
+        },
+        ElGamalPair {
+            c1_point: "pt2_c1".into(),
+            c2_point: "pt2_c2".into(),
+        },
+        ElGamalPair {
+            c1_point: "pt3_c1".into(),
+            c2_point: "pt3_c2".into(),
+        },
     ];
     let perm = vec![2, 0, 1];
     let r = vec![501, 502, 503];
@@ -67,7 +76,9 @@ fn test_tier5_threshold_key_recovery() {
 fn test_tier5_advanced_dp_moments_accountant() {
     let mut dp = AdvancedDpEngine::new(10.0, 1e-5);
     for i in 0..5 {
-        let val = dp.execute_private_query(&format!("q_{}", i), 50.0, 1.0, 3.0, 0.1).unwrap();
+        let val = dp
+            .execute_private_query(&format!("q_{}", i), 50.0, 1.0, 3.0, 0.1)
+            .unwrap();
         assert!((val - 50.0).abs() < 5.0);
     }
     let ledger = dp.get_budget_ledger();

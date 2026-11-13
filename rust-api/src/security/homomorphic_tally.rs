@@ -90,7 +90,11 @@ impl HomomorphicTallyEngine {
     }
 
     /// Encrypts an integer scalar attribute (e.g. credit score threshold, age bracket, compliance score).
-    pub fn encrypt(public_key: &[u8; 32], message_val: u64, ephemeral_randomness: &[u8; 32]) -> HomomorphicCiphertext {
+    pub fn encrypt(
+        public_key: &[u8; 32],
+        message_val: u64,
+        ephemeral_randomness: &[u8; 32],
+    ) -> HomomorphicCiphertext {
         // C1 = g^r
         let mut c1_hasher = blake3::Hasher::new();
         c1_hasher.update(b"homomorphic-c1-point-v1:");
@@ -196,7 +200,8 @@ mod tests {
         assert_ne!(combined.c1_ephemeral_point, c1.c1_ephemeral_point);
         assert_ne!(combined.c2_payload_point, c1.c2_payload_point);
 
-        let rerandomized = HomomorphicTallyEngine::rerandomize(&keypair.public_key, &combined, &[3u8; 32]);
+        let rerandomized =
+            HomomorphicTallyEngine::rerandomize(&keypair.public_key, &combined, &[3u8; 32]);
         assert_ne!(rerandomized.c1_ephemeral_point, combined.c1_ephemeral_point);
     }
 
@@ -212,6 +217,10 @@ mod tests {
             &[22u8; 32],
         );
 
-        assert!(HomomorphicTallyEngine::verify_plaintext_equality(&keypair.public_key, 100, &proof));
+        assert!(HomomorphicTallyEngine::verify_plaintext_equality(
+            &keypair.public_key,
+            100,
+            &proof
+        ));
     }
 }

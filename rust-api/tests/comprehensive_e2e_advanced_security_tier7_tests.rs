@@ -7,11 +7,11 @@
 //! 4. Cross-Domain Verifiable Credential Federation & eIDAS/NIST Bridge
 //! 5. Post-Quantum Dual-Hybrid Key Exchange Handshake & Forward Secrecy
 
-use zk_identity_api_rust::security::zk_batch_shuffle_verifier::*;
 use zk_identity_api_rust::security::confidential_calldata_evm::*;
+use zk_identity_api_rust::security::pq_session_key_exchange::*;
 use zk_identity_api_rust::security::proactive_secret_sharing::*;
 use zk_identity_api_rust::security::verifiable_credential_federation::*;
-use zk_identity_api_rust::security::pq_session_key_exchange::*;
+use zk_identity_api_rust::security::zk_batch_shuffle_verifier::*;
 
 #[test]
 fn test_tier7_batch_shuffle_verifier() {
@@ -28,12 +28,8 @@ fn test_tier7_batch_shuffle_verifier() {
 
 #[test]
 fn test_tier7_evm_calldata_formatting() {
-    let calldata = EvmCalldataEncoder::encode_groth16(
-        100, 200,
-        300, 400, 500, 600,
-        700, 800,
-        &[18, 9999],
-    );
+    let calldata =
+        EvmCalldataEncoder::encode_groth16(100, 200, 300, 400, 500, 600, 700, 800, &[18, 9999]);
 
     assert_eq!(calldata.public_signals.len(), 2);
     assert!(EvmCalldataEncoder::validate_packed_calldata(&calldata).unwrap());
@@ -45,12 +41,11 @@ fn test_tier7_proactive_secret_sharing_epoch_transition() {
     let initial_share = 5000u64;
 
     let subshares = pss.generate_zero_subshares(1, &[0x33; 32]);
-    let matching_updates = vec![
-        subshares[0].clone(),
-        subshares[1].clone(),
-    ];
+    let matching_updates = vec![subshares[0].clone(), subshares[1].clone()];
 
-    let renewed = pss.apply_resharing(1, initial_share, &matching_updates).unwrap();
+    let renewed = pss
+        .apply_resharing(1, initial_share, &matching_updates)
+        .unwrap();
     assert_eq!(renewed.epoch, 2);
     assert!(renewed.previous_epoch_zeroized);
 }
@@ -59,7 +54,11 @@ fn test_tier7_proactive_secret_sharing_epoch_transition() {
 fn test_tier7_credential_federation_eidas_bridge() {
     let federation = CredentialFederationEngine::new();
     let proof = federation
-        .issue_bridge_proof("eu.eidas.trust.registry", "us.gov.nist80063.registry", "cred_hash_441")
+        .issue_bridge_proof(
+            "eu.eidas.trust.registry",
+            "us.gov.nist80063.registry",
+            "cred_hash_441",
+        )
         .unwrap();
 
     assert!(federation.verify_federated_credential(&proof).unwrap());

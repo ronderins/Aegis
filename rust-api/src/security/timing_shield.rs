@@ -15,7 +15,11 @@ impl TimingShield {
     /// Constant-time conditional copy: if choice == 1, dest <- src; otherwise dest remains unchanged
     #[inline(never)]
     pub fn conditional_copy(choice: Choice, dest: &mut [u8], src: &[u8]) {
-        assert_eq!(dest.len(), src.len(), "Buffer length mismatch in conditional_copy");
+        assert_eq!(
+            dest.len(),
+            src.len(),
+            "Buffer length mismatch in conditional_copy"
+        );
         let mask = choice.unwrap_u8().wrapping_neg(); // 0xFF if 1, 0x00 if 0
         for i in 0..dest.len() {
             dest[i] ^= mask & (src[i] ^ dest[i]);

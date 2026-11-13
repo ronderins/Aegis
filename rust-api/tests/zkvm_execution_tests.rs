@@ -11,8 +11,20 @@ use zk_identity_microservice::zkvm::verifier::{ZkCertificateVerifier, ZkExecutio
 #[test]
 fn test_zkvm_arithmetic_execution() {
     let program = vec![
-        Instruction::new(Opcode::LoadImm, Register::R1, Register::R0, Register::R0, 42),
-        Instruction::new(Opcode::LoadImm, Register::R2, Register::R0, Register::R0, 58),
+        Instruction::new(
+            Opcode::LoadImm,
+            Register::R1,
+            Register::R0,
+            Register::R0,
+            42,
+        ),
+        Instruction::new(
+            Opcode::LoadImm,
+            Register::R2,
+            Register::R0,
+            Register::R0,
+            58,
+        ),
         Instruction::new(Opcode::Add, Register::R0, Register::R1, Register::R2, 0),
         Instruction::new(Opcode::Halt, Register::R0, Register::R0, Register::R0, 0),
     ];
@@ -28,9 +40,27 @@ fn test_zkvm_arithmetic_execution() {
 #[test]
 fn test_zkvm_poseidon_sponge_opcode() {
     let program = vec![
-        Instruction::new(Opcode::LoadImm, Register::R1, Register::R0, Register::R0, 1337),
-        Instruction::new(Opcode::LoadImm, Register::R2, Register::R0, Register::R0, 2026),
-        Instruction::new(Opcode::PoseidonSponge, Register::R0, Register::R1, Register::R2, 0),
+        Instruction::new(
+            Opcode::LoadImm,
+            Register::R1,
+            Register::R0,
+            Register::R0,
+            1337,
+        ),
+        Instruction::new(
+            Opcode::LoadImm,
+            Register::R2,
+            Register::R0,
+            Register::R0,
+            2026,
+        ),
+        Instruction::new(
+            Opcode::PoseidonSponge,
+            Register::R0,
+            Register::R1,
+            Register::R2,
+            0,
+        ),
         Instruction::new(Opcode::Halt, Register::R0, Register::R0, Register::R0, 0),
     ];
 
@@ -44,14 +74,32 @@ fn test_zkvm_poseidon_sponge_opcode() {
 fn test_zkvm_age_predicate_program() {
     // Proves age >= 21: (2026 - birth_year) >= 21
     let program = vec![
-        Instruction::new(Opcode::LoadImm, Register::R1, Register::R0, Register::R0, 2026), // Current Year
-        Instruction::new(Opcode::LoadImm, Register::R2, Register::R0, Register::R0, 2000), // Birth Year (Private input)
-        Instruction::new(Opcode::Sub, Register::R3, Register::R1, Register::R2, 0),       // Age = 26
-        Instruction::new(Opcode::LoadImm, Register::R4, Register::R0, Register::R0, 21),   // Threshold
-        Instruction::new(Opcode::JmpGt, Register::R0, Register::R3, Register::R4, 6),     // if age > 21 goto 6
-        Instruction::new(Opcode::LoadImm, Register::R0, Register::R0, Register::R0, 0),   // Failure: 0
+        Instruction::new(
+            Opcode::LoadImm,
+            Register::R1,
+            Register::R0,
+            Register::R0,
+            2026,
+        ), // Current Year
+        Instruction::new(
+            Opcode::LoadImm,
+            Register::R2,
+            Register::R0,
+            Register::R0,
+            2000,
+        ), // Birth Year (Private input)
+        Instruction::new(Opcode::Sub, Register::R3, Register::R1, Register::R2, 0), // Age = 26
+        Instruction::new(
+            Opcode::LoadImm,
+            Register::R4,
+            Register::R0,
+            Register::R0,
+            21,
+        ), // Threshold
+        Instruction::new(Opcode::JmpGt, Register::R0, Register::R3, Register::R4, 6), // if age > 21 goto 6
+        Instruction::new(Opcode::LoadImm, Register::R0, Register::R0, Register::R0, 0), // Failure: 0
         Instruction::new(Opcode::Halt, Register::R0, Register::R0, Register::R0, 0),
-        Instruction::new(Opcode::LoadImm, Register::R0, Register::R0, Register::R0, 1),   // Success: 1
+        Instruction::new(Opcode::LoadImm, Register::R0, Register::R0, Register::R0, 1), // Success: 1
         Instruction::new(Opcode::Halt, Register::R0, Register::R0, Register::R0, 0),
     ];
 
@@ -99,5 +147,7 @@ fn test_fri_protocol_verification() {
         blowup_factor: 8,
     };
 
-    assert!(verifier.verify(&proof, "trace_lde_root_hex_0123").expect("FRI verification"));
+    assert!(verifier
+        .verify(&proof, "trace_lde_root_hex_0123")
+        .expect("FRI verification"));
 }

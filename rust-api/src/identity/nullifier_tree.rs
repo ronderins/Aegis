@@ -6,9 +6,9 @@
 //! - Cryptographic Non-Membership Proofs proving a user has NOT previously registered
 //! - Epoch-based nullifier rotation with domain separation
 
+use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::sync::RwLock;
-use serde::{Deserialize, Serialize};
 
 /// Deterministic domain-separated nullifier representation
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -72,7 +72,11 @@ impl NullifierTree {
     }
 
     /// Derives a deterministic, privacy-preserving nullifier for an identity secret without revealing the secret.
-    pub fn derive_nullifier(identity_secret: &[u8], context_id: &str, epoch_nonce: u64) -> NullifierHash {
+    pub fn derive_nullifier(
+        identity_secret: &[u8],
+        context_id: &str,
+        epoch_nonce: u64,
+    ) -> NullifierHash {
         let mut hasher = blake3::Hasher::new();
         hasher.update(b"aegis-nullifier-derivation-v1\0");
         hasher.update(identity_secret);
@@ -110,7 +114,10 @@ impl NullifierTree {
     }
 
     /// Generates a cryptographic Non-Membership Proof for an unregistered nullifier.
-    pub fn prove_non_membership(&self, nullifier: NullifierHash) -> Result<NullifierNonMembershipProof, &'static str> {
+    pub fn prove_non_membership(
+        &self,
+        nullifier: NullifierHash,
+    ) -> Result<NullifierNonMembershipProof, &'static str> {
         let set = self.spent_nullifiers.read().unwrap();
         if set.contains(&nullifier) {
             return Err("Cannot generate non-membership proof: nullifier is already registered");
@@ -162,7 +169,11 @@ impl NullifierTree {
 
     /// Returns the total count of registered nullifiers.
     pub fn count(&self) -> usize {
-        self.spent_nullifiers.read().unwrap().len().saturating_sub(2) // Exclude sentinels
+        self.spent_nullifiers
+            .read()
+            .unwrap()
+            .len()
+            .saturating_sub(2) // Exclude sentinels
     }
 }
 

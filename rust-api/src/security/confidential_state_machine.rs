@@ -69,7 +69,10 @@ impl ConfidentialStateMachine {
     }
 
     /// Registers a newly minted credential in the Initialized state.
-    pub fn initialize_credential(&self, credential_id: &str) -> Result<CredentialStateRecord, &'static str> {
+    pub fn initialize_credential(
+        &self,
+        credential_id: &str,
+    ) -> Result<CredentialStateRecord, &'static str> {
         let mut map = self.state_records.write().unwrap();
         if map.contains_key(credential_id) {
             return Err("Credential already initialized");
@@ -80,7 +83,8 @@ impl ConfidentialStateMachine {
             .unwrap_or_default()
             .as_secs();
 
-        let commitment = Self::compute_state_commitment(credential_id, 0, CredentialLifecycleState::Initialized);
+        let commitment =
+            Self::compute_state_commitment(credential_id, 0, CredentialLifecycleState::Initialized);
 
         let record = CredentialStateRecord {
             credential_id: credential_id.to_string(),
@@ -95,9 +99,14 @@ impl ConfidentialStateMachine {
     }
 
     /// Transitions a credential's state upon verification of formal transition invariants.
-    pub fn apply_transition(&self, proof: &StateTransitionProof) -> Result<CredentialStateRecord, &'static str> {
+    pub fn apply_transition(
+        &self,
+        proof: &StateTransitionProof,
+    ) -> Result<CredentialStateRecord, &'static str> {
         let mut map = self.state_records.write().unwrap();
-        let record = map.get_mut(&proof.credential_id).ok_or("Credential record not found")?;
+        let record = map
+            .get_mut(&proof.credential_id)
+            .ok_or("Credential record not found")?;
 
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -105,7 +114,9 @@ impl ConfidentialStateMachine {
             .as_secs();
 
         // Invariant 1: Monotonic epoch increment
-        if proof.previous_epoch != record.current_epoch || proof.next_epoch != record.current_epoch + 1 {
+        if proof.previous_epoch != record.current_epoch
+            || proof.next_epoch != record.current_epoch + 1
+        {
             return Err("STATE MACHINE VIOLATION: Non-monotonic epoch sequence number");
         }
 
@@ -115,8 +126,12 @@ impl ConfidentialStateMachine {
         }
 
         // Invariant 3: Irreversible terminal states
-        if record.current_state == CredentialLifecycleState::Revoked || record.current_state == CredentialLifecycleState::Expired {
-            return Err("STATE MACHINE VIOLATION: Cannot transition out of irreversible terminal state");
+        if record.current_state == CredentialLifecycleState::Revoked
+            || record.current_state == CredentialLifecycleState::Expired
+        {
+            return Err(
+                "STATE MACHINE VIOLATION: Cannot transition out of irreversible terminal state",
+            );
         }
 
         // Invariant 4: Minimum time-lock between state modifications
@@ -143,18 +158,19 @@ impl ConfidentialStateMachine {
         // Apply state mutation
         record.current_epoch = proof.next_epoch;
         record.current_state = proof.to_state;
-        record.state_commitment_hash = Self::compute_state_commitment(
-            &proof.credential_id,
-            proof.next_epoch,
-            proof.to_state,
-        );
+        record.state_commitment_hash =
+            Self::compute_state_commitment(&proof.credential_id, proof.next_epoch, proof.to_state);
         record.last_transition_epoch_secs = now;
 
         Ok(record.clone())
     }
 
     /// Computes deterministic Blake3 commitment over state components.
-    pub fn compute_state_commitment(id: &str, epoch: u64, state: CredentialLifecycleState) -> [u8; 32] {
+    pub fn compute_state_commitment(
+        id: &str,
+        epoch: u64,
+        state: CredentialLifecycleState,
+    ) -> [u8; 32] {
         let mut hasher = blake3::Hasher::new();
         hasher.update(b"aegis-state-commitment-v1:");
         hasher.update(id.as_bytes());

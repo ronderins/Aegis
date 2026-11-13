@@ -153,7 +153,9 @@ impl HardwareSecurityTokenEngine {
                 user_verified: parsed.user_verified,
                 authenticator_aaguid: parsed.aaguid.unwrap_or_default(),
                 token_receipt: String::new(),
-                error_detail: Some("User Presence (UP) bit is not set: key was not touched".to_string()),
+                error_detail: Some(
+                    "User Presence (UP) bit is not set: key was not touched".to_string(),
+                ),
             };
         }
 
@@ -165,7 +167,10 @@ impl HardwareSecurityTokenEngine {
                 user_verified: false,
                 authenticator_aaguid: parsed.aaguid.unwrap_or_default(),
                 token_receipt: String::new(),
-                error_detail: Some("User Verification (UV) bit is required by policy (PIN/biometric not entered)".to_string()),
+                error_detail: Some(
+                    "User Verification (UV) bit is required by policy (PIN/biometric not entered)"
+                        .to_string(),
+                ),
             };
         }
 
@@ -178,26 +183,32 @@ impl HardwareSecurityTokenEngine {
                 user_verified: parsed.user_verified,
                 authenticator_aaguid: parsed.aaguid.unwrap_or_default(),
                 token_receipt: String::new(),
-                error_detail: Some("RP ID hash mismatch: potential phishing / domain spoofing".to_string()),
+                error_detail: Some(
+                    "RP ID hash mismatch: potential phishing / domain spoofing".to_string(),
+                ),
             };
         }
 
         // 5. Parse and verify clientDataJSON
-        let client_data_json: serde_json::Value = match serde_json::from_str(&assertion.client_data_json) {
-            Ok(v) => v,
-            Err(_) => {
-                return Fido2VerificationResult {
-                    is_valid: false,
-                    sign_count: parsed.sign_count,
-                    user_verified: parsed.user_verified,
-                    authenticator_aaguid: parsed.aaguid.unwrap_or_default(),
-                    token_receipt: String::new(),
-                    error_detail: Some("Malformed clientDataJSON payload".to_string()),
+        let client_data_json: serde_json::Value =
+            match serde_json::from_str(&assertion.client_data_json) {
+                Ok(v) => v,
+                Err(_) => {
+                    return Fido2VerificationResult {
+                        is_valid: false,
+                        sign_count: parsed.sign_count,
+                        user_verified: parsed.user_verified,
+                        authenticator_aaguid: parsed.aaguid.unwrap_or_default(),
+                        token_receipt: String::new(),
+                        error_detail: Some("Malformed clientDataJSON payload".to_string()),
+                    }
                 }
-            }
-        };
+            };
 
-        let challenge = client_data_json.get("challenge").and_then(|v| v.as_str()).unwrap_or("");
+        let challenge = client_data_json
+            .get("challenge")
+            .and_then(|v| v.as_str())
+            .unwrap_or("");
         if !crate::crypto::constant_time_eq(challenge, expected_challenge) {
             return Fido2VerificationResult {
                 is_valid: false,
@@ -205,7 +216,9 @@ impl HardwareSecurityTokenEngine {
                 user_verified: parsed.user_verified,
                 authenticator_aaguid: parsed.aaguid.unwrap_or_default(),
                 token_receipt: String::new(),
-                error_detail: Some("Client challenge mismatch (replay or expired session)".to_string()),
+                error_detail: Some(
+                    "Client challenge mismatch (replay or expired session)".to_string(),
+                ),
             };
         }
 
@@ -236,7 +249,9 @@ impl HardwareSecurityTokenEngine {
             is_valid: true,
             sign_count: parsed.sign_count,
             user_verified: parsed.user_verified,
-            authenticator_aaguid: parsed.aaguid.unwrap_or_else(|| "00000000000000000000000000000000".to_string()),
+            authenticator_aaguid: parsed
+                .aaguid
+                .unwrap_or_else(|| "00000000000000000000000000000000".to_string()),
             token_receipt: receipt,
             error_detail: None,
         }
@@ -283,13 +298,17 @@ mod tests {
         };
 
         // Verification with stored sign_count = 100 (< 105) must succeed
-        let res = HardwareSecurityTokenEngine::verify_assertion(&assertion, challenge, 100, "pk_dummy", &policy);
+        let res = HardwareSecurityTokenEngine::verify_assertion(
+            &assertion, challenge, 100, "pk_dummy", &policy,
+        );
         assert!(res.is_valid);
         assert_eq!(res.sign_count, 105);
         assert!(res.user_verified);
 
         // Verification with stored sign_count = 110 (>= 105) must fail due to counter rollback!
-        let fail_res = HardwareSecurityTokenEngine::verify_assertion(&assertion, challenge, 110, "pk_dummy", &policy);
+        let fail_res = HardwareSecurityTokenEngine::verify_assertion(
+            &assertion, challenge, 110, "pk_dummy", &policy,
+        );
         assert!(!fail_res.is_valid);
     }
 }

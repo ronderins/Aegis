@@ -12,16 +12,16 @@
 //! 9. W3C Selective Disclosure JWT (SD-JWT) Decoy Disclosure Resilience
 //! 10. Memory Canary & Guard Page Integrity Protection
 
+use zk_identity_api_rust::security::circuit_tamper_proofing::*;
 use zk_identity_api_rust::security::fault_injection_armor::*;
-use zk_identity_api_rust::security::rate_limiter_distributed::*;
-use zk_identity_api_rust::security::quantum_kyber_pke::*;
-use zk_identity_api_rust::security::side_channel_defenses::*;
-use zk_identity_api_rust::security::seccomp_sandbox::*;
-use zk_identity_api_rust::security::safe_memory_allocator::*;
 use zk_identity_api_rust::security::hardware_canary::*;
+use zk_identity_api_rust::security::quantum_kyber_pke::*;
+use zk_identity_api_rust::security::rate_limiter_distributed::*;
+use zk_identity_api_rust::security::safe_memory_allocator::*;
+use zk_identity_api_rust::security::seccomp_sandbox::*;
+use zk_identity_api_rust::security::side_channel_defenses::*;
 use zk_identity_api_rust::security::w3c_sd_jwt_vc::*;
 use zk_identity_api_rust::security::zk_dos_shield::*;
-use zk_identity_api_rust::security::circuit_tamper_proofing::*;
 
 #[test]
 fn test_tier4_fault_injection_dual_rail_execution() {
@@ -95,10 +95,13 @@ fn test_tier4_seccomp_bpf_syscall_filtering() {
 
 #[test]
 fn test_tier4_safe_memory_allocator_canaries() {
-    let mut alloc = SafeMemoryBuffer::allocate(512, MemoryProtectionPolicy::GuardPageAndZeroize).unwrap();
+    let mut alloc =
+        SafeMemoryBuffer::allocate(512, MemoryProtectionPolicy::GuardPageAndZeroize).unwrap();
     assert!(alloc.verify_canaries());
 
-    alloc.write_bytes(0, b"Confidential Secret Key Data").unwrap();
+    alloc
+        .write_bytes(0, b"Confidential Secret Key Data")
+        .unwrap();
     assert!(alloc.verify_canaries());
 
     alloc.zeroize_and_free();
@@ -126,7 +129,9 @@ fn test_tier4_w3c_sd_jwt_decoy_protection() {
     let credential = engine.issue_sd_jwt(&claims, 5).unwrap(); // 5 decoy claims to defeat frequency analysis
     assert!(credential.decoy_digests.len() >= 5);
 
-    let presentation = engine.create_presentation(&credential, &["age_over_18"]).unwrap();
+    let presentation = engine
+        .create_presentation(&credential, &["age_over_18"])
+        .unwrap();
     let verification = engine.verify_presentation(&presentation).unwrap();
 
     assert!(verification.is_valid);

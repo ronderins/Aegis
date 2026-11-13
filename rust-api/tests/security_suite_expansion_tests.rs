@@ -22,12 +22,9 @@ use zk_identity_microservice::security::*;
 #[test]
 fn test_frost_threshold_signing_end_to_end() {
     let master_seed = b"test_master_entropy_frost_2026_production_grade";
-    let (shares, vss, group_pk) = threshold_mpc_signing::FrostCoordinator::trusted_dealer_keygen(
-        3,
-        5,
-        master_seed,
-    )
-    .expect("Keygen must succeed");
+    let (shares, vss, group_pk) =
+        threshold_mpc_signing::FrostCoordinator::trusted_dealer_keygen(3, 5, master_seed)
+            .expect("Keygen must succeed");
 
     assert_eq!(shares.len(), 5);
     for share in &shares {
@@ -41,14 +38,25 @@ fn test_frost_threshold_signing_end_to_end() {
 
     let comms = vec![p1_comm, p2_comm, p4_comm];
 
-    let s1 = threshold_mpc_signing::FrostCoordinator::round2_sign(&shares[0], &p1_priv, &comms, message).unwrap();
-    let s2 = threshold_mpc_signing::FrostCoordinator::round2_sign(&shares[1], &p2_priv, &comms, message).unwrap();
-    let s4 = threshold_mpc_signing::FrostCoordinator::round2_sign(&shares[3], &p4_priv, &comms, message).unwrap();
+    let s1 =
+        threshold_mpc_signing::FrostCoordinator::round2_sign(&shares[0], &p1_priv, &comms, message)
+            .unwrap();
+    let s2 =
+        threshold_mpc_signing::FrostCoordinator::round2_sign(&shares[1], &p2_priv, &comms, message)
+            .unwrap();
+    let s4 =
+        threshold_mpc_signing::FrostCoordinator::round2_sign(&shares[3], &p4_priv, &comms, message)
+            .unwrap();
 
     let partials = vec![s1, s2, s4];
-    let agg_sig = threshold_mpc_signing::FrostCoordinator::aggregate_signatures(&group_pk, &comms, &partials, message).unwrap();
+    let agg_sig = threshold_mpc_signing::FrostCoordinator::aggregate_signatures(
+        &group_pk, &comms, &partials, message,
+    )
+    .unwrap();
 
-    assert!(threshold_mpc_signing::FrostCoordinator::verify_aggregated_signature(&agg_sig, message));
+    assert!(
+        threshold_mpc_signing::FrostCoordinator::verify_aggregated_signature(&agg_sig, message)
+    );
 }
 
 #[test]
@@ -74,7 +82,9 @@ fn test_zk_rollup_batcher_end_to_end() {
 
     let receipt = batcher.seal_batch().unwrap();
     assert_eq!(receipt.transaction_count, 10);
-    assert!(zk_rollup_batcher::ZkRollupBatcher::verify_batch_receipt(&receipt));
+    assert!(zk_rollup_batcher::ZkRollupBatcher::verify_batch_receipt(
+        &receipt
+    ));
 }
 
 #[test]
@@ -96,12 +106,24 @@ fn test_w3c_sd_jwt_selective_disclosure_end_to_end() {
     .unwrap();
 
     // Holder reveals ONLY over_18 and country_code
-    let presentation = w3c_sd_jwt_vc::SdJwtEngine::create_presentation(&cred, &["over_18", "country_code"], "nonce_fresh").unwrap();
+    let presentation = w3c_sd_jwt_vc::SdJwtEngine::create_presentation(
+        &cred,
+        &["over_18", "country_code"],
+        "nonce_fresh",
+    )
+    .unwrap();
 
-    let result = w3c_sd_jwt_vc::SdJwtEngine::verify_presentation(&presentation, b"signing_key_secret_2026");
+    let result =
+        w3c_sd_jwt_vc::SdJwtEngine::verify_presentation(&presentation, b"signing_key_secret_2026");
     assert!(result.is_valid);
-    assert_eq!(result.unmasked_claims.get("over_18"), Some(&serde_json::json!(true)));
-    assert_eq!(result.unmasked_claims.get("country_code"), Some(&serde_json::json!("DE")));
+    assert_eq!(
+        result.unmasked_claims.get("over_18"),
+        Some(&serde_json::json!(true))
+    );
+    assert_eq!(
+        result.unmasked_claims.get("country_code"),
+        Some(&serde_json::json!("DE"))
+    );
     assert!(!result.unmasked_claims.contains_key("ssn_tax_id"));
 }
 
@@ -125,7 +147,12 @@ fn test_enclave_attestation_quote_verification() {
         require_replay_protection: true,
     };
 
-    assert!(confidential_mpc_enclave::ConfidentialEnclaveEngine::verify_quote(&quote, &policy, challenge).unwrap());
+    assert!(
+        confidential_mpc_enclave::ConfidentialEnclaveEngine::verify_quote(
+            &quote, &policy, challenge
+        )
+        .unwrap()
+    );
 }
 
 #[test]
@@ -141,21 +168,35 @@ fn test_nist_fips_204_dilithium_post_quantum_signatures() {
 #[test]
 fn test_dynamic_revocation_accumulator() {
     let mut acc = zero_knowledge_revocation::DynamicRevocationAccumulator::new(1, b"seed_entropy");
-    let active = zero_knowledge_revocation::AccumulatorElement::from_credential_id("cred_active_1", b"salt");
-    let revoked = zero_knowledge_revocation::AccumulatorElement::from_credential_id("cred_revoked_2", b"salt");
+    let active =
+        zero_knowledge_revocation::AccumulatorElement::from_credential_id("cred_active_1", b"salt");
+    let revoked = zero_knowledge_revocation::AccumulatorElement::from_credential_id(
+        "cred_revoked_2",
+        b"salt",
+    );
 
     acc.revoke(revoked.clone());
     let comm = acc.compute_commitment();
 
     let witness = acc.generate_non_membership_witness(&active).unwrap();
-    assert!(zero_knowledge_revocation::DynamicRevocationAccumulator::verify_non_membership(&witness, &comm));
+    assert!(
+        zero_knowledge_revocation::DynamicRevocationAccumulator::verify_non_membership(
+            &witness, &comm
+        )
+    );
     assert!(acc.generate_non_membership_witness(&revoked).is_err());
 }
 
 #[test]
 fn test_spectre_shield_constant_time() {
-    assert_eq!(side_channel_spectre_shield::SpectreShield::cmov_u64(true, 777, 999), 777);
-    assert_eq!(side_channel_spectre_shield::SpectreShield::cmov_u64(false, 777, 999), 999);
+    assert_eq!(
+        side_channel_spectre_shield::SpectreShield::cmov_u64(true, 777, 999),
+        777
+    );
+    assert_eq!(
+        side_channel_spectre_shield::SpectreShield::cmov_u64(false, 777, 999),
+        999
+    );
 }
 
 #[test]
@@ -189,7 +230,9 @@ fn test_biometric_vault_matching() {
         true,
     );
 
-    let receipt = biometric_liveness_vault::BiometricVault::verify_match(&emb, &record, &enrolled, None).unwrap();
+    let receipt =
+        biometric_liveness_vault::BiometricVault::verify_match(&emb, &record, &enrolled, None)
+            .unwrap();
     assert!(receipt.is_matched);
 }
 
@@ -198,10 +241,20 @@ fn test_rln_anonymous_slashing() {
     let id = zk_rate_limiter_anonymous::RlnIdentitySecret::from_seed(b"rln_user_alice");
     let mut manager = zk_rate_limiter_anonymous::RlnManager::new(10, "root_auth_2026");
 
-    let share1 = zk_rate_limiter_anonymous::RlnManager::create_proof_share(&id, 10, b"Msg 1", "root_auth_2026");
+    let share1 = zk_rate_limiter_anonymous::RlnManager::create_proof_share(
+        &id,
+        10,
+        b"Msg 1",
+        "root_auth_2026",
+    );
     assert!(manager.verify_and_record(&share1).unwrap().is_none());
 
-    let share2 = zk_rate_limiter_anonymous::RlnManager::create_proof_share(&id, 10, b"Msg 2", "root_auth_2026");
+    let share2 = zk_rate_limiter_anonymous::RlnManager::create_proof_share(
+        &id,
+        10,
+        b"Msg 2",
+        "root_auth_2026",
+    );
     let slashed = manager.verify_and_record(&share2).unwrap();
     assert!(slashed.is_some());
     assert_eq!(slashed.unwrap().recovered_secret_a0, id.identity_secret_a0);
@@ -209,8 +262,14 @@ fn test_rln_anonymous_slashing() {
 
 #[test]
 fn test_verifiable_shuffle_integration() {
-    let t0 = zk_verifiable_shuffle::ShuffleCiphertext { c1: "0x02a".to_string(), c2: "0x02b".to_string() };
-    let t1 = zk_verifiable_shuffle::ShuffleCiphertext { c1: "0x02c".to_string(), c2: "0x02d".to_string() };
+    let t0 = zk_verifiable_shuffle::ShuffleCiphertext {
+        c1: "0x02a".to_string(),
+        c2: "0x02b".to_string(),
+    };
+    let t1 = zk_verifiable_shuffle::ShuffleCiphertext {
+        c1: "0x02c".to_string(),
+        c2: "0x02d".to_string(),
+    };
     let (shuffled, proof) = zk_verifiable_shuffle::VerifiableShuffleEngine::shuffle_and_prove(
         &[t0, t1],
         &[1, 0],
@@ -220,20 +279,34 @@ fn test_verifiable_shuffle_integration() {
     .unwrap();
 
     assert_eq!(shuffled.len(), 2);
-    assert!(zk_verifiable_shuffle::VerifiableShuffleEngine::verify_shuffle(&proof, "0xgroup_pk_shuffle"));
+    assert!(
+        zk_verifiable_shuffle::VerifiableShuffleEngine::verify_shuffle(
+            &proof,
+            "0xgroup_pk_shuffle"
+        )
+    );
 }
 
 #[test]
 fn test_fuzzy_name_matching_integration() {
-    let r = zk_sanctions_fuzzy_trie::FuzzyNameMatchingEngine::evaluate_fuzzy_match("Alexander", "Alexandre", 2);
+    let r = zk_sanctions_fuzzy_trie::FuzzyNameMatchingEngine::evaluate_fuzzy_match(
+        "Alexander",
+        "Alexandre",
+        2,
+    );
     assert!(r.is_match_within_edit_distance);
     assert_eq!(r.calculated_edit_distance, 2);
 }
 
 #[test]
 fn test_bbs_plus_credential_disclosure_integration() {
-    let (pk, sk) = zk_anonymous_credential_issuer::BbsPlusEngine::keygen(3, b"authority_seed_test_suite");
-    let attrs = vec!["CitizenAlice".to_string(), "US".to_string(), "Over21".to_string()];
+    let (pk, sk) =
+        zk_anonymous_credential_issuer::BbsPlusEngine::keygen(3, b"authority_seed_test_suite");
+    let attrs = vec![
+        "CitizenAlice".to_string(),
+        "US".to_string(),
+        "Over21".to_string(),
+    ];
     let sig = zk_anonymous_credential_issuer::BbsPlusEngine::sign_attributes(&sk, &attrs).unwrap();
 
     let proof = zk_anonymous_credential_issuer::BbsPlusEngine::prove_selective_disclosure(
@@ -247,7 +320,13 @@ fn test_bbs_plus_credential_disclosure_integration() {
 
     assert_eq!(proof.revealed_attributes.len(), 2);
     assert_eq!(proof.hidden_attribute_indices, vec![0]);
-    assert!(zk_anonymous_credential_issuer::BbsPlusEngine::verify_selective_disclosure(&pk, &proof, "nonce_test_suite"));
+    assert!(
+        zk_anonymous_credential_issuer::BbsPlusEngine::verify_selective_disclosure(
+            &pk,
+            &proof,
+            "nonce_test_suite"
+        )
+    );
 }
 
 #[test]
@@ -258,8 +337,15 @@ fn test_dhkdf_ratchet_integration() {
         derivation_path: "m/auth/v1".to_string(),
         epoch_index: 1,
     };
-    let step = threshold_key_derivation_hkdf::DistributedHkdfEngine::node_derive_step(&node, "aegis/token");
-    let subkey = threshold_key_derivation_hkdf::DistributedHkdfEngine::combine_shares_and_ratchet(&[step], "key_test").unwrap();
+    let step = threshold_key_derivation_hkdf::DistributedHkdfEngine::node_derive_step(
+        &node,
+        "aegis/token",
+    );
+    let subkey = threshold_key_derivation_hkdf::DistributedHkdfEngine::combine_shares_and_ratchet(
+        &[step],
+        "key_test",
+    )
+    .unwrap();
     assert_eq!(subkey.subkey_bytes.len(), 32);
 }
 
@@ -274,4 +360,3 @@ fn test_smt_membership_integration() {
     assert!(!proof.is_non_membership);
     assert!(zk_membership_merkle_accumulator::SparseMerkleTree256::verify_proof(&proof));
 }
-

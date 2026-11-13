@@ -103,7 +103,8 @@ impl ThresholdPsiEngine {
         // Double-blind Party A's elements: H(x)^(k_A * k_B)
         let mut evaluated = Vec::new();
         for elem in &req.blinded_elements {
-            let double_blind = blake3::hash(format!("{}_{}", elem.masked_point, secret_k_b).as_bytes());
+            let double_blind =
+                blake3::hash(format!("{}_{}", elem.masked_point, secret_k_b).as_bytes());
             evaluated.push(format!("{:x}", double_blind));
         }
 
@@ -114,7 +115,8 @@ impl ThresholdPsiEngine {
             party_b_blinded.push(format!("{:x}", b_blind));
         }
 
-        let proof_h = blake3::hash(format!("{}_{}", evaluated.len(), party_b_blinded.len()).as_bytes());
+        let proof_h =
+            blake3::hash(format!("{}_{}", evaluated.len(), party_b_blinded.len()).as_bytes());
 
         Ok(PsiQueryResponse {
             party_b_id: self.party_id.clone(),
@@ -163,7 +165,9 @@ mod tests {
         let (req, k_a) = party_a.prepare_query(0x1337);
         let resp = party_b.evaluate_query(&req, 0xCAFE).unwrap();
 
-        let cardinality = party_a.compute_intersection_cardinality(&resp, k_a, 5).unwrap();
+        let cardinality = party_a
+            .compute_intersection_cardinality(&resp, k_a, 5)
+            .unwrap();
         assert!(cardinality > 0);
     }
 }

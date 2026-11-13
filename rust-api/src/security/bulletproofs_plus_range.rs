@@ -163,8 +163,14 @@ impl BulletproofsPlusEngine {
             commitments.push(PedersenCommitment::commit(values[i], blindings[i]));
         }
 
-        let agg_a = format!("{:x}", blake3::hash(format!("agg_a_{}", values.len()).as_bytes()));
-        let agg_b = format!("{:x}", blake3::hash(format!("agg_b_{}", values.len()).as_bytes()));
+        let agg_a = format!(
+            "{:x}",
+            blake3::hash(format!("agg_a_{}", values.len()).as_bytes())
+        );
+        let agg_b = format!(
+            "{:x}",
+            blake3::hash(format!("agg_b_{}", values.len()).as_bytes())
+        );
 
         // Logarithmic inner-product rounds for aggregated vector
         let rounds_count = 6 + (values.len() as f64).log2().ceil() as usize;
@@ -176,7 +182,10 @@ impl BulletproofsPlusEngine {
             });
         }
 
-        let digest = format!("{:x}", blake3::hash(format!("{}_{}", agg_a, agg_b).as_bytes()));
+        let digest = format!(
+            "{:x}",
+            blake3::hash(format!("{}_{}", agg_a, agg_b).as_bytes())
+        );
 
         Ok(AggregateRangeProof {
             attribute_commitments: commitments,
@@ -219,7 +228,9 @@ mod tests {
         let attributes = [25u64, 85u64, 60u64];
         let blindings = [101u64, 102u64, 103u64];
 
-        let agg_proof = BulletproofsPlusEngine::prove_aggregate_attributes(&attributes, &blindings, 18, 100).unwrap();
+        let agg_proof =
+            BulletproofsPlusEngine::prove_aggregate_attributes(&attributes, &blindings, 18, 100)
+                .unwrap();
         assert_eq!(agg_proof.count, 3);
         assert!(!agg_proof.proof_digest.is_empty());
     }

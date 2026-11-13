@@ -20,6 +20,8 @@ pub use air::IdentityAir;
 pub use fri::{FriCommitLayer, FriProof, FriQueryProof, FriVerifier};
 pub use opcodes::{Instruction, Opcode, Register};
 pub use polynomial::Polynomial;
-pub use safe_execution_sandbox::{SafeZkVmSandbox, SandboxConfig, SandboxExecutionReceipt, SandboxViolation};
+pub use safe_execution_sandbox::{
+    SafeZkVmSandbox, SandboxConfig, SandboxExecutionReceipt, SandboxViolation,
+};
 pub use state_machine::{ExecutionTrace, TraceRow, ZkVirtualMachine};
 pub use verifier::{ZkCertificateVerifier, ZkExecutionCertificate};

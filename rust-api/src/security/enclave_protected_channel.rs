@@ -80,10 +80,15 @@ impl EnclaveProtectedChannel {
         }
 
         let resp_e_pub = format!("e_{:x}", blake3::hash(&resp_ephemeral_priv.to_le_bytes()));
-        let shared_ee = blake3::hash(format!("{}_{}", msg1.ephemeral_public_key, resp_ephemeral_priv).as_bytes());
+        let shared_ee = blake3::hash(
+            format!("{}_{}", msg1.ephemeral_public_key, resp_ephemeral_priv).as_bytes(),
+        );
 
         // Encrypt responder static identity under shared_ee
-        let enc_static = format!("enc_s_{:x}", blake3::hash(format!("{}_{}", self.local_static_pub, shared_ee).as_bytes()));
+        let enc_static = format!(
+            "enc_s_{:x}",
+            blake3::hash(format!("{}_{}", self.local_static_pub, shared_ee).as_bytes())
+        );
 
         self.state = NoiseHandshakeState::Message2Received;
 
@@ -104,11 +109,19 @@ impl EnclaveProtectedChannel {
             return Err("Invalid handshake step 2 message or missing attestation quote");
         }
 
-        let session_h = blake3::hash(format!("{}_{}", self.local_static_pub, msg2.ephemeral_public_key).as_bytes());
+        let session_h = blake3::hash(
+            format!("{}_{}", self.local_static_pub, msg2.ephemeral_public_key).as_bytes(),
+        );
         let session_id = format!("sess_{:x}", session_h);
 
-        let tx_key = format!("tx_key_{:x}", blake3::hash(format!("tx_{}", session_id).as_bytes()));
-        let rx_key = format!("rx_key_{:x}", blake3::hash(format!("rx_{}", session_id).as_bytes()));
+        let tx_key = format!(
+            "tx_key_{:x}",
+            blake3::hash(format!("tx_{}", session_id).as_bytes())
+        );
+        let rx_key = format!(
+            "rx_key_{:x}",
+            blake3::hash(format!("rx_{}", session_id).as_bytes())
+        );
 
         self.state = NoiseHandshakeState::TransportEstablished;
 

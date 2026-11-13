@@ -7,14 +7,17 @@
 //! - Division-by-zero witness injection in arithmetic circuits
 //! - Fake witness forging attacks
 
-use std::collections::{HashMap, HashSet};
 use serde::{Deserialize, Serialize};
+use std::collections::{HashMap, HashSet};
 
 /// Type of constraint violation detected by the safety verifier
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum CircuitSafetyViolation {
     /// A witness signal was declared but never appears in any constraint
-    UnconstrainedSignal { signal_id: usize, signal_name: String },
+    UnconstrainedSignal {
+        signal_id: usize,
+        signal_name: String,
+    },
     /// A wire appears in linear combinations but lacks a quadratic (multiplication) constraint
     LinearOnlyWire { wire_id: usize },
     /// A boolean wire lacks the quadratic constraint $b \cdot (1 - b) = 0$
@@ -91,7 +94,13 @@ impl CircuitSafetyVerifier {
     }
 
     /// Appends an R1CS constraint gate $A \cdot B = C$ to the verification suite.
-    pub fn add_gate(&mut self, a: Vec<WireTerm>, b: Vec<WireTerm>, c: Vec<WireTerm>, label: impl Into<String>) {
+    pub fn add_gate(
+        &mut self,
+        a: Vec<WireTerm>,
+        b: Vec<WireTerm>,
+        c: Vec<WireTerm>,
+        label: impl Into<String>,
+    ) {
         self.gates.push(R1csGate {
             a,
             b,
@@ -148,7 +157,11 @@ impl CircuitSafetyVerifier {
             for gate in &self.gates {
                 let wire_in_a = gate.a.iter().any(|t| t.wire_id == *bool_wire);
                 let wire_in_b = gate.b.iter().any(|t| t.wire_id == *bool_wire);
-                let c_is_zero_or_wire = gate.c.is_empty() || gate.c.iter().any(|t| t.wire_id == *bool_wire || t.wire_id == 0);
+                let c_is_zero_or_wire = gate.c.is_empty()
+                    || gate
+                        .c
+                        .iter()
+                        .any(|t| t.wire_id == *bool_wire || t.wire_id == 0);
 
                 if wire_in_a && wire_in_b && c_is_zero_or_wire {
                     has_boolean_constraint = true;
@@ -157,7 +170,11 @@ impl CircuitSafetyVerifier {
             }
 
             if !has_boolean_constraint {
-                let name = self.wire_names.get(bool_wire).cloned().unwrap_or_else(|| format!("wire_{}", bool_wire));
+                let name = self
+                    .wire_names
+                    .get(bool_wire)
+                    .cloned()
+                    .unwrap_or_else(|| format!("wire_{}", bool_wire));
                 violations.push(CircuitSafetyViolation::MissingBooleanCheck {
                     wire_id: *bool_wire,
                     signal_name: name.clone(),
@@ -196,17 +213,30 @@ impl CircuitSafetyVerifier {
     }
 
     /// Verifies that an age predicate circuit ($Age \ge Threshold$) properly prevents underflow.
-    pub fn verify_age_circuit_safety(&self, threshold_wire: usize, birth_year_wire: usize, current_year_wire: usize) -> Result<(), Vec<String>> {
+    pub fn verify_age_circuit_safety(
+        &self,
+        threshold_wire: usize,
+        birth_year_wire: usize,
+        current_year_wire: usize,
+    ) -> Result<(), Vec<String>> {
         let mut errors = Vec::new();
 
         if !self.is_public.contains(&threshold_wire) {
-            errors.push("Age threshold wire must be public to prevent client-chosen threshold spoofing".to_string());
+            errors.push(
+                "Age threshold wire must be public to prevent client-chosen threshold spoofing"
+                    .to_string(),
+            );
         }
         if !self.is_public.contains(&current_year_wire) {
-            errors.push("Current year wire must be public to prevent historical replay attacks".to_string());
+            errors.push(
+                "Current year wire must be public to prevent historical replay attacks".to_string(),
+            );
         }
         if self.is_public.contains(&birth_year_wire) {
-            errors.push("CRITICAL PRIVACY VIOLATION: Birth year wire must remain private witness".to_string());
+            errors.push(
+                "CRITICAL PRIVACY VIOLATION: Birth year wire must remain private witness"
+                    .to_string(),
+            );
         }
 
         if errors.is_empty() {
@@ -231,8 +261,20 @@ mod tests {
 
         // Gate 1: (current_year - birth_year) * 1 = delta
         verifier.add_gate(
-            vec![WireTerm { wire_id: 1, coefficient: 1 }, WireTerm { wire_id: 2, coefficient: 1 }],
-            vec![WireTerm { wire_id: 0, coefficient: 1 }],
+            vec![
+                WireTerm {
+                    wire_id: 1,
+                    coefficient: 1,
+                },
+                WireTerm {
+                    wire_id: 2,
+                    coefficient: 1,
+                },
+            ],
+            vec![WireTerm {
+                wire_id: 0,
+                coefficient: 1,
+            }],
             vec![],
             "age_delta",
         );
@@ -257,9 +299,18 @@ mod tests {
 
         // Gate: is_adult * (1 - is_adult) = 0
         verifier.add_gate(
-            vec![WireTerm { wire_id: 1, coefficient: 1 }],
-            vec![WireTerm { wire_id: 1, coefficient: 1 }],
-            vec![WireTerm { wire_id: 1, coefficient: 1 }],
+            vec![WireTerm {
+                wire_id: 1,
+                coefficient: 1,
+            }],
+            vec![WireTerm {
+                wire_id: 1,
+                coefficient: 1,
+            }],
+            vec![WireTerm {
+                wire_id: 1,
+                coefficient: 1,
+            }],
             "boolean_check",
         );
 

@@ -89,23 +89,36 @@ impl GdprComplianceAuditor {
         if witness_zeroized {
             findings.push("Article 32(1)(b) PASSED: Witness memory zeroized immediately upon proof completion.".to_string());
         } else {
-            findings.push("Article 32(1)(b) WARNING: Witness data retained in unscrubbed memory.".to_string());
+            findings.push(
+                "Article 32(1)(b) WARNING: Witness data retained in unscrubbed memory.".to_string(),
+            );
         }
 
         // 3. Article 32(1)(c): Tamper-Evident Ledger Integrity
         let tamper_evident_ledger_active = has_merkle_receipt;
         if has_merkle_receipt {
-            findings.push("Article 32(1)(c) PASSED: Verification bound to append-only Blake3 Merkle ledger.".to_string());
+            findings.push(
+                "Article 32(1)(c) PASSED: Verification bound to append-only Blake3 Merkle ledger."
+                    .to_string(),
+            );
         } else {
-            findings.push("Article 32(1)(c) WARNING: Missing immutable ledger audit receipt.".to_string());
+            findings.push(
+                "Article 32(1)(c) WARNING: Missing immutable ledger audit receipt.".to_string(),
+            );
         }
 
         // 4. Article 32(1)(d): Anti-Replay & Freshness Testing
         let forward_secrecy_active = has_ephemeral_nonce;
         if has_ephemeral_nonce {
-            findings.push("Article 32(1)(d) PASSED: Ephemeral single-use nonces enforce forward freshness.".to_string());
+            findings.push(
+                "Article 32(1)(d) PASSED: Ephemeral single-use nonces enforce forward freshness."
+                    .to_string(),
+            );
         } else {
-            findings.push("Article 32(1)(d) WARNING: Nonce missing, transaction vulnerable to replay.".to_string());
+            findings.push(
+                "Article 32(1)(d) WARNING: Nonce missing, transaction vulnerable to replay."
+                    .to_string(),
+            );
         }
 
         let is_fully_compliant = pseudonymisation_verified
@@ -132,12 +145,15 @@ mod tests {
     #[test]
     fn test_shannon_entropy_detection() {
         // High entropy cryptographic digest (Blake3 output)
-        let hash = blake3::hash(b"confidential_identity_claim_test").as_bytes().to_vec();
+        let hash = blake3::hash(b"confidential_identity_claim_test")
+            .as_bytes()
+            .to_vec();
         let entropy = GdprComplianceAuditor::compute_shannon_entropy(&hash);
         assert!(entropy >= 4.0); // 32 unique bytes have high entropy
 
         // Low entropy plaintext string
-        let plaintext = b"John Doe, born 1985-05-12, SSN: 000-12-3456, Address: 123 Main St".to_vec();
+        let plaintext =
+            b"John Doe, born 1985-05-12, SSN: 000-12-3456, Address: 123 Main St".to_vec();
         let pt_entropy = GdprComplianceAuditor::compute_shannon_entropy(&plaintext);
         assert!(pt_entropy < 5.0);
     }

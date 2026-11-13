@@ -17,10 +17,27 @@ impl TerminalRenderer {
 
     /// Prints cryptographic banner
     pub fn print_banner() {
-        println!("{}{}╔══════════════════════════════════════════════════════════════════════╗{}", Self::ANSI_BOLD, Self::ANSI_EMERALD, Self::ANSI_RESET);
-        println!("{}║      ZK-AUTH :: ZERO-KNOWLEDGE IDENTITY VERIFICATION SUITE         ║{}", Self::ANSI_EMERALD, Self::ANSI_RESET);
-        println!("{}║   Constant-Time Rust Core • Groth16/BN254 • Poseidon • Blake3 SMT  ║{}", Self::ANSI_EMERALD, Self::ANSI_RESET);
-        println!("{}╚══════════════════════════════════════════════════════════════════════╝{}", Self::ANSI_EMERALD, Self::ANSI_RESET);
+        println!(
+            "{}{}╔══════════════════════════════════════════════════════════════════════╗{}",
+            Self::ANSI_BOLD,
+            Self::ANSI_EMERALD,
+            Self::ANSI_RESET
+        );
+        println!(
+            "{}║      ZK-AUTH :: ZERO-KNOWLEDGE IDENTITY VERIFICATION SUITE         ║{}",
+            Self::ANSI_EMERALD,
+            Self::ANSI_RESET
+        );
+        println!(
+            "{}║   Constant-Time Rust Core • Groth16/BN254 • Poseidon • Blake3 SMT  ║{}",
+            Self::ANSI_EMERALD,
+            Self::ANSI_RESET
+        );
+        println!(
+            "{}╚══════════════════════════════════════════════════════════════════════╝{}",
+            Self::ANSI_EMERALD,
+            Self::ANSI_RESET
+        );
         println!();
     }
 
@@ -33,28 +50,93 @@ impl TerminalRenderer {
         is_valid: bool,
     ) {
         let status_text = if is_valid {
-            format!("{}[VALID] CRYPTOGRAPHICALLY VERIFIED{}", Self::ANSI_BOLD, Self::ANSI_RESET)
+            format!(
+                "{}[VALID] CRYPTOGRAPHICALLY VERIFIED{}",
+                Self::ANSI_BOLD,
+                Self::ANSI_RESET
+            )
         } else {
-            format!("{}[FAILED] VERIFICATION REJECTED{}", Self::ANSI_BOLD, Self::ANSI_RESET)
+            format!(
+                "{}[FAILED] VERIFICATION REJECTED{}",
+                Self::ANSI_BOLD,
+                Self::ANSI_RESET
+            )
         };
 
-        println!("{}+----------------------------------------------------------------------+{}", Self::ANSI_DIM, Self::ANSI_RESET);
-        println!("| {}STATEMENT RESULT:{} {}", Self::ANSI_BOLD, Self::ANSI_RESET, status_text);
-        println!("{}+----------------------------------------------------------------------+{}", Self::ANSI_DIM, Self::ANSI_RESET);
-        println!("| {}Proof ID:{}      {}", Self::ANSI_CYAN, Self::ANSI_RESET, proof_id);
-        println!("| {}Predicate:{}     {}", Self::ANSI_CYAN, Self::ANSI_RESET, predicate);
-        println!("| {}Nullifier:{}     {}...", Self::ANSI_CYAN, Self::ANSI_RESET, &nullifier[0..32.min(nullifier.len())]);
-        println!("| {}Latency:{}       {}{} µs{} (Rust native constant-time)", Self::ANSI_CYAN, Self::ANSI_RESET, Self::ANSI_YELLOW, latency_us, Self::ANSI_RESET);
-        println!("| {}Memory State:{}  {}Ephemeral Zeroize memory wiped{}", Self::ANSI_CYAN, Self::ANSI_RESET, Self::ANSI_GREEN, Self::ANSI_RESET);
-        println!("{}+----------------------------------------------------------------------+{}", Self::ANSI_DIM, Self::ANSI_RESET);
+        println!(
+            "{}+----------------------------------------------------------------------+{}",
+            Self::ANSI_DIM,
+            Self::ANSI_RESET
+        );
+        println!(
+            "| {}STATEMENT RESULT:{} {}",
+            Self::ANSI_BOLD,
+            Self::ANSI_RESET,
+            status_text
+        );
+        println!(
+            "{}+----------------------------------------------------------------------+{}",
+            Self::ANSI_DIM,
+            Self::ANSI_RESET
+        );
+        println!(
+            "| {}Proof ID:{}      {}",
+            Self::ANSI_CYAN,
+            Self::ANSI_RESET,
+            proof_id
+        );
+        println!(
+            "| {}Predicate:{}     {}",
+            Self::ANSI_CYAN,
+            Self::ANSI_RESET,
+            predicate
+        );
+        println!(
+            "| {}Nullifier:{}     {}...",
+            Self::ANSI_CYAN,
+            Self::ANSI_RESET,
+            &nullifier[0..32.min(nullifier.len())]
+        );
+        println!(
+            "| {}Latency:{}       {}{} µs{} (Rust native constant-time)",
+            Self::ANSI_CYAN,
+            Self::ANSI_RESET,
+            Self::ANSI_YELLOW,
+            latency_us,
+            Self::ANSI_RESET
+        );
+        println!(
+            "| {}Memory State:{}  {}Ephemeral Zeroize memory wiped{}",
+            Self::ANSI_CYAN,
+            Self::ANSI_RESET,
+            Self::ANSI_GREEN,
+            Self::ANSI_RESET
+        );
+        println!(
+            "{}+----------------------------------------------------------------------+{}",
+            Self::ANSI_DIM,
+            Self::ANSI_RESET
+        );
         println!();
     }
 
     /// Generates ASCII representation of a Merkle inclusion branch
     pub fn render_merkle_branch(root_hex: &str, leaf_hex: &str, depth: usize) {
-        println!("{}Merkle Inclusion Proof Authentication Path:{}", Self::ANSI_BOLD, Self::ANSI_RESET);
-        println!("  Root: {}...{}", &root_hex[0..12], &root_hex[root_hex.len().saturating_sub(8)..]);
-        println!("    └── [Depth 0] Leaf: {}...{}", &leaf_hex[0..12], &leaf_hex[leaf_hex.len().saturating_sub(8)..]);
+        println!(
+            "{}Merkle Inclusion Proof Authentication Path:{}",
+            Self::ANSI_BOLD,
+            Self::ANSI_RESET
+        );
+        println!(
+            "  Root: {}...{}",
+            &root_hex[0..12],
+            &root_hex[root_hex.len().saturating_sub(8)..]
+        );
+        println!(
+            "    └── [Depth 0] Leaf: {}...{}",
+            &leaf_hex[0..12],
+            &leaf_hex[leaf_hex.len().saturating_sub(8)..]
+        );
         for d in 1..=depth.min(4) {
             println!("        ├── [Level {} Sibling Hash Verified]", d);
         }

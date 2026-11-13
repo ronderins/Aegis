@@ -23,7 +23,7 @@ pub enum EnclaveTcbStatus {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EnclaveAttestationEvidence {
     pub quote_version: u16,
-    pub tee_type: String, // "Intel_SGX_DCAP" or "AMD_SEV_SNP"
+    pub tee_type: String,  // "Intel_SGX_DCAP" or "AMD_SEV_SNP"
     pub mrenclave: String, // 32-byte hex hash of enclave code & memory layout
     pub mrsigner: String,  // 32-byte hex hash of enclave developer authority key
     pub isv_prod_id: u16,
@@ -41,7 +41,11 @@ pub struct HardwareEnclaveVerifier {
 }
 
 impl HardwareEnclaveVerifier {
-    pub fn new(expected_mrenclave: Option<String>, expected_mrsigner: String, minimum_isv_svn: u16) -> Self {
+    pub fn new(
+        expected_mrenclave: Option<String>,
+        expected_mrsigner: String,
+        minimum_isv_svn: u16,
+    ) -> Self {
         Self {
             expected_mrenclave,
             expected_mrsigner,
@@ -72,7 +76,10 @@ impl HardwareEnclaveVerifier {
         let given_mrsigner = hex::decode(&evidence.mrsigner).map_err(|e| e.to_string())?;
         let expected_mrsigner = hex::decode(&self.expected_mrsigner).map_err(|e| e.to_string())?;
         if !bool::from(given_mrsigner.ct_eq(&expected_mrsigner)) {
-            return Err("MRSIGNER mismatch: Enclave binary was not signed by authorized authority".to_string());
+            return Err(
+                "MRSIGNER mismatch: Enclave binary was not signed by authorized authority"
+                    .to_string(),
+            );
         }
 
         // 4. Optional strict MRENCLAVE match
@@ -80,7 +87,10 @@ impl HardwareEnclaveVerifier {
             let given_mr = hex::decode(&evidence.mrenclave).map_err(|e| e.to_string())?;
             let exp_mr_bytes = hex::decode(exp_mr).map_err(|e| e.to_string())?;
             if !bool::from(given_mr.ct_eq(&exp_mr_bytes)) {
-                return Err("MRENCLAVE mismatch: Enclave image hash does not match expected measurement".to_string());
+                return Err(
+                    "MRENCLAVE mismatch: Enclave image hash does not match expected measurement"
+                        .to_string(),
+                );
             }
         }
 
@@ -142,11 +152,8 @@ mod tests {
         let mrsigner = "99887766554433221100aabbccddeeff99887766554433221100aabbccddeeff";
         let public_inputs = b"zk_proof_age_over_18_session_nonce_7788";
 
-        let verifier = HardwareEnclaveVerifier::new(
-            Some(mrenclave.to_string()),
-            mrsigner.to_string(),
-            1,
-        );
+        let verifier =
+            HardwareEnclaveVerifier::new(Some(mrenclave.to_string()), mrsigner.to_string(), 1);
 
         let report = HardwareEnclaveVerifier::generate_attestation_report(
             "Intel_SGX_DCAP",

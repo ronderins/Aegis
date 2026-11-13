@@ -26,7 +26,12 @@ impl DifferentialPrivacyEngine {
 
     /// Evaluates a query with Laplace perturbation
     /// Noise sampled via inverse transform sampling: X = -\frac{\Delta f}{\epsilon} \text{sgn}(U - 0.5) \ln(1 - 2|U - 0.5|)
-    pub fn perturb_count(&self, raw_count: u64, sensitivity: f64, epsilon: Option<f64>) -> DifferentiallyPrivateStat {
+    pub fn perturb_count(
+        &self,
+        raw_count: u64,
+        sensitivity: f64,
+        epsilon: Option<f64>,
+    ) -> DifferentiallyPrivateStat {
         let eps = epsilon.unwrap_or(self.default_epsilon).max(0.01);
         let scale = sensitivity / eps;
 
@@ -37,7 +42,12 @@ impl DifferentialPrivacyEngine {
         hasher.update(&eps.to_le_bytes());
         let hash = hasher.finalize();
 
-        let u_raw = u32::from_le_bytes([hash.as_bytes()[0], hash.as_bytes()[1], hash.as_bytes()[2], hash.as_bytes()[3]]);
+        let u_raw = u32::from_le_bytes([
+            hash.as_bytes()[0],
+            hash.as_bytes()[1],
+            hash.as_bytes()[2],
+            hash.as_bytes()[3],
+        ]);
         let u = (u_raw as f64 + 1.0) / (u32::MAX as f64 + 2.0); // uniform in (0, 1)
 
         let diff = u - 0.5;
@@ -52,10 +62,7 @@ impl DifferentialPrivacyEngine {
             noisy_value: (noisy_val * 100.0).round() / 100.0,
             epsilon: eps,
             sensitivity,
-            confidence_interval_95: (
-                (noisy_val - margin_95).max(0.0),
-                noisy_val + margin_95,
-            ),
+            confidence_interval_95: ((noisy_val - margin_95).max(0.0), noisy_val + margin_95),
         }
     }
 }

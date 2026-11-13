@@ -51,11 +51,7 @@ pub struct KeyDerivation;
 
 impl KeyDerivation {
     /// Derives a subkey for a specific domain context (e.g. "zk-identity-session", "zk-audit-hmac")
-    pub fn derive_subkey(
-        master_secret: &SecretKey256,
-        salt: &[u8],
-        info: &[u8],
-    ) -> SecretKey256 {
+    pub fn derive_subkey(master_secret: &SecretKey256, salt: &[u8], info: &[u8]) -> SecretKey256 {
         let mut hasher = blake3::Hasher::new_keyed(&master_secret.0);
         hasher.update(b"HKDF-Derive-v1\0");
         hasher.update(salt);

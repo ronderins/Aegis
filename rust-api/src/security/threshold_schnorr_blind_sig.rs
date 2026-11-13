@@ -53,7 +53,10 @@ impl ThresholdSchnorrBlindEngine {
         let msg_h = blake3::hash(message);
         let blinded_h = blake3::hash(format!("{}_{}", msg_h, blinding_scalar_alpha).as_bytes());
 
-        let pok = format!("{:x}", blake3::hash(format!("pok_{}", blinding_scalar_alpha).as_bytes()));
+        let pok = format!(
+            "{:x}",
+            blake3::hash(format!("pok_{}", blinding_scalar_alpha).as_bytes())
+        );
 
         (
             BlindedSchnorrRequest {
@@ -105,7 +108,10 @@ impl ThresholdSchnorrBlindEngine {
 
         // Unblind: s = (s_sum - alpha) mod p
         let unblinded_s = (s_sum + 65537 - (blinding_alpha % 65537)) % 65537;
-        let r_combined = format!("R_comb_{:x}", blake3::hash(partials[0].public_nonce_r.as_bytes()));
+        let r_combined = format!(
+            "R_comb_{:x}",
+            blake3::hash(partials[0].public_nonce_r.as_bytes())
+        );
         let msg_h = format!("{:x}", blake3::hash(original_message));
 
         Ok(UnblindedSchnorrSignature {
@@ -143,10 +149,13 @@ mod tests {
         let part1 = ThresholdSchnorrBlindEngine::authority_sign_partial(1, 100, &req, 500);
         let part2 = ThresholdSchnorrBlindEngine::authority_sign_partial(2, 200, &req, 600);
 
-        let unblinded = engine.unblind_and_combine(&[part1, part2], alpha_saved, secret_msg).unwrap();
+        let unblinded = engine
+            .unblind_and_combine(&[part1, part2], alpha_saved, secret_msg)
+            .unwrap();
         assert!(unblinded.r_point_hex.starts_with("R_comb_"));
 
-        let verified = ThresholdSchnorrBlindEngine::verify_signature(&unblinded, "AggPubKey").unwrap();
+        let verified =
+            ThresholdSchnorrBlindEngine::verify_signature(&unblinded, "AggPubKey").unwrap();
         assert!(verified);
     }
 }

@@ -114,7 +114,12 @@ impl Polynomial {
 
         let mut remainder = self.coeffs.clone();
         let divisor_deg = divisor.coeffs.len() - 1;
-        let divisor_lead_inv = divisor.coeffs.last().unwrap().inv().ok_or("No inverse for leading coeff")?;
+        let divisor_lead_inv = divisor
+            .coeffs
+            .last()
+            .unwrap()
+            .inv()
+            .ok_or("No inverse for leading coeff")?;
 
         let quotient_len = remainder.len() - divisor.coeffs.len() + 1;
         let mut quotient = vec![Fp::zero(); quotient_len];

@@ -11,11 +11,7 @@ pub struct ComparatorGadget;
 
 impl ComparatorGadget {
     /// Enforces that lhs <= rhs: decomposes (rhs - lhs) into 64 positive bits
-    pub fn enforce_less_or_equal(
-        cs: &mut ConstraintSystem,
-        lhs: Variable,
-        rhs: Variable,
-    ) {
+    pub fn enforce_less_or_equal(cs: &mut ConstraintSystem, lhs: Variable, rhs: Variable) {
         let diff_var = cs.alloc_private();
 
         // 1 * (rhs - lhs) = diff
@@ -36,11 +32,7 @@ impl ComparatorGadget {
     }
 
     /// Allocates a boolean indicator variable `is_equal` = (a == b)
-    pub fn is_equal(
-        cs: &mut ConstraintSystem,
-        a: Variable,
-        b: Variable,
-    ) -> Variable {
+    pub fn is_equal(cs: &mut ConstraintSystem, a: Variable, b: Variable) -> Variable {
         let is_eq = cs.alloc_private();
         let inv_diff = cs.alloc_private();
 

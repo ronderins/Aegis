@@ -51,7 +51,13 @@ impl LogupEngine {
 
     /// Registers a lookup table (e.g. valid age values [18..130])
     pub fn register_table(&mut self, table_id: usize, values: Vec<u64>) {
-        self.tables.insert(table_id, LogupTable { table_id, entries: values });
+        self.tables.insert(
+            table_id,
+            LogupTable {
+                table_id,
+                entries: values,
+            },
+        );
     }
 
     /// Proves that all elements in query_values exist in registered table table_id
@@ -93,7 +99,16 @@ impl LogupEngine {
             }
         }
 
-        let proof_h = blake3::hash(format!("{}_{}_{}_{}", table_id, query_values.len(), sum_lhs, sum_rhs).as_bytes());
+        let proof_h = blake3::hash(
+            format!(
+                "{}_{}_{}_{}",
+                table_id,
+                query_values.len(),
+                sum_lhs,
+                sum_rhs
+            )
+            .as_bytes(),
+        );
 
         Ok(LogupProof {
             table_id,

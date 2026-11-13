@@ -124,7 +124,10 @@ mod tests {
 
         // Emergency tripwire test
         HardwareCanaryGuard::trigger_emergency_tripwire();
-        assert_eq!(guard.evaluate_health(), CanaryHealthStatus::CanaryTripwireTriggered);
+        assert_eq!(
+            guard.evaluate_health(),
+            CanaryHealthStatus::CanaryTripwireTriggered
+        );
 
         // Clean up
         HardwareCanaryGuard::reset_tripwire_for_testing();

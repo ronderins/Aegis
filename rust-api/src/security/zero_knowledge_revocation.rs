@@ -113,11 +113,8 @@ impl DynamicRevocationAccumulator {
         h.update(&self.epoch_id.to_be_bytes());
 
         // Sort elements deterministically for canonical commitment
-        let mut sorted_hashes: Vec<String> = self
-            .revoked_elements
-            .iter()
-            .map(|el| el.to_hex())
-            .collect();
+        let mut sorted_hashes: Vec<String> =
+            self.revoked_elements.iter().map(|el| el.to_hex()).collect();
         sorted_hashes.sort();
 
         for hash_str in &sorted_hashes {
@@ -148,7 +145,9 @@ impl DynamicRevocationAccumulator {
         element: &AccumulatorElement,
     ) -> Result<NonMembershipWitness, String> {
         if self.is_revoked(element) {
-            return Err("Cannot generate non-membership witness: credential IS revoked".to_string());
+            return Err(
+                "Cannot generate non-membership witness: credential IS revoked".to_string(),
+            );
         }
 
         let commitment = self.compute_commitment();
@@ -194,7 +193,10 @@ impl DynamicRevocationAccumulator {
         if witness.epoch_id != commitment.epoch_id {
             return false;
         }
-        if !crate::crypto::constant_time_eq(&witness.accumulator_value, &commitment.accumulated_value) {
+        if !crate::crypto::constant_time_eq(
+            &witness.accumulator_value,
+            &commitment.accumulated_value,
+        ) {
             return false;
         }
 
@@ -223,8 +225,10 @@ mod tests {
     fn test_dynamic_accumulator_revocation_and_witness() {
         let mut acc = DynamicRevocationAccumulator::new(1, b"seed_entropy_accumulator_2026");
 
-        let active_user = AccumulatorElement::from_credential_id("user_alice_credential_42", b"salt1");
-        let revoked_user = AccumulatorElement::from_credential_id("user_mallory_bad_actor", b"salt1");
+        let active_user =
+            AccumulatorElement::from_credential_id("user_alice_credential_42", b"salt1");
+        let revoked_user =
+            AccumulatorElement::from_credential_id("user_mallory_bad_actor", b"salt1");
 
         // Revoke mallory
         acc.revoke(revoked_user.clone());
@@ -236,7 +240,9 @@ mod tests {
 
         // Generating witness for Alice (active) must succeed
         let witness = acc.generate_non_membership_witness(&active_user).unwrap();
-        assert!(DynamicRevocationAccumulator::verify_non_membership(&witness, &comm));
+        assert!(DynamicRevocationAccumulator::verify_non_membership(
+            &witness, &comm
+        ));
 
         // Generating witness for Mallory (revoked) must FAIL
         assert!(acc.generate_non_membership_witness(&revoked_user).is_err());

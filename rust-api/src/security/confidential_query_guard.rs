@@ -29,8 +29,21 @@ pub enum SafeSqlToken {
 
 /// Dangerous SQL keywords blocked immediately
 pub const DANGEROUS_SQL_KEYWORDS: &[&str] = &[
-    "DROP", "TRUNCATE", "ALTER", "GRANT", "REVOKE", "EXEC", "EXECUTE", "XP_", "INFORMATION_SCHEMA",
-    "UNION SELECT", "SLEEP(", "BENCHMARK(", "WAITFOR DELAY", "1=1", "OR '1'='1",
+    "DROP",
+    "TRUNCATE",
+    "ALTER",
+    "GRANT",
+    "REVOKE",
+    "EXEC",
+    "EXECUTE",
+    "XP_",
+    "INFORMATION_SCHEMA",
+    "UNION SELECT",
+    "SLEEP(",
+    "BENCHMARK(",
+    "WAITFOR DELAY",
+    "1=1",
+    "OR '1'='1",
 ];
 
 /// A parsed and AST-verified safe parameterized query
@@ -63,7 +76,10 @@ impl ConfidentialQueryGuard {
     }
 
     /// Verifies and sanitizes a SQL query template before parameter substitution
-    pub fn validate_and_tokenize(&self, query_template: &str) -> Result<SafeParameterizedQuery, &'static str> {
+    pub fn validate_and_tokenize(
+        &self,
+        query_template: &str,
+    ) -> Result<SafeParameterizedQuery, &'static str> {
         let upper = query_template.to_uppercase();
 
         // 1. Scan for dangerous SQL injection signatures
@@ -118,7 +134,10 @@ impl ConfidentialQueryGuard {
                 }
                 ident => {
                     // Validate identifier characters
-                    if !ident.chars().all(|c| c.is_alphanumeric() || c == '_' || c == '.') {
+                    if !ident
+                        .chars()
+                        .all(|c| c.is_alphanumeric() || c == '_' || c == '.')
+                    {
                         return Err("Security Violation: Malformed identifier characters");
                     }
                     safe_tokens.push(SafeSqlToken::Identifier(ident.to_string()));
@@ -156,7 +175,8 @@ mod tests {
     #[test]
     fn test_valid_safe_query_validation() {
         let guard = ConfidentialQueryGuard::new();
-        let query = "SELECT commitment, timestamp FROM commitments WHERE user_id_digest = ? AND active = ?";
+        let query =
+            "SELECT commitment, timestamp FROM commitments WHERE user_id_digest = ? AND active = ?";
 
         let parsed = guard.validate_and_tokenize(query).unwrap();
         assert_eq!(parsed.table_accessed, "commitments");

@@ -49,7 +49,10 @@ impl R1csFormalOptimizer {
         let mut out: Vec<R1csTerm> = map
             .into_iter()
             .filter(|&(_, coeff)| coeff != 0)
-            .map(|(wire_id, coefficient)| R1csTerm { wire_id, coefficient })
+            .map(|(wire_id, coefficient)| R1csTerm {
+                wire_id,
+                coefficient,
+            })
             .collect();
 
         out.sort_by_key(|t| t.wire_id);
@@ -104,12 +107,22 @@ impl R1csFormalOptimizer {
         // Calculate dead wires pruned
         let mut active_wires = HashSet::new();
         for g in &optimized {
-            for t in &g.a { active_wires.insert(t.wire_id); }
-            for t in &g.b { active_wires.insert(t.wire_id); }
-            for t in &g.c { active_wires.insert(t.wire_id); }
+            for t in &g.a {
+                active_wires.insert(t.wire_id);
+            }
+            for t in &g.b {
+                active_wires.insert(t.wire_id);
+            }
+            for t in &g.c {
+                active_wires.insert(t.wire_id);
+            }
         }
-        for &inp in public_inputs { active_wires.insert(inp); }
-        for &out in outputs { active_wires.insert(out); }
+        for &inp in public_inputs {
+            active_wires.insert(inp);
+        }
+        for &out in outputs {
+            active_wires.insert(out);
+        }
 
         let gates_eliminated = original_gate_count.saturating_sub(optimized.len());
         let reduction_pct = if original_gate_count > 0 {
@@ -151,22 +164,43 @@ mod tests {
             // Valid gate: w1 * w2 = w3
             R1csGate {
                 gate_id: 0,
-                a: vec![R1csTerm { wire_id: 1, coefficient: 1 }],
-                b: vec![R1csTerm { wire_id: 2, coefficient: 1 }],
-                c: vec![R1csTerm { wire_id: 3, coefficient: 1 }],
+                a: vec![R1csTerm {
+                    wire_id: 1,
+                    coefficient: 1,
+                }],
+                b: vec![R1csTerm {
+                    wire_id: 2,
+                    coefficient: 1,
+                }],
+                c: vec![R1csTerm {
+                    wire_id: 3,
+                    coefficient: 1,
+                }],
             },
             // Duplicate of gate 0
             R1csGate {
                 gate_id: 1,
-                a: vec![R1csTerm { wire_id: 1, coefficient: 1 }],
-                b: vec![R1csTerm { wire_id: 2, coefficient: 1 }],
-                c: vec![R1csTerm { wire_id: 3, coefficient: 1 }],
+                a: vec![R1csTerm {
+                    wire_id: 1,
+                    coefficient: 1,
+                }],
+                b: vec![R1csTerm {
+                    wire_id: 2,
+                    coefficient: 1,
+                }],
+                c: vec![R1csTerm {
+                    wire_id: 3,
+                    coefficient: 1,
+                }],
             },
             // Trivial tautology: 0 * w1 = 0
             R1csGate {
                 gate_id: 2,
                 a: vec![],
-                b: vec![R1csTerm { wire_id: 1, coefficient: 1 }],
+                b: vec![R1csTerm {
+                    wire_id: 1,
+                    coefficient: 1,
+                }],
                 c: vec![],
             },
         ];

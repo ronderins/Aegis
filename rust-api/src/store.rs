@@ -10,8 +10,8 @@ use zeroize::Zeroize;
 
 use crate::crypto::{
     build_commitment, compute_blake3_hex, compute_merkle_node, compute_receipt_block_hash,
-    compute_sha256_hex, constant_time_eq, simulate_zkp_age_verification,
-    EphemeralSensitiveWitness, ZkTokenSigner,
+    compute_sha256_hex, constant_time_eq, simulate_zkp_age_verification, EphemeralSensitiveWitness,
+    ZkTokenSigner,
 };
 use crate::models::{
     AuditEvent, BlindQrSession, ExecutionLatencyMicros, LedgerChainResponse,
@@ -142,9 +142,15 @@ impl Repository {
 
     /// Emergency wipe: Drops all SQLite tables and clears session memory cache immediately.
     pub async fn emergency_wipe_local_data(&self) {
-        let _ = sqlx::query("DROP TABLE IF EXISTS zk_verifications").execute(&self.pool).await;
-        let _ = sqlx::query("DROP TABLE IF EXISTS zk_audit_events").execute(&self.pool).await;
-        let _ = sqlx::query("DROP TABLE IF EXISTS zk_receipt_ledger").execute(&self.pool).await;
+        let _ = sqlx::query("DROP TABLE IF EXISTS zk_verifications")
+            .execute(&self.pool)
+            .await;
+        let _ = sqlx::query("DROP TABLE IF EXISTS zk_audit_events")
+            .execute(&self.pool)
+            .await;
+        let _ = sqlx::query("DROP TABLE IF EXISTS zk_receipt_ledger")
+            .execute(&self.pool)
+            .await;
 
         let mut lock = self.sessions.write().await;
         lock.clear();
@@ -243,10 +249,19 @@ impl Repository {
         meta.insert("version".to_string(), "zk-identity-proof-v1".to_string());
         meta.insert("database".to_string(), "sqlx-in-memory-sqlite".to_string());
         meta.insert("jwt_signer".to_string(), "jwt-simple-hs256".to_string());
-        meta.insert("zk_circuit".to_string(), "simulated-r1cs-age-check".to_string());
-        meta.insert("pii_policy".to_string(), "zero_pii_strictly_enforced".to_string());
+        meta.insert(
+            "zk_circuit".to_string(),
+            "simulated-r1cs-age-check".to_string(),
+        );
+        meta.insert(
+            "pii_policy".to_string(),
+            "zero_pii_strictly_enforced".to_string(),
+        );
         meta.insert("ledger".to_string(), "blake3-merkle-chain".to_string());
-        meta.insert("memory_lockdown".to_string(), "zeroize-ephemeral-wipe".to_string());
+        meta.insert(
+            "memory_lockdown".to_string(),
+            "zeroize-ephemeral-wipe".to_string(),
+        );
 
         let meta_json = serde_json::to_string(&meta).unwrap_or_default();
 
@@ -384,13 +399,15 @@ impl Repository {
             &witness.nonce,
         );
         let sha_elapsed = t_sha.elapsed().as_micros() as u64;
-        self.last_sha256_micros.store(sha_elapsed, Ordering::Relaxed);
+        self.last_sha256_micros
+            .store(sha_elapsed, Ordering::Relaxed);
 
         // Ephemeral Memory Lockdown: Immediately overwrite and wipe witness memory
         let t_zeroize = std::time::Instant::now();
         witness.lockdown_and_wipe();
         let zeroize_elapsed = t_zeroize.elapsed().as_micros() as u64;
-        self.last_zeroize_micros.store(zeroize_elapsed, Ordering::Relaxed);
+        self.last_zeroize_micros
+            .store(zeroize_elapsed, Ordering::Relaxed);
 
         // 2. Generate unique cryptographically signed payload token using jwt-simple
         let proof_signature = self
@@ -434,9 +451,18 @@ impl Repository {
         meta.insert("version".to_string(), "zk-identity-proof-v1".to_string());
         meta.insert("database".to_string(), "sqlx-in-memory-sqlite".to_string());
         meta.insert("jwt_signer".to_string(), "jwt-simple-hs256".to_string());
-        meta.insert("zk_circuit".to_string(), "simulated-r1cs-age-check".to_string());
-        meta.insert("pii_policy".to_string(), "zero_pii_strictly_enforced".to_string());
-        meta.insert("memory_lockdown".to_string(), "zeroize-ephemeral-wipe".to_string());
+        meta.insert(
+            "zk_circuit".to_string(),
+            "simulated-r1cs-age-check".to_string(),
+        );
+        meta.insert(
+            "pii_policy".to_string(),
+            "zero_pii_strictly_enforced".to_string(),
+        );
+        meta.insert(
+            "memory_lockdown".to_string(),
+            "zeroize-ephemeral-wipe".to_string(),
+        );
         meta.insert("ledger".to_string(), "blake3-merkle-chain".to_string());
 
         let meta_json = serde_json::to_string(&meta).unwrap_or_default();
@@ -500,15 +526,21 @@ impl Repository {
         .await;
 
         let blake_elapsed = t_blake.elapsed().as_micros() as u64;
-        self.last_blake3_micros.store(blake_elapsed, Ordering::Relaxed);
+        self.last_blake3_micros
+            .store(blake_elapsed, Ordering::Relaxed);
 
         // Record total operation microsecond latency
         let total_op_micros = op_start.elapsed().as_micros() as u64;
-        self.last_op_micros.store(total_op_micros, Ordering::Relaxed);
-        self.total_verifications_count.fetch_add(1, Ordering::Relaxed);
-        self.total_micros_accum.fetch_add(total_op_micros, Ordering::Relaxed);
-        self.min_micros.fetch_min(total_op_micros, Ordering::Relaxed);
-        self.max_micros.fetch_max(total_op_micros, Ordering::Relaxed);
+        self.last_op_micros
+            .store(total_op_micros, Ordering::Relaxed);
+        self.total_verifications_count
+            .fetch_add(1, Ordering::Relaxed);
+        self.total_micros_accum
+            .fetch_add(total_op_micros, Ordering::Relaxed);
+        self.min_micros
+            .fetch_min(total_op_micros, Ordering::Relaxed);
+        self.max_micros
+            .fetch_max(total_op_micros, Ordering::Relaxed);
 
         // Compliance: Return strict JSON containing only verified, criteria_met, proof_signature
         Ok(VerifyResponse {
@@ -517,7 +549,6 @@ impl Repository {
             proof_signature,
         })
     }
-
 
     /// Queries proof verification record by proof_id from SQLite database.
     pub async fn get_proof(&self, proof_id: &str) -> Option<ProofResponse> {
@@ -737,7 +768,10 @@ impl Repository {
     }
 
     /// Cryptographically decodes and verifies a signed ZK proof token.
-    pub async fn verify_signed_token(&self, token: &str) -> Result<crate::models::VerifyTokenResponse, String> {
+    pub async fn verify_signed_token(
+        &self,
+        token: &str,
+    ) -> Result<crate::models::VerifyTokenResponse, String> {
         let claims = self.token_signer.verify_token(token)?;
         let custom = claims.custom;
 
@@ -775,11 +809,10 @@ impl Repository {
                 .await
                 .unwrap_or(0);
 
-        let total_ledger_blocks: i64 =
-            sqlx::query_scalar("SELECT COUNT(*) FROM zk_receipt_ledger")
-                .fetch_one(&self.pool)
-                .await
-                .unwrap_or(0);
+        let total_ledger_blocks: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM zk_receipt_ledger")
+            .fetch_one(&self.pool)
+            .await
+            .unwrap_or(0);
 
         let latest_merkle_root: String = sqlx::query_scalar(
             "SELECT merkle_root FROM zk_receipt_ledger ORDER BY block_index DESC LIMIT 1",
@@ -807,7 +840,11 @@ impl Repository {
     pub async fn get_metrics(&self) -> PerformanceMetricsResponse {
         let count = self.total_verifications_count.load(Ordering::Relaxed);
         let total_micros = self.total_micros_accum.load(Ordering::Relaxed);
-        let avg_micros = if count > 0 { total_micros / (count as u64) } else { 0 };
+        let avg_micros = if count > 0 {
+            total_micros / (count as u64)
+        } else {
+            0
+        };
         let min_m = self.min_micros.load(Ordering::Relaxed);
         let min_micros = if min_m == u64::MAX { 0 } else { min_m };
         let max_micros = self.max_micros.load(Ordering::Relaxed);
@@ -894,7 +931,10 @@ mod tests {
     async fn test_canary_deadman_switch_emergency_wipe() {
         let repo = Repository::new().await;
         let doc_hash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
-        let _ = repo.create_proof("user_canary", doc_hash, 18).await.unwrap();
+        let _ = repo
+            .create_proof("user_canary", doc_hash, 18)
+            .await
+            .unwrap();
 
         let proofs_before = repo.list_proofs(10).await;
         assert!(!proofs_before.is_empty());
@@ -904,7 +944,10 @@ mod tests {
 
         // Querying dropped table returns empty list gracefully
         let proofs_after = repo.list_proofs(10).await;
-        assert!(proofs_after.is_empty(), "All local data must be wiped completely");
+        assert!(
+            proofs_after.is_empty(),
+            "All local data must be wiped completely"
+        );
     }
 
     #[tokio::test]
@@ -928,7 +971,11 @@ mod tests {
         assert_eq!(parsed["verified"], true);
         assert_eq!(parsed["criteria_met"], "age_over_21");
         assert!(parsed["proof_signature"].is_string());
-        assert_eq!(parsed.as_object().unwrap().len(), 3, "Strict JSON must contain ONLY 3 fields");
+        assert_eq!(
+            parsed.as_object().unwrap().len(),
+            3,
+            "Strict JSON must contain ONLY 3 fields"
+        );
 
         // Verify list
         let proofs = repo.list_proofs(10).await;
@@ -967,8 +1014,14 @@ mod tests {
         let _ = repo.create_proof("user_2", doc_hash, 21).await.unwrap();
 
         let ledger = repo.get_receipt_ledger(50).await;
-        assert!(ledger.total_blocks >= 3, "Genesis + Seed + 2 Created proofs");
-        assert!(ledger.is_valid, "Merkle receipt chain must be cryptographically valid");
+        assert!(
+            ledger.total_blocks >= 3,
+            "Genesis + Seed + 2 Created proofs"
+        );
+        assert!(
+            ledger.is_valid,
+            "Merkle receipt chain must be cryptographically valid"
+        );
         assert_eq!(ledger.latest_merkle_root.len(), 64);
     }
 }

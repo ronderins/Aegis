@@ -59,13 +59,25 @@ impl PqSessionKeyExchangeEngine {
         server_seed: &[u8; 32],
     ) -> (HybridServerResponse, String) {
         let server_x25519_priv = (server_seed[0] as u64).wrapping_mul(0x517CC1B727220A95);
-        let server_x25519_pub = format!("x25519_pk_{:x}", blake3::hash(&server_x25519_priv.to_le_bytes()));
+        let server_x25519_pub = format!(
+            "x25519_pk_{:x}",
+            blake3::hash(&server_x25519_priv.to_le_bytes())
+        );
 
         // Classical shared secret
-        let classical_ss = blake3::hash(format!("{}_{}", init.x25519_client_public, server_x25519_priv).as_bytes());
+        let classical_ss = blake3::hash(
+            format!("{}_{}", init.x25519_client_public, server_x25519_priv).as_bytes(),
+        );
 
         // Post-quantum Kyber shared secret simulation
-        let pq_ss = blake3::hash(format!("kyber_{:x}_{:x}", blake3::hash(&init.kyber_client_public_seed), blake3::hash(server_seed)).as_bytes());
+        let pq_ss = blake3::hash(
+            format!(
+                "kyber_{:x}_{:x}",
+                blake3::hash(&init.kyber_client_public_seed),
+                blake3::hash(server_seed)
+            )
+            .as_bytes(),
+        );
 
         // Hybrid Combiner: HKDF-Expand(Classical_SS || PQ_SS)
         let mut hybrid_hasher = blake3::Hasher::new();
@@ -75,7 +87,10 @@ impl PqSessionKeyExchangeEngine {
         let master_shared_secret = format!("{:x}", hybrid_hasher.finalize());
 
         let kyber_ct = format!("kyber_ct_{:x}", blake3::hash(pq_ss.as_bytes()));
-        let auth_sig = format!("pq_auth_sig_{:x}", blake3::hash(format!("{}_{}", init.client_session_id, kyber_ct).as_bytes()));
+        let auth_sig = format!(
+            "pq_auth_sig_{:x}",
+            blake3::hash(format!("{}_{}", init.client_session_id, kyber_ct).as_bytes())
+        );
 
         (
             HybridServerResponse {
@@ -98,7 +113,8 @@ impl PqSessionKeyExchangeEngine {
             return Err("Invalid server response parameters");
         }
 
-        let classical_ss = blake3::hash(format!("{}_{}", resp.x25519_server_public, client_priv).as_bytes());
+        let classical_ss =
+            blake3::hash(format!("{}_{}", resp.x25519_server_public, client_priv).as_bytes());
         let mut hybrid_hasher = blake3::Hasher::new();
         hybrid_hasher.update(b"HYBRID_PQ_COMBINER_V1");
         hybrid_hasher.update(classical_ss.as_bytes());
@@ -120,10 +136,12 @@ mod tests {
 
     #[test]
     fn test_pq_session_key_exchange_handshake() {
-        let (init, client_priv) = PqSessionKeyExchangeEngine::client_initiate("sess_pq_001", &[0x44; 32]);
+        let (init, client_priv) =
+            PqSessionKeyExchangeEngine::client_initiate("sess_pq_001", &[0x44; 32]);
         let (resp, _server_secret) = PqSessionKeyExchangeEngine::server_respond(&init, &[0x88; 32]);
 
-        let client_context = PqSessionKeyExchangeEngine::client_finalize(&init, client_priv, &resp).unwrap();
+        let client_context =
+            PqSessionKeyExchangeEngine::client_finalize(&init, client_priv, &resp).unwrap();
         assert!(client_context.post_quantum_secure);
         assert!(!client_context.hybrid_shared_secret_hex.is_empty());
     }

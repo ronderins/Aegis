@@ -19,8 +19,12 @@ fn benchmark_poseidon_hash(iterations: usize) -> u128 {
         val = poseidon_hash_2(val, i as u64);
     }
     let elapsed = start.elapsed().as_micros();
-    println!("Poseidon Hash ({} iterations): {} µs total (avg {:.2} µs/hash)",
-        iterations, elapsed, elapsed as f64 / iterations as f64);
+    println!(
+        "Poseidon Hash ({} iterations): {} µs total (avg {:.2} µs/hash)",
+        iterations,
+        elapsed,
+        elapsed as f64 / iterations as f64
+    );
     elapsed
 }
 
@@ -32,8 +36,12 @@ fn benchmark_bn254_field_ops(iterations: usize) -> u128 {
         a = a.add(b).double();
     }
     let elapsed = start.elapsed().as_micros();
-    println!("BN254 Fp Arithmetic ({} ops): {} µs total (avg {:.3} µs/op)",
-        iterations, elapsed, elapsed as f64 / iterations as f64);
+    println!(
+        "BN254 Fp Arithmetic ({} ops): {} µs total (avg {:.3} µs/op)",
+        iterations,
+        elapsed,
+        elapsed as f64 / iterations as f64
+    );
     elapsed
 }
 
@@ -53,8 +61,12 @@ fn benchmark_r1cs_circuit_synthesis(iterations: usize) -> u128 {
         let _ = cs.is_satisfied(&table.values).unwrap();
     }
     let elapsed = start.elapsed().as_micros();
-    println!("R1CS Circuit Synthesis & Verification ({} runs): {} µs total (avg {:.2} µs/run)",
-        iterations, elapsed, elapsed as f64 / iterations as f64);
+    println!(
+        "R1CS Circuit Synthesis & Verification ({} runs): {} µs total (avg {:.2} µs/run)",
+        iterations,
+        elapsed,
+        elapsed as f64 / iterations as f64
+    );
     elapsed
 }
 
@@ -69,7 +81,10 @@ fn benchmark_merkle_tree(num_leaves: usize) -> u128 {
     }
     let _root = tree.compute_root();
     let elapsed = start.elapsed().as_micros();
-    println!("Blake3 Merkle Tree ({} leaves): {} µs total", num_leaves, elapsed);
+    println!(
+        "Blake3 Merkle Tree ({} leaves): {} µs total",
+        num_leaves, elapsed
+    );
     elapsed
 }
 

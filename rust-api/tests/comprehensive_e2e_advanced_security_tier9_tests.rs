@@ -5,9 +5,9 @@
 //! 2. Recursive Groth16 Proof Folding over BN254 & Pasta Curves
 //! 3. Property-Based Formal Invariant Fuzzing of Finite Field Operations
 
+use zk_identity_api_rust::security::formal_invariant_arithmetic_fuzzer::*;
 use zk_identity_api_rust::security::zk_confidential_multi_hop_settlement::*;
 use zk_identity_api_rust::security::zk_groth16_recursive_verifier::*;
-use zk_identity_api_rust::security::formal_invariant_arithmetic_fuzzer::*;
 
 #[test]
 fn test_tier9_multi_hop_htlc_full_flow() {
@@ -38,7 +38,8 @@ fn test_tier9_multi_hop_htlc_full_flow() {
         },
     ];
 
-    let receipt = MultiHopSettlementEngine::execute_atomic_settlement(&lock, preimage, 2000, &hops).unwrap();
+    let receipt =
+        MultiHopSettlementEngine::execute_atomic_settlement(&lock, preimage, 2000, &hops).unwrap();
     assert!(receipt.is_settled);
     assert_eq!(receipt.total_hops, 2);
 }

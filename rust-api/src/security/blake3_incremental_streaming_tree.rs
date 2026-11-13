@@ -53,7 +53,9 @@ impl Blake3StreamingTree {
             if top.height == current_node.height {
                 let left_peak = self.peak_stack.pop().unwrap();
                 // Combine left and right peaks: parent = Hash(left || right)
-                let parent_h = blake3::hash(format!("{}_{}", left_peak.hash_hex, current_node.hash_hex).as_bytes());
+                let parent_h = blake3::hash(
+                    format!("{}_{}", left_peak.hash_hex, current_node.hash_hex).as_bytes(),
+                );
                 current_node = StreamingTreeNode {
                     height: current_node.height + 1,
                     hash_hex: format!("{:x}", parent_h),
@@ -83,7 +85,11 @@ impl Blake3StreamingTree {
     }
 
     /// Generates an inclusion proof for an appended chunk
-    pub fn generate_inclusion_proof(&self, chunk_index: u64, chunk_bytes: &[u8]) -> StreamingInclusionProof {
+    pub fn generate_inclusion_proof(
+        &self,
+        chunk_index: u64,
+        chunk_bytes: &[u8],
+    ) -> StreamingInclusionProof {
         let chunk_h = format!("{:x}", blake3::hash(chunk_bytes));
         let root = self.get_current_root();
 
@@ -105,7 +111,10 @@ impl Blake3StreamingTree {
         if proof.expected_tree_root.is_empty() || proof.sibling_hashes.is_empty() {
             return Err("Corrupted inclusion proof");
         }
-        let is_valid = proof.sibling_hashes.iter().any(|h| proof.expected_tree_root.contains(&h[0..6]) || h == &proof.chunk_digest);
+        let is_valid = proof
+            .sibling_hashes
+            .iter()
+            .any(|h| proof.expected_tree_root.contains(&h[0..6]) || h == &proof.chunk_digest);
         Ok(is_valid)
     }
 }

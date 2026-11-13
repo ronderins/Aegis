@@ -45,7 +45,7 @@ fn test_plonk_prover_and_verifier_pipeline() {
     };
 
     let gates = vec![
-        PlonkGateRow::new_addition(0, 1, 2),       // x0 + x1 = x2  (3 + 5 = 8)
+        PlonkGateRow::new_addition(0, 1, 2), // x0 + x1 = x2  (3 + 5 = 8)
         PlonkGateRow::new_multiplication(2, 3, 4), // x2 * x3 = x4  (8 * 2 = 16)
     ];
 
@@ -95,15 +95,24 @@ fn test_ring_signature_anonymity_and_linkability() {
     let signer_idx = 1; // Bob
     let bob_secret = [0x33u8; 32];
 
-    let sig = RingSignatureEngine::sign_ring(msg, &ring, signer_idx, &bob_secret).expect("Ring signature");
+    let sig = RingSignatureEngine::sign_ring(msg, &ring, signer_idx, &bob_secret)
+        .expect("Ring signature");
     assert_eq!(sig.ring_public_keys.len(), 3);
     assert_eq!(sig.responses.len(), 3);
 
     let mut seen_nullifiers = std::collections::HashSet::new();
-    assert!(RingSignatureEngine::verify_ring(msg, &sig, &seen_nullifiers));
+    assert!(RingSignatureEngine::verify_ring(
+        msg,
+        &sig,
+        &seen_nullifiers
+    ));
 
     // Mark key image as seen
     seen_nullifiers.insert(sig.key_image.clone());
     // Second attempt should fail (linkable double-spend prevention)
-    assert!(!RingSignatureEngine::verify_ring(msg, &sig, &seen_nullifiers));
+    assert!(!RingSignatureEngine::verify_ring(
+        msg,
+        &sig,
+        &seen_nullifiers
+    ));
 }

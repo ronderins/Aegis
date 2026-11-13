@@ -25,7 +25,10 @@ pub use bls12_381::{BlsG1Affine, BlsScalar};
 pub use bn254_constants::Bn254Constants;
 pub use ed25519::{Ed25519Field, Ed25519Point};
 pub use fp12::{Fp12, Fp6};
-pub use frost_dkg::{AggregatedSchnorrSignature, DkgRound1Commitment, DkgRound2Share, FrostCoordinator, SigningNonceCommitment, ThresholdKeyShare, ThresholdSignatureShare};
+pub use frost_dkg::{
+    AggregatedSchnorrSignature, DkgRound1Commitment, DkgRound2Share, FrostCoordinator,
+    SigningNonceCommitment, ThresholdKeyShare, ThresholdSignatureShare,
+};
 pub use jubjub::JubjubPoint;
 pub use optimal_ate::OptimalAtePairing;
 pub use pasta::PastaPoint;

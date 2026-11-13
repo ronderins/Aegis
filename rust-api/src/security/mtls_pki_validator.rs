@@ -17,19 +17,32 @@ use zeroize::Zeroize;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PkiValidationError {
     /// Certificate has expired or is not yet valid
-    CertificateExpired { not_before: u64, not_after: u64, current_time: u64 },
+    CertificateExpired {
+        not_before: u64,
+        not_after: u64,
+        current_time: u64,
+    },
     /// Issuer signature does not verify against parent public key
     SignatureVerificationFailed { issuer: String },
     /// Pinned intermediate or root CA fingerprint does not match approved trust anchors
     UntrustedAuthorityFingerprint { fingerprint_sha256: String },
     /// SAN does not cover the requested service identity
-    HostnameSanMismatch { requested: String, provided_sans: Vec<String> },
+    HostnameSanMismatch {
+        requested: String,
+        provided_sans: Vec<String>,
+    },
     /// Certificate revoked via OCSP or CRL
-    RevokedCertificate { serial_hex: String, revocation_time: u64 },
+    RevokedCertificate {
+        serial_hex: String,
+        revocation_time: u64,
+    },
     /// Missing required Extended Key Usage (e.g. id-kp-clientAuth for mTLS client)
     MissingKeyUsage { required_usage: String },
     /// SCT (Signed Certificate Timestamp) count is below Certificate Transparency threshold
-    InsufficientSctProof { sct_count: usize, required_minimum: usize },
+    InsufficientSctProof {
+        sct_count: usize,
+        required_minimum: usize,
+    },
 }
 
 /// Normalized X.509 Certificate Representation for Zero-Trust Validation
@@ -73,7 +86,8 @@ impl PkiTrustStore {
 
     /// Adds a certificate serial number to the active CRL blacklist.
     pub fn revoke_serial(&mut self, serial_hex: impl Into<String>) {
-        self.revoked_serials.insert(serial_hex.into().to_lowercase());
+        self.revoked_serials
+            .insert(serial_hex.into().to_lowercase());
     }
 
     /// Validates an incoming client mTLS certificate chain against pinned anchors and policy rules.
@@ -98,7 +112,10 @@ impl PkiTrustStore {
         }
 
         // 2. Check revocation status
-        if self.revoked_serials.contains(&client_cert.serial_number_hex.to_lowercase()) {
+        if self
+            .revoked_serials
+            .contains(&client_cert.serial_number_hex.to_lowercase())
+        {
             return Err(PkiValidationError::RevokedCertificate {
                 serial_hex: client_cert.serial_number_hex.clone(),
                 revocation_time: now,
@@ -143,7 +160,9 @@ impl PkiTrustStore {
             hasher.update(&issuer.public_key_der);
             let fp = *hasher.finalize().as_bytes();
 
-            if !self.pinned_root_fingerprints.is_empty() && !self.pinned_root_fingerprints.contains(&fp) {
+            if !self.pinned_root_fingerprints.is_empty()
+                && !self.pinned_root_fingerprints.contains(&fp)
+            {
                 return Err(PkiValidationError::UntrustedAuthorityFingerprint {
                     fingerprint_sha256: hex::encode(fp),
                 });
@@ -231,7 +250,11 @@ mod tests {
             is_ca: false,
         };
 
-        let res = trust_store.validate_client_mtls_cert(&client, Some(&issuer), "zk-prover.mesh.internal");
+        let res = trust_store.validate_client_mtls_cert(
+            &client,
+            Some(&issuer),
+            "zk-prover.mesh.internal",
+        );
         assert!(res.is_ok());
     }
 
@@ -256,6 +279,9 @@ mod tests {
         };
 
         let res = trust_store.validate_client_mtls_cert(&client, None, "service.internal");
-        assert!(matches!(res, Err(PkiValidationError::RevokedCertificate { .. })));
+        assert!(matches!(
+            res,
+            Err(PkiValidationError::RevokedCertificate { .. })
+        ));
     }
 }

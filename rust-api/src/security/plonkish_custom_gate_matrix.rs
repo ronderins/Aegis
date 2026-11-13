@@ -21,9 +21,17 @@ pub struct PlonkishCell {
 /// A custom gate expression evaluating non-linear constraints
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum CustomGateExpression {
-    PoseidonSbox { advice_col: usize },
-    RangeCheck16 { advice_col: usize },
-    LinearCombination { left_col: usize, right_col: usize, out_col: usize },
+    PoseidonSbox {
+        advice_col: usize,
+    },
+    RangeCheck16 {
+        advice_col: usize,
+    },
+    LinearCombination {
+        left_col: usize,
+        right_col: usize,
+        out_col: usize,
+    },
 }
 
 /// PlonKish Matrix Constraint Synthesizer
@@ -56,12 +64,14 @@ impl PlonkishMatrix {
 
     /// Attaches Poseidon S-Box custom gate: val^5 mod p
     pub fn add_poseidon_sbox_gate(&mut self, col: usize) {
-        self.custom_gates.push(CustomGateExpression::PoseidonSbox { advice_col: col });
+        self.custom_gates
+            .push(CustomGateExpression::PoseidonSbox { advice_col: col });
     }
 
     /// Attaches 16-bit range check gate: val in [0, 65535]
     pub fn add_range_check_16(&mut self, col: usize) {
-        self.custom_gates.push(CustomGateExpression::RangeCheck16 { advice_col: col });
+        self.custom_gates
+            .push(CustomGateExpression::RangeCheck16 { advice_col: col });
     }
 
     /// Validates all rows against registered custom gates
@@ -82,7 +92,11 @@ impl PlonkishMatrix {
                         }
                     }
                 }
-                CustomGateExpression::LinearCombination { left_col, right_col, out_col } => {
+                CustomGateExpression::LinearCombination {
+                    left_col,
+                    right_col,
+                    out_col,
+                } => {
                     for row in 0..self.row_count {
                         let a = self.advice_matrix[*left_col][row];
                         let b = self.advice_matrix[*right_col][row];

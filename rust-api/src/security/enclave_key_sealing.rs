@@ -80,7 +80,10 @@ impl EnclaveKeySealingEngine {
         enc_hasher.update(plaintext);
         let ct_digest = enc_hasher.finalize();
 
-        let tag = format!("{:x}", blake3::hash(format!("{}_{}", ct_digest, seal_key[0]).as_bytes()));
+        let tag = format!(
+            "{:x}",
+            blake3::hash(format!("{}_{}", ct_digest, seal_key[0]).as_bytes())
+        );
 
         SealedHardwarePayload {
             policy,
@@ -106,11 +109,16 @@ impl EnclaveKeySealingEngine {
             return Err("Hardware Security Fault: Enclave measurement mismatch, cannot unseal");
         }
         if self.cpu_security_version < sealed.cpu_svn {
-            return Err("Rollback Attack Detected: CPU SVN is lower than sealed payload requirement");
+            return Err(
+                "Rollback Attack Detected: CPU SVN is lower than sealed payload requirement",
+            );
         }
 
         let seal_key = self.derive_seal_key(sealed.policy, &sealed.derivation_nonce);
-        let expected_tag = format!("{:x}", blake3::hash(format!("{}_{}", sealed.ciphertext_hex, seal_key[0]).as_bytes()));
+        let expected_tag = format!(
+            "{:x}",
+            blake3::hash(format!("{}_{}", sealed.ciphertext_hex, seal_key[0]).as_bytes())
+        );
 
         if expected_tag != sealed.authentication_tag {
             return Err("Authentication Tag Mismatch: Sealed data corrupted or tampered");
@@ -136,7 +144,11 @@ mod tests {
         let secret_payload = b"Hardware Private Key 0x4421...9912";
         let nonce = [0x55u8; 16];
 
-        let sealed = engine.seal_data(secret_payload, EnclaveSealingPolicy::ExactEnclaveMeasurement, &nonce);
+        let sealed = engine.seal_data(
+            secret_payload,
+            EnclaveSealingPolicy::ExactEnclaveMeasurement,
+            &nonce,
+        );
         assert_eq!(sealed.cpu_svn, 2);
 
         let unsealed_ok = engine.unseal_data(&sealed).unwrap();

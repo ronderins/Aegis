@@ -99,8 +99,12 @@ impl ThresholdKeyRecoveryEngine {
 
         for (i, share) in shares.iter().enumerate() {
             // Verify share commitment
-            let expected_cm = blake3::hash(format!("{}_{}", share.guardian_index, share.share_scalar_y).as_bytes());
-            if !share.share_commitment_v.contains(&format!("{:x}", expected_cm)[0..8])
+            let expected_cm = blake3::hash(
+                format!("{}_{}", share.guardian_index, share.share_scalar_y).as_bytes(),
+            );
+            if !share
+                .share_commitment_v
+                .contains(&format!("{:x}", expected_cm)[0..8])
                 && !share.share_commitment_v.is_empty()
             {
                 corrupt_nodes.push(share.guardian_index);
@@ -165,7 +169,9 @@ mod tests {
             guardian_identity_did: "did:key:g3".into(),
         };
 
-        let result = engine.reconstruct_secret(&[share1, share2, share3]).unwrap();
+        let result = engine
+            .reconstruct_secret(&[share1, share2, share3])
+            .unwrap();
         assert!(result.is_successful);
 
         let expected_digest = format!("{:x}", blake3::hash(&secret.to_le_bytes()));

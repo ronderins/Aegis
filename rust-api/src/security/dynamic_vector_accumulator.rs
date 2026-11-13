@@ -50,17 +50,34 @@ impl DynamicVectorAccumulator {
 
     /// Adds a revoked credential digest into the accumulator
     pub fn accumulate_revocation(&mut self, credential_digest: &str) -> Result<(), &'static str> {
-        if self.accumulated_elements.iter().any(|e| e == credential_digest) {
+        if self
+            .accumulated_elements
+            .iter()
+            .any(|e| e == credential_digest)
+        {
             return Err("Credential digest already accumulated in revocation list");
         }
 
-        self.accumulated_elements.push(credential_digest.to_string());
+        self.accumulated_elements
+            .push(credential_digest.to_string());
         self.current_state.element_count += 1;
         self.current_state.state_epoch += 1;
 
         // Update accumulator values
-        let new_g1_hash = blake3::hash(format!("{}_{}", self.current_state.accumulator_value_g1, credential_digest).as_bytes());
-        let new_g2_hash = blake3::hash(format!("{}_{}", self.current_state.accumulator_value_g2, credential_digest).as_bytes());
+        let new_g1_hash = blake3::hash(
+            format!(
+                "{}_{}",
+                self.current_state.accumulator_value_g1, credential_digest
+            )
+            .as_bytes(),
+        );
+        let new_g2_hash = blake3::hash(
+            format!(
+                "{}_{}",
+                self.current_state.accumulator_value_g2, credential_digest
+            )
+            .as_bytes(),
+        );
 
         self.current_state.accumulator_value_g1 = format!("g1_acc_{:x}", new_g1_hash);
         self.current_state.accumulator_value_g2 = format!("g2_acc_{:x}", new_g2_hash);
@@ -82,12 +99,24 @@ impl DynamicVectorAccumulator {
         &self,
         credential_digest: &str,
     ) -> Result<DynamicNonMembershipWitness, &'static str> {
-        if self.accumulated_elements.iter().any(|e| e == credential_digest) {
-            return Err("Cannot generate non-membership witness: credential is in revocation accumulator");
+        if self
+            .accumulated_elements
+            .iter()
+            .any(|e| e == credential_digest)
+        {
+            return Err(
+                "Cannot generate non-membership witness: credential is in revocation accumulator",
+            );
         }
 
         // Polynomial Bezout identity witness: d * (X + y) + c = Accumulator(X)
-        let w_g1_hash = blake3::hash(format!("witness_g1_{}_{}", self.current_state.state_root_blake3, credential_digest).as_bytes());
+        let w_g1_hash = blake3::hash(
+            format!(
+                "witness_g1_{}_{}",
+                self.current_state.state_root_blake3, credential_digest
+            )
+            .as_bytes(),
+        );
         let c_scalar_hash = blake3::hash(format!("bezout_c_{}", credential_digest).as_bytes());
 
         Ok(DynamicNonMembershipWitness {
@@ -107,7 +136,11 @@ impl DynamicVectorAccumulator {
         if witness.evaluated_epoch != self.current_state.state_epoch {
             return Err("Witness epoch expired: accumulator state has been updated");
         }
-        if self.accumulated_elements.iter().any(|e| e == &witness.target_credential_digest) {
+        if self
+            .accumulated_elements
+            .iter()
+            .any(|e| e == &witness.target_credential_digest)
+        {
             return Ok(false);
         }
 
@@ -130,7 +163,9 @@ mod tests {
         assert_eq!(acc.current_state.element_count, 1);
 
         // Generate non-membership witness for valid credential
-        let witness = acc.generate_non_membership_witness(valid_user_cred).unwrap();
+        let witness = acc
+            .generate_non_membership_witness(valid_user_cred)
+            .unwrap();
         let is_valid = acc.verify_non_membership(&witness).unwrap();
         assert!(is_valid);
 

@@ -87,7 +87,8 @@ impl ConstraintSystem {
     pub fn alloc_variable(&mut self, name: Option<&str>) -> Variable {
         let var = Variable(self.num_variables);
         if let Some(n) = name {
-            self.variable_names.insert(self.num_variables, n.to_string());
+            self.variable_names
+                .insert(self.num_variables, n.to_string());
         }
         self.num_variables += 1;
         var

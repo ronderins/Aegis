@@ -66,7 +66,8 @@ impl ZkDosShield {
             self.base_difficulty
         };
 
-        self.current_backpressure_difficulty.store(target_diff, Ordering::Relaxed);
+        self.current_backpressure_difficulty
+            .store(target_diff, Ordering::Relaxed);
     }
 
     /// Issues a stateless, time-bound PoW challenge for an incoming client session.
@@ -108,7 +109,11 @@ impl ZkDosShield {
     }
 
     /// Verifies that a client's solution satisfies the required difficulty threshold.
-    pub fn verify_solution(&self, challenge: &PowChallenge, solution: &PowSolution) -> Result<(), &'static str> {
+    pub fn verify_solution(
+        &self,
+        challenge: &PowChallenge,
+        solution: &PowSolution,
+    ) -> Result<(), &'static str> {
         if challenge.challenge_id != solution.challenge_id {
             return Err("Challenge ID mismatch");
         }

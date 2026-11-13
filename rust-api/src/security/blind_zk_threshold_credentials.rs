@@ -80,8 +80,14 @@ impl BlindThresholdCredentialsEngine {
         }
         let cm = format!("cm_{:x}", hasher.finalize());
 
-        let pok = format!("{:x}", blake3::hash(format!("pok_{}_{}", cm, blinding_scalar_r).as_bytes()));
-        let nonce = format!("{:x}", blake3::hash(blinding_scalar_r.to_le_bytes().as_ref()));
+        let pok = format!(
+            "{:x}",
+            blake3::hash(format!("pok_{}_{}", cm, blinding_scalar_r).as_bytes())
+        );
+        let nonce = format!(
+            "{:x}",
+            blake3::hash(blinding_scalar_r.to_le_bytes().as_ref())
+        );
 
         Ok(BlindedCredentialIssuanceRequest {
             blinded_pedersen_commitment: cm,
@@ -103,7 +109,13 @@ impl BlindThresholdCredentialsEngine {
 
         let sig_a = format!(
             "sig_a_{:x}",
-            blake3::hash(format!("{}_{}_{}", authority_id, authority_secret_key, req.blinded_pedersen_commitment).as_bytes())
+            blake3::hash(
+                format!(
+                    "{}_{}_{}",
+                    authority_id, authority_secret_key, req.blinded_pedersen_commitment
+                )
+                .as_bytes()
+            )
         );
         let sig_b = format!(
             "sig_b_{:x}",
@@ -157,10 +169,19 @@ impl BlindThresholdCredentialsEngine {
         session_nonce: &str,
         predicates: &[&str],
     ) -> AnonymousPresentationProof {
-        let rand_a = format!("{:x}", blake3::hash(format!("{}_{}", cred.master_signature_a, randomizer_t).as_bytes()));
-        let rand_b = format!("{:x}", blake3::hash(format!("{}_{}", cred.master_signature_b, randomizer_t).as_bytes()));
+        let rand_a = format!(
+            "{:x}",
+            blake3::hash(format!("{}_{}", cred.master_signature_a, randomizer_t).as_bytes())
+        );
+        let rand_b = format!(
+            "{:x}",
+            blake3::hash(format!("{}_{}", cred.master_signature_b, randomizer_t).as_bytes())
+        );
 
-        let s_resp = format!("{:x}", blake3::hash(format!("{}_{}_{}", rand_a, rand_b, session_nonce).as_bytes()));
+        let s_resp = format!(
+            "{:x}",
+            blake3::hash(format!("{}_{}_{}", rand_a, rand_b, session_nonce).as_bytes())
+        );
 
         AnonymousPresentationProof {
             randomized_sig_a: rand_a,
@@ -186,7 +207,13 @@ impl BlindThresholdCredentialsEngine {
 
         let expected_s = format!(
             "{:x}",
-            blake3::hash(format!("{}_{}_{}", proof.randomized_sig_a, proof.randomized_sig_b, expected_session_nonce).as_bytes())
+            blake3::hash(
+                format!(
+                    "{}_{}_{}",
+                    proof.randomized_sig_a, proof.randomized_sig_b, expected_session_nonce
+                )
+                .as_bytes()
+            )
         );
 
         Ok(proof.schnorr_response_s == expected_s)
@@ -204,15 +231,20 @@ mod tests {
         let blinding_r = 0xDEAD_BEEF;
 
         // 1. User creates blinded issuance request
-        let req = BlindThresholdCredentialsEngine::create_issuance_request(&attributes, blinding_r).unwrap();
+        let req = BlindThresholdCredentialsEngine::create_issuance_request(&attributes, blinding_r)
+            .unwrap();
         assert!(req.blinded_pedersen_commitment.starts_with("cm_"));
 
         // 2. Authorities sign
-        let share1 = BlindThresholdCredentialsEngine::authority_sign_blinded(1, 0x1111, &req, 100).unwrap();
-        let share2 = BlindThresholdCredentialsEngine::authority_sign_blinded(2, 0x2222, &req, 100).unwrap();
+        let share1 =
+            BlindThresholdCredentialsEngine::authority_sign_blinded(1, 0x1111, &req, 100).unwrap();
+        let share2 =
+            BlindThresholdCredentialsEngine::authority_sign_blinded(2, 0x2222, &req, 100).unwrap();
 
         // 3. User combines shares into unblinded master credential
-        let master_cred = engine.combine_shares_and_unblind(&[share1, share2], &attributes, blinding_r).unwrap();
+        let master_cred = engine
+            .combine_shares_and_unblind(&[share1, share2], &attributes, blinding_r)
+            .unwrap();
         assert!(master_cred.master_signature_a.starts_with("master_a_"));
 
         // 4. User presents credential to verifier anonymously
@@ -225,7 +257,8 @@ mod tests {
         );
 
         // 5. Verifier checks presentation
-        let verified = BlindThresholdCredentialsEngine::verify_presentation(&presentation, nonce).unwrap();
+        let verified =
+            BlindThresholdCredentialsEngine::verify_presentation(&presentation, nonce).unwrap();
         assert!(verified);
     }
 }

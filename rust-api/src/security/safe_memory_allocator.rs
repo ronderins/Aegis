@@ -124,7 +124,8 @@ impl SafeMemoryBuffer {
 
     /// Returns a slice to the user data payload.
     pub fn as_slice(&self) -> &[u8] {
-        self.verify_integrity().expect("Cryptographic memory corruption detected in secure buffer");
+        self.verify_integrity()
+            .expect("Cryptographic memory corruption detected in secure buffer");
         unsafe {
             let data_ptr = self.raw_ptr.add(self.data_offset);
             std::slice::from_raw_parts(data_ptr, self.capacity)
@@ -133,7 +134,8 @@ impl SafeMemoryBuffer {
 
     /// Returns a mutable slice to the user data payload.
     pub fn as_mut_slice(&mut self) -> &mut [u8] {
-        self.verify_integrity().expect("Cryptographic memory corruption detected in secure buffer");
+        self.verify_integrity()
+            .expect("Cryptographic memory corruption detected in secure buffer");
         unsafe {
             let data_ptr = self.raw_ptr.add(self.data_offset);
             std::slice::from_raw_parts_mut(data_ptr, self.capacity)
@@ -295,7 +297,8 @@ mod tests {
     #[test]
     fn test_secure_buffer_allocation_and_wiping() {
         let secret = b"my_hyper_confidential_witness_scalar_key";
-        let mut buf = SafeMemoryBuffer::from_slice(secret, MemoryProtectionPolicy::default()).unwrap();
+        let mut buf =
+            SafeMemoryBuffer::from_slice(secret, MemoryProtectionPolicy::default()).unwrap();
         assert_eq!(buf.as_slice(), secret);
         assert!(buf.verify_integrity().is_ok());
 
@@ -305,9 +308,12 @@ mod tests {
 
     #[test]
     fn test_constant_time_equality() {
-        let b1 = SafeMemoryBuffer::from_slice(b"secret_key_a", MemoryProtectionPolicy::default()).unwrap();
-        let b2 = SafeMemoryBuffer::from_slice(b"secret_key_a", MemoryProtectionPolicy::default()).unwrap();
-        let b3 = SafeMemoryBuffer::from_slice(b"secret_key_b", MemoryProtectionPolicy::default()).unwrap();
+        let b1 = SafeMemoryBuffer::from_slice(b"secret_key_a", MemoryProtectionPolicy::default())
+            .unwrap();
+        let b2 = SafeMemoryBuffer::from_slice(b"secret_key_a", MemoryProtectionPolicy::default())
+            .unwrap();
+        let b3 = SafeMemoryBuffer::from_slice(b"secret_key_b", MemoryProtectionPolicy::default())
+            .unwrap();
 
         assert!(b1.constant_time_eq(&b2));
         assert!(!b1.constant_time_eq(&b3));

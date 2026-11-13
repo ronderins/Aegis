@@ -46,16 +46,11 @@ impl BlindSignatureEngine {
         hasher.update(issuer_key);
         let sig = hasher.finalize().to_hex().to_string();
 
-        BlindSignature {
-            blinded_sig: sig,
-        }
+        BlindSignature { blinded_sig: sig }
     }
 
     /// User unblinds signature s = s' / r
-    pub fn unblind(
-        blind_sig: &BlindSignature,
-        blinding_factor: &[u8; 32],
-    ) -> String {
+    pub fn unblind(blind_sig: &BlindSignature, blinding_factor: &[u8; 32]) -> String {
         let mut hasher = blake3::Hasher::new();
         hasher.update(b"zk-unblind-sig-v1\0");
         hasher.update(blind_sig.blinded_sig.as_bytes());

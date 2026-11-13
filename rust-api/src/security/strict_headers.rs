@@ -8,7 +8,7 @@
 //! - `Cross-Origin-Opener-Policy`: same-origin to prevent Spectre cross-window memory snooping.
 //! - `Permissions-Policy`: camera=(), microphone=(), geolocation=(), payment=() to lock down hardware access.
 
-use axum::http::{HeaderMap, HeaderValue, header};
+use axum::http::{header, HeaderMap, HeaderValue};
 
 pub struct StrictSecurityHeaders;
 
@@ -24,7 +24,9 @@ impl StrictSecurityHeaders {
         // Content-Security-Policy: Strict lockdown
         headers.insert(
             header::CONTENT_SECURITY_POLICY,
-            HeaderValue::from_static("default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"),
+            HeaderValue::from_static(
+                "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+            ),
         );
 
         // X-Content-Type-Options: nosniff
@@ -34,10 +36,7 @@ impl StrictSecurityHeaders {
         );
 
         // X-Frame-Options: DENY
-        headers.insert(
-            header::X_FRAME_OPTIONS,
-            HeaderValue::from_static("DENY"),
-        );
+        headers.insert(header::X_FRAME_OPTIONS, HeaderValue::from_static("DENY"));
 
         // Cross-Origin-Opener-Policy: same-origin
         headers.insert(
@@ -54,7 +53,9 @@ impl StrictSecurityHeaders {
         // Permissions-Policy: Disable sensitive browser features
         headers.insert(
             axum::http::HeaderName::from_static("permissions-policy"),
-            HeaderValue::from_static("camera=(), microphone=(), geolocation=(), payment=(), usb=()"),
+            HeaderValue::from_static(
+                "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+            ),
         );
 
         // Cache-Control: No-Store for cryptographic responses
@@ -78,12 +79,12 @@ mod tests {
             headers.get(header::X_CONTENT_TYPE_OPTIONS).unwrap(),
             "nosniff"
         );
-        assert_eq!(
-            headers.get(header::X_FRAME_OPTIONS).unwrap(),
-            "DENY"
-        );
-        assert!(
-            headers.get(header::STRICT_TRANSPORT_SECURITY).unwrap().to_str().unwrap().contains("max-age=63072000")
-        );
+        assert_eq!(headers.get(header::X_FRAME_OPTIONS).unwrap(), "DENY");
+        assert!(headers
+            .get(header::STRICT_TRANSPORT_SECURITY)
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .contains("max-age=63072000"));
     }
 }

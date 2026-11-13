@@ -41,14 +41,18 @@ impl VerifiableShuffleEngine {
     ) -> Result<(Vec<ShuffleCiphertext>, VerifiableShuffleProof), String> {
         let n = input_tokens.len();
         if permutation_mapping.len() != n || re_randomization_seeds.len() != n {
-            return Err("Permutation vector and seed lengths must match input token count".to_string());
+            return Err(
+                "Permutation vector and seed lengths must match input token count".to_string(),
+            );
         }
 
         // Verify permutation is a valid bijective mapping of 0..n-1
         let mut check_set = std::collections::HashSet::new();
         for &idx in permutation_mapping {
             if idx >= n || !check_set.insert(idx) {
-                return Err("Invalid permutation mapping: must be a bijective permutation".to_string());
+                return Err(
+                    "Invalid permutation mapping: must be a bijective permutation".to_string(),
+                );
             }
         }
 
@@ -79,7 +83,10 @@ impl VerifiableShuffleEngine {
             r2.update(seed);
             let c2_new = format!("0x02{}", &hex::encode(r2.finalize())[0..64]);
 
-            let new_tok = ShuffleCiphertext { c1: c1_new, c2: c2_new };
+            let new_tok = ShuffleCiphertext {
+                c1: c1_new,
+                c2: c2_new,
+            };
 
             let mut out_comm = blake3::Hasher::new();
             out_comm.update(new_tok.c1.as_bytes());
@@ -93,8 +100,12 @@ impl VerifiableShuffleEngine {
         let mut chal_hasher = Sha256::new();
         chal_hasher.update(b"BAYER_GROTH_SHUFFLE_CHALLENGE");
         chal_hasher.update(public_key.as_bytes());
-        for ic in &input_commitments { chal_hasher.update(ic.as_bytes()); }
-        for oc in &output_commitments { chal_hasher.update(oc.as_bytes()); }
+        for ic in &input_commitments {
+            chal_hasher.update(ic.as_bytes());
+        }
+        for oc in &output_commitments {
+            chal_hasher.update(oc.as_bytes());
+        }
         let challenge = hex::encode(chal_hasher.finalize());
 
         // Grand product commitment
@@ -128,10 +139,7 @@ impl VerifiableShuffleEngine {
     }
 
     /// Verifies that output ciphertexts constitute a valid zero-knowledge permutation of input ciphertexts.
-    pub fn verify_shuffle(
-        proof: &VerifiableShuffleProof,
-        public_key: &str,
-    ) -> bool {
+    pub fn verify_shuffle(proof: &VerifiableShuffleProof, public_key: &str) -> bool {
         if proof.batch_size == 0
             || proof.input_token_commitments.len() != proof.batch_size
             || proof.output_token_commitments.len() != proof.batch_size
@@ -142,8 +150,12 @@ impl VerifiableShuffleEngine {
         let mut chal_hasher = Sha256::new();
         chal_hasher.update(b"BAYER_GROTH_SHUFFLE_CHALLENGE");
         chal_hasher.update(public_key.as_bytes());
-        for ic in &proof.input_token_commitments { chal_hasher.update(ic.as_bytes()); }
-        for oc in &proof.output_token_commitments { chal_hasher.update(oc.as_bytes()); }
+        for ic in &proof.input_token_commitments {
+            chal_hasher.update(ic.as_bytes());
+        }
+        for oc in &proof.output_token_commitments {
+            chal_hasher.update(oc.as_bytes());
+        }
         let expected_challenge = hex::encode(chal_hasher.finalize());
 
         if !crate::crypto::constant_time_eq(&proof.grand_product_challenge, &expected_challenge) {
@@ -160,16 +172,26 @@ mod tests {
 
     #[test]
     fn test_verifiable_shuffle_3_tokens() {
-        let t0 = ShuffleCiphertext { c1: "0x02c1_0".to_string(), c2: "0x02c2_0".to_string() };
-        let t1 = ShuffleCiphertext { c1: "0x02c1_1".to_string(), c2: "0x02c2_1".to_string() };
-        let t2 = ShuffleCiphertext { c1: "0x02c1_2".to_string(), c2: "0x02c2_2".to_string() };
+        let t0 = ShuffleCiphertext {
+            c1: "0x02c1_0".to_string(),
+            c2: "0x02c2_0".to_string(),
+        };
+        let t1 = ShuffleCiphertext {
+            c1: "0x02c1_1".to_string(),
+            c2: "0x02c2_1".to_string(),
+        };
+        let t2 = ShuffleCiphertext {
+            c1: "0x02c1_2".to_string(),
+            c2: "0x02c2_2".to_string(),
+        };
 
         let inputs = vec![t0, t1, t2];
         let perm = vec![2, 0, 1]; // Bijective shuffle
         let seeds = vec![[0x11; 32], [0x22; 32], [0x33; 32]];
         let pk = "0xmaster_elgamal_pk_2026";
 
-        let (shuffled, proof) = VerifiableShuffleEngine::shuffle_and_prove(&inputs, &perm, &seeds, pk).unwrap();
+        let (shuffled, proof) =
+            VerifiableShuffleEngine::shuffle_and_prove(&inputs, &perm, &seeds, pk).unwrap();
 
         assert_eq!(shuffled.len(), 3);
         assert_eq!(proof.batch_size, 3);

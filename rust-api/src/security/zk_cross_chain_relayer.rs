@@ -120,7 +120,8 @@ mod tests {
             block_number: 19_500_000,
             block_hash: "0x89abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567".into(),
             state_root: "0x123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0".into(),
-            receipts_root: "0xabcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789".into(),
+            receipts_root: "0xabcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+                .into(),
             logs_bloom: "0x00".into(),
             timestamp: 1775000000,
         };

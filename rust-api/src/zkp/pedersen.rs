@@ -20,8 +20,10 @@ pub struct PedersenGenerators {
 impl Default for PedersenGenerators {
     fn default() -> Self {
         Self {
-            g_compressed: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798".to_string(),
-            h_compressed: "0250929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac0".to_string(),
+            g_compressed: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+                .to_string(),
+            h_compressed: "0250929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac0"
+                .to_string(),
         }
     }
 }

@@ -41,10 +41,7 @@ impl HsmCryptoToken {
     }
 
     /// Derives an ephemeral hardware blinded signature without exposing root keys
-    pub fn sign_identity_receipt(
-        _session: &HsmSession,
-        receipt_digest: &[u8; 32],
-    ) -> [u8; 64] {
+    pub fn sign_identity_receipt(_session: &HsmSession, receipt_digest: &[u8; 32]) -> [u8; 64] {
         let mut hasher = blake3::Hasher::new();
         hasher.update(b"zk-hsm-blind-signature-v1\0");
         hasher.update(receipt_digest);

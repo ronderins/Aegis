@@ -97,7 +97,13 @@ pub struct Instruction {
 }
 
 impl Instruction {
-    pub fn new(opcode: Opcode, dst: Register, src1: Register, src2: Register, immediate: u64) -> Self {
+    pub fn new(
+        opcode: Opcode,
+        dst: Register,
+        src1: Register,
+        src2: Register,
+        immediate: u64,
+    ) -> Self {
         Self {
             opcode,
             dst,

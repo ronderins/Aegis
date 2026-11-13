@@ -66,13 +66,13 @@ impl CpAbeEngine {
     }
 
     /// Evaluates if user attribute set satisfies the access policy tree
-    pub fn evaluate_node_satisfaction(
-        node: &PolicyTreeNode,
-        user_attrs: &[String],
-    ) -> bool {
+    pub fn evaluate_node_satisfaction(node: &PolicyTreeNode, user_attrs: &[String]) -> bool {
         match node {
             PolicyTreeNode::AttributeLeaf(attr) => user_attrs.contains(attr),
-            PolicyTreeNode::ThresholdGate { threshold_k, children } => {
+            PolicyTreeNode::ThresholdGate {
+                threshold_k,
+                children,
+            } => {
                 let satisfied_children_count = children
                     .iter()
                     .filter(|c| Self::evaluate_node_satisfaction(c, user_attrs))
@@ -87,9 +87,16 @@ impl CpAbeEngine {
         ct: &CpAbeCiphertext,
         user_keys: &UserAttributeKeyBundle,
     ) -> ZkPolicySatisfactionProof {
-        let satisfied = Self::evaluate_node_satisfaction(&ct.policy_tree, &user_keys.possessed_attributes);
+        let satisfied =
+            Self::evaluate_node_satisfaction(&ct.policy_tree, &user_keys.possessed_attributes);
 
-        let proof_h = blake3::hash(format!("{}_{}_{}", ct.ciphertext_id, user_keys.user_id_digest, satisfied).as_bytes());
+        let proof_h = blake3::hash(
+            format!(
+                "{}_{}_{}",
+                ct.ciphertext_id, user_keys.user_id_digest, satisfied
+            )
+            .as_bytes(),
+        );
 
         ZkPolicySatisfactionProof {
             ciphertext_id: ct.ciphertext_id.clone(),
@@ -133,15 +140,16 @@ mod tests {
             ],
         };
 
-        let ct = CpAbeEngine::encrypt_under_policy(b"Secret Regulatory Document", root_policy, "MPK_9041");
+        let ct = CpAbeEngine::encrypt_under_policy(
+            b"Secret Regulatory Document",
+            root_policy,
+            "MPK_9041",
+        );
 
         // User with valid attributes
         let user_keys = UserAttributeKeyBundle {
             user_id_digest: "user_alice".into(),
-            possessed_attributes: vec![
-                "Role::ComplianceOfficer".into(),
-                "Jurisdiction::EU".into(),
-            ],
+            possessed_attributes: vec!["Role::ComplianceOfficer".into(), "Jurisdiction::EU".into()],
             secret_components: vec!["comp1".into()],
         };
 

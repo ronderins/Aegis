@@ -29,9 +29,17 @@ pub enum WasmOpcode {
 /// Execution error condition inside the WASM sandbox.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum WasmSandboxError {
-    GasExhausted { gas_limit: u64, gas_used: u64 },
-    MemoryOutOfBounds { requested_offset: u32, max_bound: usize },
-    StackOverflow { max_depth: usize },
+    GasExhausted {
+        gas_limit: u64,
+        gas_used: u64,
+    },
+    MemoryOutOfBounds {
+        requested_offset: u32,
+        max_bound: usize,
+    },
+    StackOverflow {
+        max_depth: usize,
+    },
     StackUnderflow,
     IllegalOpcode,
     ExplicitTrapTriggered,
@@ -266,10 +274,7 @@ mod tests {
     #[test]
     fn test_wasm_sandbox_gas_limit_exhaustion() {
         // Infinite loop: Jump to 0 with gas limit of 10
-        let infinite_loop = vec![
-            WasmOpcode::I64Const(1),
-            WasmOpcode::Jump { target_pc: 0 },
-        ];
+        let infinite_loop = vec![WasmOpcode::I64Const(1), WasmOpcode::Jump { target_pc: 0 }];
 
         let mut vm = WasmEnclaveSandbox::new(infinite_loop, 10, 1);
         let res = vm.execute();

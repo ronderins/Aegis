@@ -116,7 +116,10 @@ impl PlonkFriComposer {
         let sel_root = format!("{:x}", selector_hasher.finalize());
         let wire_root = format!("{:x}", wire_hasher.finalize());
 
-        let quot_h = format!("{:x}", blake3::hash(format!("{}_{}", sel_root, wire_root).as_bytes()));
+        let quot_h = format!(
+            "{:x}",
+            blake3::hash(format!("{}_{}", sel_root, wire_root).as_bytes())
+        );
 
         Ok(PlonkFriCompositeProof {
             total_gates: self.constraints.len(),
@@ -139,7 +142,13 @@ impl PlonkFriComposer {
 
         let expected_quot = format!(
             "{:x}",
-            blake3::hash(format!("{}_{}", proof.selector_root_blake3, proof.wire_witness_root_blake3).as_bytes())
+            blake3::hash(
+                format!(
+                    "{}_{}",
+                    proof.selector_root_blake3, proof.wire_witness_root_blake3
+                )
+                .as_bytes()
+            )
         );
 
         Ok(proof.quotient_evaluation_h == expected_quot)

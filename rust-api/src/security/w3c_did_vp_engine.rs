@@ -115,7 +115,8 @@ impl W3cDidEngine {
             _ => return Err("Unsupported DID method"),
         };
 
-        self.cached_documents.insert(did_uri.to_string(), doc.clone());
+        self.cached_documents
+            .insert(did_uri.to_string(), doc.clone());
         Ok(doc)
     }
 
@@ -195,16 +196,25 @@ impl W3cDidEngine {
     ) -> Result<bool, &'static str> {
         // Anti-replay challenge check
         if presentation.proof.challenge_nonce != expected_challenge {
-            return Err("Replay Attack Detected: Challenge nonce does not match expected session nonce");
+            return Err(
+                "Replay Attack Detected: Challenge nonce does not match expected session nonce",
+            );
         }
         if presentation.proof.domain != expected_domain {
-            return Err("Domain Mismatch: Presentation audience domain does not match verifier domain");
+            return Err(
+                "Domain Mismatch: Presentation audience domain does not match verifier domain",
+            );
         }
 
         // Resolve holder DID
         let did_doc = self.resolve_did(&presentation.holder_did)?;
-        if !did_doc.authentication.contains(&presentation.proof.verification_method) {
-            return Err("Verification method not authorized for authentication in holder DID document");
+        if !did_doc
+            .authentication
+            .contains(&presentation.proof.verification_method)
+        {
+            return Err(
+                "Verification method not authorized for authentication in holder DID document",
+            );
         }
 
         if presentation.verifiable_credentials.is_empty() {
@@ -241,7 +251,10 @@ mod tests {
 
         let vc = VerifiableCredentialItem {
             id: "urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6".to_string(),
-            vc_types: vec!["VerifiableCredential".to_string(), "AgeCredential".to_string()],
+            vc_types: vec![
+                "VerifiableCredential".to_string(),
+                "AgeCredential".to_string(),
+            ],
             issuer: "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLxmQR".to_string(),
             issuance_date: "2026-09-29T00:00:00Z".to_string(),
             credential_subject: subject,
@@ -264,7 +277,9 @@ mod tests {
             },
         };
 
-        let verified = engine.verify_presentation(&vp, "nonce_challenge_12345", "auth.aegis.dev").unwrap();
+        let verified = engine
+            .verify_presentation(&vp, "nonce_challenge_12345", "auth.aegis.dev")
+            .unwrap();
         assert!(verified);
     }
 }

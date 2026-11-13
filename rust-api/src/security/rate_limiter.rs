@@ -63,9 +63,11 @@ impl RateLimiter {
             Err(_) => return true, // Fail-open gracefully on lock poison
         };
 
-        let record = map.entry(*client_hash).or_insert_with(|| ClientWindowRecord {
-            timestamps: Vec::with_capacity(self.policy.max_requests_per_window),
-        });
+        let record = map
+            .entry(*client_hash)
+            .or_insert_with(|| ClientWindowRecord {
+                timestamps: Vec::with_capacity(self.policy.max_requests_per_window),
+            });
 
         // Prune expired timestamps
         record.timestamps.retain(|&ts| ts > cutoff);
@@ -81,7 +83,9 @@ impl RateLimiter {
     /// Periodic garbage collection of inactive clients
     pub fn prune_stale_entries(&self) {
         let now = Instant::now();
-        let cutoff = now.checked_sub(self.policy.window_duration * 2).unwrap_or(now);
+        let cutoff = now
+            .checked_sub(self.policy.window_duration * 2)
+            .unwrap_or(now);
 
         if let Ok(mut map) = self.clients.lock() {
             map.retain(|_, record| record.timestamps.iter().any(|&ts| ts > cutoff));

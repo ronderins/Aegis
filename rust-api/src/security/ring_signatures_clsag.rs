@@ -74,7 +74,10 @@ impl ClsagEngine {
         }
 
         let c1_hash = transcript_hasher.finalize();
-        let aux_d = format!("{:x}", blake3::hash(format!("aux_d_{}", key_image.image_hex).as_bytes()));
+        let aux_d = format!(
+            "{:x}",
+            blake3::hash(format!("aux_d_{}", key_image.image_hex).as_bytes())
+        );
 
         let ring_members = ring_keys
             .iter()
@@ -111,7 +114,13 @@ impl ClsagEngine {
             let pk = &sig.ring_public_keys[i];
             let s = &sig.scalar_responses_s[i];
 
-            let step_h = blake3::hash(format!("{}_{}_{}_{}", current_c, pk.key_hex, s, sig.key_image.image_hex).as_bytes());
+            let step_h = blake3::hash(
+                format!(
+                    "{}_{}_{}_{}",
+                    current_c, pk.key_hex, s, sig.key_image.image_hex
+                )
+                .as_bytes(),
+            );
             current_c = format!("c_next_{:x}", step_h);
         }
 

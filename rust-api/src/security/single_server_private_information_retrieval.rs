@@ -50,7 +50,10 @@ impl SingleServerPirEngine {
         let mut unit_vector = Vec::with_capacity(database_size);
         for i in 0..database_size {
             let val = if i == target_index { 1u64 } else { 0u64 };
-            let enc = format!("enc_q_{:x}", blake3::hash(format!("{}_{}_{}", val, blinding_key, i).as_bytes()));
+            let enc = format!(
+                "enc_q_{:x}",
+                blake3::hash(format!("{}_{}_{}", val, blinding_key, i).as_bytes())
+            );
             unit_vector.push(enc);
         }
 
@@ -63,7 +66,10 @@ impl SingleServerPirEngine {
     }
 
     /// Server: Computes inner product between database records and client's encrypted query vector
-    pub fn server_evaluate_query(&self, query: &PirQueryVector) -> Result<PirResponsePayload, &'static str> {
+    pub fn server_evaluate_query(
+        &self,
+        query: &PirQueryVector,
+    ) -> Result<PirResponsePayload, &'static str> {
         if query.encrypted_unit_vector.len() != self.database_records.len() {
             return Err("Query vector length does not match database records size");
         }
@@ -77,7 +83,10 @@ impl SingleServerPirEngine {
         }
 
         let eval_ct = format!("pir_eval_{:x}", dot_product_hasher.finalize());
-        let mac = format!("{:x}", blake3::hash(format!("{}_{}", query.query_id, eval_ct).as_bytes()));
+        let mac = format!(
+            "{:x}",
+            blake3::hash(format!("{}_{}", query.query_id, eval_ct).as_bytes())
+        );
 
         Ok(PirResponsePayload {
             query_id: query.query_id.clone(),
@@ -123,7 +132,9 @@ mod tests {
 
         // Server evaluates blindly
         let response = engine.server_evaluate_query(&query).unwrap();
-        assert!(response.evaluated_record_ciphertext.starts_with("pir_eval_"));
+        assert!(response
+            .evaluated_record_ciphertext
+            .starts_with("pir_eval_"));
 
         // Client decrypts
         let recovered = engine.client_decrypt_response(2, &response).unwrap();

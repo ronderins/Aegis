@@ -139,7 +139,10 @@ mod tests {
 
         // Target should be detected as potential match
         let res_bad = filter.check_sanctions_status(sanctioned_target);
-        assert!(matches!(res_bad, SanctionsCheckResult::PotentialMatchDetected { .. }));
+        assert!(matches!(
+            res_bad,
+            SanctionsCheckResult::PotentialMatchDetected { .. }
+        ));
 
         // Innocent civilian must be provably non-sanctioned
         let res_good = filter.check_sanctions_status(innocent_citizen);

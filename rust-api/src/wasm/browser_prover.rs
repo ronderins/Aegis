@@ -34,7 +34,9 @@ pub struct BrowserProverEngine;
 
 impl BrowserProverEngine {
     /// Executes client-side proof synthesis and nullifier generation
-    pub fn synthesize_proof_in_wasm(req: &WasmProverRequest) -> Result<WasmProverResponse, &'static str> {
+    pub fn synthesize_proof_in_wasm(
+        req: &WasmProverRequest,
+    ) -> Result<WasmProverResponse, &'static str> {
         let circuit = AgeVerificationCircuit::new(req.threshold, req.current_year);
         let mut cs = ConstraintSystem::new();
         circuit.synthesize(&mut cs);

@@ -116,7 +116,8 @@ impl RlnManager {
 
         // Evaluate f(x) = (a0 + a1 * x) mod q
         let a1_x = ((a1 as u128) * (x as u128)) % (RLN_PRIME_MODULUS as u128);
-        let y = (((identity.identity_secret_a0 as u128) + a1_x) % (RLN_PRIME_MODULUS as u128)) as u64;
+        let y =
+            (((identity.identity_secret_a0 as u128) + a1_x) % (RLN_PRIME_MODULUS as u128)) as u64;
 
         // Compute domain-separated epoch nullifier
         let mut null_hasher = blake3::Hasher::new();
@@ -155,7 +156,8 @@ impl RlnManager {
             ));
         }
 
-        if !crate::crypto::constant_time_eq(&share.membership_merkle_root, &self.active_merkle_root) {
+        if !crate::crypto::constant_time_eq(&share.membership_merkle_root, &self.active_merkle_root)
+        {
             return Err("Membership Merkle root mismatch".to_string());
         }
 
@@ -176,7 +178,11 @@ impl RlnManager {
 
             let term1 = (x2 * y1) % q;
             let term2 = (x1 * y2) % q;
-            let num = if term1 >= term2 { term1 - term2 } else { term1 + q - term2 };
+            let num = if term1 >= term2 {
+                term1 - term2
+            } else {
+                term1 + q - term2
+            };
 
             let den = if x2 >= x1 { x2 - x1 } else { x2 + q - x1 };
             let inv_den = Self::mod_inverse(den as u64, RLN_PRIME_MODULUS).unwrap_or(1) as u128;
@@ -196,14 +202,18 @@ impl RlnManager {
                 share_1_y: existing.share_y,
                 share_2_x: share.share_x,
                 share_2_y: share.share_y,
-                slashing_bounty_tx: format!("slash-tx-{}", hex::encode(Sha256::digest(&recovered_a0.to_be_bytes()))),
+                slashing_bounty_tx: format!(
+                    "slash-tx-{}",
+                    hex::encode(Sha256::digest(&recovered_a0.to_be_bytes()))
+                ),
             };
 
             return Ok(Some(evidence));
         }
 
         // Honest single spend
-        self.seen_shares.insert(share.nullifier_hash.clone(), share.clone());
+        self.seen_shares
+            .insert(share.nullifier_hash.clone(), share.clone());
         Ok(None)
     }
 
@@ -246,16 +256,24 @@ mod tests {
         let mut manager = RlnManager::new(42, merkle_root);
 
         // First verification share for Message 1 (e.g. "Request Access to API")
-        let share1 = RlnManager::create_proof_share(&identity, 42, b"Request Access to API", merkle_root);
+        let share1 =
+            RlnManager::create_proof_share(&identity, 42, b"Request Access to API", merkle_root);
         let res1 = manager.verify_and_record(&share1).unwrap();
         assert!(res1.is_none(), "Honest single spend must not be slashed");
 
         // Malicious second verification share in same epoch for Message 2 (Spam attempt!)
-        let share2 = RlnManager::create_proof_share(&identity, 42, b"Spam Access Attempt 2", merkle_root);
+        let share2 =
+            RlnManager::create_proof_share(&identity, 42, b"Spam Access Attempt 2", merkle_root);
         let res2 = manager.verify_and_record(&share2).unwrap();
-        assert!(res2.is_some(), "Double spend must trigger mathematical slashing!");
+        assert!(
+            res2.is_some(),
+            "Double spend must trigger mathematical slashing!"
+        );
 
         let evidence = res2.unwrap();
-        assert_eq!(evidence.recovered_secret_a0, identity.identity_secret_a0, "Prover private key must be recovered exactly!");
+        assert_eq!(
+            evidence.recovered_secret_a0, identity.identity_secret_a0,
+            "Prover private key must be recovered exactly!"
+        );
     }
 }

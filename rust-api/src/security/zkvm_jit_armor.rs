@@ -324,7 +324,11 @@ impl HardenedZkvmSandbox {
                     let cond = self.pop_operand()?;
                     if cond != 0 {
                         let target = (current_pc as isize) + (offset as isize);
-                        if !self.cfi_table.valid_jump_targets.contains(&(target as usize)) {
+                        if !self
+                            .cfi_table
+                            .valid_jump_targets
+                            .contains(&(target as usize))
+                        {
                             return Err("CFI Violation: Unauthorized jump target");
                         }
                         self.pc = target as usize;
@@ -336,14 +340,21 @@ impl HardenedZkvmSandbox {
                     if self.call_stack.len() >= self.cfi_table.call_depth_limit {
                         return Err("ZKVM Call Stack Depth Exceeded");
                     }
-                    if !self.cfi_table.valid_jump_targets.contains(&(target_pc as usize)) {
+                    if !self
+                        .cfi_table
+                        .valid_jump_targets
+                        .contains(&(target_pc as usize))
+                    {
                         return Err("CFI Violation: Unauthorized call target");
                     }
                     self.call_stack.push(self.pc + 1);
                     self.pc = target_pc as usize;
                 }
                 ZkOpcode::Ret => {
-                    let return_pc = self.call_stack.pop().ok_or("ZKVM Call Stack Underflow on Ret")?;
+                    let return_pc = self
+                        .call_stack
+                        .pop()
+                        .ok_or("ZKVM Call Stack Underflow on Ret")?;
                     self.pc = return_pc;
                 }
                 ZkOpcode::Halt => {

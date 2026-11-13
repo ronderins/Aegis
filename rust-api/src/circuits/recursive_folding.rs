@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 pub struct RelaxedR1csInstance {
     pub commitment_w: String, // Commitment to witness vector W
     pub commitment_e: String, // Commitment to error vector E
-    pub scalar_u: String,      // Relaxation scalar u
+    pub scalar_u: String,     // Relaxation scalar u
     pub public_inputs_x: Vec<String>,
 }
 
@@ -77,7 +77,11 @@ impl RecursiveFoldingScheme {
 
         let mut folded_inputs = Vec::new();
         for (i, in1) in running_accumulator.public_inputs_x.iter().enumerate() {
-            let in2 = new_instance.public_inputs_x.get(i).cloned().unwrap_or_default();
+            let in2 = new_instance
+                .public_inputs_x
+                .get(i)
+                .cloned()
+                .unwrap_or_default();
             let mut in_hasher = blake3::Hasher::new();
             in_hasher.update(in1.as_bytes());
             in_hasher.update(in2.as_bytes());

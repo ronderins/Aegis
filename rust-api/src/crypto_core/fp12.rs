@@ -53,12 +53,30 @@ impl Fp6 {
         let v1 = self.c1.mul(&other.c1);
         let v2 = self.c2.mul(&other.c2);
 
-        let t0 = self.c1.add(&self.c2).mul(&other.c1.add(&other.c2)).sub(&v1).sub(&v2);
-        let t1 = self.c0.add(&self.c1).mul(&other.c0.add(&other.c1)).sub(&v0).sub(&v1);
-        let t2 = self.c0.add(&self.c2).mul(&other.c0.add(&other.c2)).sub(&v0).sub(&v2);
+        let t0 = self
+            .c1
+            .add(&self.c2)
+            .mul(&other.c1.add(&other.c2))
+            .sub(&v1)
+            .sub(&v2);
+        let t1 = self
+            .c0
+            .add(&self.c1)
+            .mul(&other.c0.add(&other.c1))
+            .sub(&v0)
+            .sub(&v1);
+        let t2 = self
+            .c0
+            .add(&self.c2)
+            .mul(&other.c0.add(&other.c2))
+            .sub(&v0)
+            .sub(&v2);
 
         // Multiply by non-residue xi = (9 + u)
-        let xi = Fp2 { c0: Fp::from_u64(9), c1: Fp::from_u64(1) };
+        let xi = Fp2 {
+            c0: Fp::from_u64(9),
+            c1: Fp::from_u64(1),
+        };
         let c0 = v0.add(&t0.mul(&xi));
         let c1 = t1.add(&v2.mul(&xi));
         let c2 = t2.add(&v1);
@@ -121,7 +139,10 @@ impl Fp12 {
         let v1 = self.c1.mul(&other.c1);
 
         // v1 * v (v is non-residue in Fp6)
-        let xi = Fp2 { c0: Fp::from_u64(9), c1: Fp::from_u64(1) };
+        let xi = Fp2 {
+            c0: Fp::from_u64(9),
+            c1: Fp::from_u64(1),
+        };
         let v1_times_v = Fp6 {
             c0: v1.c2.mul(&xi),
             c1: v1.c0,
@@ -129,7 +150,12 @@ impl Fp12 {
         };
 
         let c0 = v0.add(&v1_times_v);
-        let c1 = self.c0.add(&self.c1).mul(&other.c0.add(&other.c1)).sub(&v0).sub(&v1);
+        let c1 = self
+            .c0
+            .add(&self.c1)
+            .mul(&other.c0.add(&other.c1))
+            .sub(&v0)
+            .sub(&v1);
 
         Self { c0, c1 }
     }

@@ -71,7 +71,11 @@ impl FuzzyNameMatchingEngine {
 
     /// Computes American Soundex phonetic code: Letter + 3 numeric digits.
     pub fn compute_soundex(name: &str) -> String {
-        let clean: String = name.to_uppercase().chars().filter(|c| c.is_ascii_alphabetic()).collect();
+        let clean: String = name
+            .to_uppercase()
+            .chars()
+            .filter(|c| c.is_ascii_alphabetic())
+            .collect();
         if clean.is_empty() {
             return "0000".to_string();
         }
@@ -129,7 +133,10 @@ impl FuzzyNameMatchingEngine {
         token_hasher.update(target_name.as_bytes());
         token_hasher.update(&dist.to_be_bytes());
         token_hasher.update(&[is_match as u8]);
-        let receipt_token = format!("fuzzy-zk-{}", hex::encode(&token_hasher.finalize().as_bytes()[0..16]));
+        let receipt_token = format!(
+            "fuzzy-zk-{}",
+            hex::encode(&token_hasher.finalize().as_bytes()[0..16])
+        );
 
         FuzzyMatchReceipt {
             is_match_within_edit_distance: is_match,

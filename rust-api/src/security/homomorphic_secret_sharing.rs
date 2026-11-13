@@ -147,7 +147,8 @@ mod tests {
 
         let out_a_match = HomomorphicSecretSharingEngine::evaluate_dpf(&share_a, target_id);
         let out_b_match = HomomorphicSecretSharingEngine::evaluate_dpf(&share_b, target_id);
-        let res_match = HomomorphicSecretSharingEngine::reconstruct_result(out_a_match, out_b_match);
+        let res_match =
+            HomomorphicSecretSharingEngine::reconstruct_result(out_a_match, out_b_match);
 
         // Matching point yields non-zero payload
         assert_ne!(res_match, 0);
@@ -155,7 +156,8 @@ mod tests {
         // Non-matching point
         let out_a_other = HomomorphicSecretSharingEngine::evaluate_dpf(&share_a, 999);
         let out_b_other = HomomorphicSecretSharingEngine::evaluate_dpf(&share_b, 999);
-        let res_other = HomomorphicSecretSharingEngine::reconstruct_result(out_a_other, out_b_other);
+        let res_other =
+            HomomorphicSecretSharingEngine::reconstruct_result(out_a_other, out_b_other);
         assert_ne!(res_match, res_other);
     }
 }

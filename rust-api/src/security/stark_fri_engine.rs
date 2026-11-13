@@ -233,7 +233,10 @@ impl StarkFriEngine {
                     evaluation_value: eval_val,
                     sibling_hashes: vec![
                         format!("sibling_{:x}", blake3::hash(&query_pos.to_le_bytes())),
-                        format!("sibling_{:x}", blake3::hash(&layer.domain_size.to_le_bytes())),
+                        format!(
+                            "sibling_{:x}",
+                            blake3::hash(&layer.domain_size.to_le_bytes())
+                        ),
                     ],
                 });
             }
@@ -271,7 +274,9 @@ impl StarkFriEngine {
             let expected_alpha = GoldilocksField::new(u64::from_le_bytes(alpha_bytes));
 
             if proof.fiat_shamir_alpha_challenges[i].value != expected_alpha.value {
-                return Err("Soundness Error: Fiat-Shamir alpha challenge does not match commitment root");
+                return Err(
+                    "Soundness Error: Fiat-Shamir alpha challenge does not match commitment root",
+                );
             }
         }
 

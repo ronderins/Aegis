@@ -58,7 +58,7 @@ fn msm_bucket_accumulate(@builtin(global_invocation_id) global_id: vec3<u32>) {
     /// Estimates GPU acceleration benchmarks for a given constraint size
     pub fn benchmark_estimated_speedup(num_constraints: usize) -> GpuAccelerationBenchmark {
         let cpu_ms = (num_constraints as f64) * 0.0018; // ~1.8us per gate on CPU
-        let gpu_ms = (cpu_ms * 0.12).max(1.5);         // ~8x to 10x throughput on modern WebGPU
+        let gpu_ms = (cpu_ms * 0.12).max(1.5); // ~8x to 10x throughput on modern WebGPU
         let speedup = cpu_ms / gpu_ms;
 
         GpuAccelerationBenchmark {

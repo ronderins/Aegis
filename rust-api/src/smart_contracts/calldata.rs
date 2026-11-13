@@ -55,7 +55,8 @@ impl EvmCalldataEncoder {
         );
 
         EvmCalldataPayload {
-            function_signature: "verifyProof(uint256[2],uint256[2][2],uint256[2],uint256[4])".to_string(),
+            function_signature: "verifyProof(uint256[2],uint256[2][2],uint256[2],uint256[4])"
+                .to_string(),
             a_g1: [a_x, a_y],
             b_g2: [[b_x1, b_x2], [b_y1, b_y2]],
             c_g1: [c_x, c_y],

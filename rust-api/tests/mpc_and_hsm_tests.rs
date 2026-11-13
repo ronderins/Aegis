@@ -36,7 +36,8 @@ fn test_mpc_ceremony_contribution_chain() {
 
 #[test]
 fn test_hsm_session_and_blind_signing() {
-    let session = HsmCryptoToken::open_session("ZK_IDENTITY_FIPS140_HSM", b"pin_987654").expect("HSM session open");
+    let session = HsmCryptoToken::open_session("ZK_IDENTITY_FIPS140_HSM", b"pin_987654")
+        .expect("HSM session open");
     assert!(session.is_authenticated);
 
     let doc_digest = [0x5au8; 32];
@@ -57,7 +58,9 @@ fn test_enclave_attestation_verification() {
         timestamp_epoch_ms: 1786770000000,
     };
 
-    assert!(verifier.verify_quote(&quote, "challenge_nonce_xyz123").expect("Enclave verification"));
+    assert!(verifier
+        .verify_quote(&quote, "challenge_nonce_xyz123")
+        .expect("Enclave verification"));
 }
 
 #[test]

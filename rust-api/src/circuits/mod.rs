@@ -18,5 +18,9 @@ pub mod merkle_membership;
 pub mod recursive_folding;
 pub mod sanctions_non_membership;
 
-pub use biometric_embedding::{BiometricCircuit, BiometricMatchResult, BiometricWitnessVector, EnrolledTemplateCommitment};
-pub use recursive_folding::{FoldedProofReceipt, RecursiveFoldingScheme, RelaxedR1csInstance, RelaxedR1csWitness};
+pub use biometric_embedding::{
+    BiometricCircuit, BiometricMatchResult, BiometricWitnessVector, EnrolledTemplateCommitment,
+};
+pub use recursive_folding::{
+    FoldedProofReceipt, RecursiveFoldingScheme, RelaxedR1csInstance, RelaxedR1csWitness,
+};

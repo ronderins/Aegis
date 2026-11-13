@@ -162,7 +162,11 @@ impl SmtCircuitBridge {
             is_sound_and_complete: is_sound,
             underconstrained_wires: underconstrained,
             smt_lib2_script: smt_text,
-            solver_verdict: if is_sound { "sat (proven sound)".into() } else { "unsat (under-constrained)".into() },
+            solver_verdict: if is_sound {
+                "sat (proven sound)".into()
+            } else {
+                "unsat (under-constrained)".into()
+            },
         }
     }
 }

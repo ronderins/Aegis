@@ -23,8 +23,12 @@ pub struct ThresholdScalar {
 }
 
 impl ThresholdScalar {
-    pub const ZERO: Self = Self { limbs: [0, 0, 0, 0] };
-    pub const ONE: Self = Self { limbs: [1, 0, 0, 0] };
+    pub const ZERO: Self = Self {
+        limbs: [0, 0, 0, 0],
+    };
+    pub const ONE: Self = Self {
+        limbs: [1, 0, 0, 0],
+    };
 
     pub fn from_u64(val: u64) -> Self {
         Self {
@@ -347,10 +351,7 @@ impl FrostCoordinator {
     }
 
     /// Participant generates Round 1 ephemeral nonces and commitments.
-    pub fn round1_commit(
-        participant_index: u32,
-        seed: &[u8],
-    ) -> (PrivateNonces, Round1Commitment) {
+    pub fn round1_commit(participant_index: u32, seed: &[u8]) -> (PrivateNonces, Round1Commitment) {
         let mut h1 = Sha256::new();
         h1.update(b"FROST_HIDING_NONCE_V1");
         h1.update(seed);
@@ -422,7 +423,8 @@ impl FrostCoordinator {
         let c = ThresholdScalar::from_be_bytes(&challenge_bytes);
 
         // Compute Lagrange coefficient \lambda_i
-        let lambda_i = Self::compute_lagrange_coefficient(key_share.participant_index, &signer_indices);
+        let lambda_i =
+            Self::compute_lagrange_coefficient(key_share.participant_index, &signer_indices);
 
         // Compute z_i = d_i + (e_i * \rho_i) + (\lambda_i * s_i * c)
         let binding_term = nonces.binding_nonce.mul(&rho_i);
@@ -476,10 +478,7 @@ impl FrostCoordinator {
     }
 
     /// Verifies the final aggregated threshold Schnorr signature.
-    pub fn verify_aggregated_signature(
-        sig: &AggregatedThresholdSignature,
-        message: &[u8],
-    ) -> bool {
+    pub fn verify_aggregated_signature(sig: &AggregatedThresholdSignature, message: &[u8]) -> bool {
         // Check message digest
         let mut msg_hasher = Sha256::new();
         msg_hasher.update(message);
@@ -512,7 +511,8 @@ mod tests {
     #[test]
     fn test_frost_3_of_5_threshold_sign_and_verify() {
         let master_seed = b"test_entropy_seed_for_frost_threshold_keys_2026";
-        let (shares, vss, group_pk) = FrostCoordinator::trusted_dealer_keygen(3, 5, master_seed).unwrap();
+        let (shares, vss, group_pk) =
+            FrostCoordinator::trusted_dealer_keygen(3, 5, master_seed).unwrap();
 
         assert_eq!(shares.len(), 5);
         assert_eq!(vss.commitments.len(), 3);
@@ -530,15 +530,22 @@ mod tests {
 
         let commitments = vec![p1_comm, p3_comm, p5_comm];
 
-        let s1 = FrostCoordinator::round2_sign(&shares[0], &p1_priv, &commitments, message).unwrap();
-        let s3 = FrostCoordinator::round2_sign(&shares[2], &p3_priv, &commitments, message).unwrap();
-        let s5 = FrostCoordinator::round2_sign(&shares[4], &p5_priv, &commitments, message).unwrap();
+        let s1 =
+            FrostCoordinator::round2_sign(&shares[0], &p1_priv, &commitments, message).unwrap();
+        let s3 =
+            FrostCoordinator::round2_sign(&shares[2], &p3_priv, &commitments, message).unwrap();
+        let s5 =
+            FrostCoordinator::round2_sign(&shares[4], &p5_priv, &commitments, message).unwrap();
 
         let partial_sigs = vec![s1, s3, s5];
-        let agg_sig = FrostCoordinator::aggregate_signatures(&group_pk, &commitments, &partial_sigs, message).unwrap();
+        let agg_sig =
+            FrostCoordinator::aggregate_signatures(&group_pk, &commitments, &partial_sigs, message)
+                .unwrap();
 
         assert_eq!(agg_sig.signers_participated, vec![1, 3, 5]);
-        assert!(FrostCoordinator::verify_aggregated_signature(&agg_sig, message));
+        assert!(FrostCoordinator::verify_aggregated_signature(
+            &agg_sig, message
+        ));
     }
 
     #[test]

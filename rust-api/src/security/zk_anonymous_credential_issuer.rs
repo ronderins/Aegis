@@ -51,7 +51,10 @@ pub struct BbsPlusEngine;
 
 impl BbsPlusEngine {
     /// Authority generates BBS+ keypair supporting up to max_attributes credentials.
-    pub fn keygen(max_attributes: usize, authority_seed: &[u8]) -> (BbsPlusPublicKey, BbsPlusSecretKey) {
+    pub fn keygen(
+        max_attributes: usize,
+        authority_seed: &[u8],
+    ) -> (BbsPlusPublicKey, BbsPlusSecretKey) {
         let mut x_hasher = Sha256::new();
         x_hasher.update(b"BBS_PLUS_AUTHORITY_SECRET_X");
         x_hasher.update(authority_seed);
@@ -67,11 +70,15 @@ impl BbsPlusEngine {
             let mut gen_hasher = blake3::Hasher::new();
             gen_hasher.update(b"BBS_PLUS_ATTRIBUTE_GENERATOR_H_");
             gen_hasher.update(&i.to_be_bytes());
-            attribute_generators.push(format!("0x02{}", &hex::encode(gen_hasher.finalize().as_bytes())[0..64]));
+            attribute_generators.push(format!(
+                "0x02{}",
+                &hex::encode(gen_hasher.finalize().as_bytes())[0..64]
+            ));
         }
 
         let pk = BbsPlusPublicKey {
-            g1_generator: "0x0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798".to_string(),
+            g1_generator: "0x0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+                .to_string(),
             g2_issuer_pubkey: format!("0x{}", g2_key),
             attribute_generators,
         };
@@ -116,7 +123,10 @@ impl BbsPlusEngine {
         for a in attributes {
             a_hasher.update(a.as_bytes());
         }
-        let point_a = format!("0x02{}", &hex::encode(a_hasher.finalize().as_bytes())[0..64]);
+        let point_a = format!(
+            "0x02{}",
+            &hex::encode(a_hasher.finalize().as_bytes())[0..64]
+        );
 
         Ok(BbsPlusSignature {
             point_a,
@@ -151,8 +161,14 @@ impl BbsPlusEngine {
         r1_hasher.update(nonce.as_bytes());
         let a_prime = format!("0x02{}", &hex::encode(r1_hasher.finalize())[0..64]);
 
-        let a_bar = format!("0x02{}", &hex::encode(Sha256::digest(a_prime.as_bytes()))[0..64]);
-        let d_point = format!("0x02{}", &hex::encode(Sha256::digest(a_bar.as_bytes()))[0..64]);
+        let a_bar = format!(
+            "0x02{}",
+            &hex::encode(Sha256::digest(a_prime.as_bytes()))[0..64]
+        );
+        let d_point = format!(
+            "0x02{}",
+            &hex::encode(Sha256::digest(a_bar.as_bytes()))[0..64]
+        );
 
         // Fiat-Shamir challenge
         let mut chal_hasher = blake3::Hasher::new();
@@ -213,21 +229,25 @@ mod tests {
         let (pk, sk) = BbsPlusEngine::keygen(5, b"authority_bbs_master_entropy_seed");
 
         let attributes = vec![
-            "Alice Citizen".to_string(), // 0: Name (hidden)
-            "DE".to_string(),            // 1: Country (revealed)
-            "25".to_string(),            // 2: Age (revealed)
-            "Tier3_Verified".to_string(),// 3: KYC Tier (revealed)
-            "X99881122".to_string(),     // 4: Passport No (hidden)
+            "Alice Citizen".to_string(),  // 0: Name (hidden)
+            "DE".to_string(),             // 1: Country (revealed)
+            "25".to_string(),             // 2: Age (revealed)
+            "Tier3_Verified".to_string(), // 3: KYC Tier (revealed)
+            "X99881122".to_string(),      // 4: Passport No (hidden)
         ];
 
         let sig = BbsPlusEngine::sign_attributes(&sk, &attributes).unwrap();
 
         // Reveal ONLY attributes 1 (DE), 2 (25), 3 (Tier3_Verified)
         let nonce = "verifier_session_challenge_9912";
-        let proof = BbsPlusEngine::prove_selective_disclosure(&pk, &sig, &attributes, &[1, 2, 3], nonce).unwrap();
+        let proof =
+            BbsPlusEngine::prove_selective_disclosure(&pk, &sig, &attributes, &[1, 2, 3], nonce)
+                .unwrap();
 
         assert_eq!(proof.revealed_attributes.len(), 3);
         assert_eq!(proof.hidden_attribute_indices, vec![0, 4]); // Name & Passport concealed!
-        assert!(BbsPlusEngine::verify_selective_disclosure(&pk, &proof, nonce));
+        assert!(BbsPlusEngine::verify_selective_disclosure(
+            &pk, &proof, nonce
+        ));
     }
 }

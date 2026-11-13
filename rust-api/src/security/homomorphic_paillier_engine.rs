@@ -180,7 +180,12 @@ impl PaillierEngine {
         n_limbs[3] |= 0x8000000000000000; // High bit set
 
         let n = BigInt512 { limbs: n_limbs };
-        let n_squared = n.mul_mod(&n, &BigInt512 { limbs: [u64::MAX; 8] });
+        let n_squared = n.mul_mod(
+            &n,
+            &BigInt512 {
+                limbs: [u64::MAX; 8],
+            },
+        );
 
         let pk = PaillierPublicKey {
             n: n.clone(),
@@ -201,7 +206,11 @@ impl PaillierEngine {
     }
 
     /// Encrypts plaintext message m: C = (g^m * r^n) mod n^2
-    pub fn encrypt(pk: &PaillierPublicKey, message: u64, random_blinding: &[u8]) -> PaillierCiphertext {
+    pub fn encrypt(
+        pk: &PaillierPublicKey,
+        message: u64,
+        random_blinding: &[u8],
+    ) -> PaillierCiphertext {
         let mut r_hasher = Sha256::new();
         r_hasher.update(b"PAILLIER_ENCRYPT_R");
         r_hasher.update(random_blinding);

@@ -9,7 +9,7 @@ impl SolidityVerifierGenerator {
     /// Generates standalone Solidity code for Groth16 BN254 Verifier
     pub fn generate_verifier_contract(contract_name: &str) -> String {
         format!(
-r#"// SPDX-License-Identifier: MIT
+            r#"// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
 /**
@@ -81,6 +81,8 @@ contract {} {{
         return isValid;
     }}
 }}
-"#, contract_name, contract_name)
+"#,
+            contract_name, contract_name
+        )
     }
 }

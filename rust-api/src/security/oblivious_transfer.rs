@@ -97,7 +97,9 @@ impl ObliviousTransferEngine {
 
         (
             OtSenderSetup { public_key_a: pk_a },
-            OtBlock { bytes: secret_bytes },
+            OtBlock {
+                bytes: secret_bytes,
+            },
         )
     }
 
@@ -202,13 +204,17 @@ impl ObliviousTransferEngine {
             h0.update(seed);
             h0.update(&i.to_be_bytes());
             h0.update(b"_wire_0");
-            let k0 = OtBlock { bytes: h0.finalize().into() };
+            let k0 = OtBlock {
+                bytes: h0.finalize().into(),
+            };
 
             let mut h1 = Sha256::new();
             h1.update(seed);
             h1.update(&i.to_be_bytes());
             h1.update(b"_wire_1");
-            let k1 = OtBlock { bytes: h1.finalize().into() };
+            let k1 = OtBlock {
+                bytes: h1.finalize().into(),
+            };
 
             wire_keys.push([k0, k1]);
         }
@@ -252,10 +258,7 @@ impl ObliviousTransferEngine {
     }
 
     /// Evaluates garbled circuit obliviously.
-    pub fn evaluate_circuit(
-        circuit: &GarbledCircuit,
-        active_wire_labels: &[OtBlock],
-    ) -> bool {
+    pub fn evaluate_circuit(circuit: &GarbledCircuit, active_wire_labels: &[OtBlock]) -> bool {
         if active_wire_labels.len() != circuit.input_wire_count {
             return false;
         }
@@ -286,9 +289,11 @@ mod tests {
 
         // Receiver wants message 1 (choice = true)
         let choice = true;
-        let (query, _receiver_key) = ObliviousTransferEngine::receiver_query(&setup, choice, b"receiver_seed_456");
+        let (query, _receiver_key) =
+            ObliviousTransferEngine::receiver_query(&setup, choice, b"receiver_seed_456");
 
-        let response = ObliviousTransferEngine::sender_respond(&setup, &sender_priv, &query, &m0, &m1);
+        let response =
+            ObliviousTransferEngine::sender_respond(&setup, &sender_priv, &query, &m0, &m1);
 
         assert!(!response.ciphertext_0.is_empty());
         assert!(!response.ciphertext_1.is_empty());
@@ -297,7 +302,8 @@ mod tests {
 
     #[test]
     fn test_garbled_circuit_generation() {
-        let (circuit, wire_keys) = ObliviousTransferEngine::garble_comparator_circuit(21, b"circuit_seed_789");
+        let (circuit, wire_keys) =
+            ObliviousTransferEngine::garble_comparator_circuit(21, b"circuit_seed_789");
         assert_eq!(circuit.input_wire_count, 8);
         assert_eq!(wire_keys.len(), 8);
 
@@ -306,7 +312,11 @@ mod tests {
         let age: u8 = 25;
         for i in 0..8 {
             let bit = ((age >> i) & 1) == 1;
-            active_labels.push(if bit { wire_keys[i][1].clone() } else { wire_keys[i][0].clone() });
+            active_labels.push(if bit {
+                wire_keys[i][1].clone()
+            } else {
+                wire_keys[i][0].clone()
+            });
         }
 
         let _result = ObliviousTransferEngine::evaluate_circuit(&circuit, &active_labels);

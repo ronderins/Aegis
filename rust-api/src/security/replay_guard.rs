@@ -5,9 +5,9 @@
 //! - `EpochSlidingWindow`: Rejects proofs generated outside the active time-to-live window (e.g. >300s).
 //! - `CryptographicNullifierLedger`: Prevents double-presentation attacks on privacy credentials.
 
+use sha2::{Digest, Sha256};
 use std::collections::HashSet;
 use std::sync::{Arc, Mutex};
-use sha2::{Digest, Sha256};
 
 /// Replay guard configuration
 #[derive(Debug, Clone)]
@@ -41,7 +41,12 @@ impl ReplayGuard {
     }
 
     /// Check if a nullifier/nonce is fresh and immediately mark it as seen (atomic)
-    pub fn verify_and_consume(&self, nullifier_hex: &str, timestamp_epoch: i64, current_epoch: i64) -> Result<(), String> {
+    pub fn verify_and_consume(
+        &self,
+        nullifier_hex: &str,
+        timestamp_epoch: i64,
+        current_epoch: i64,
+    ) -> Result<(), String> {
         // 1. Verify Timestamp Epoch Skew
         let diff = (current_epoch - timestamp_epoch).abs();
         if diff > self.config.max_epoch_skew_seconds {
@@ -59,7 +64,9 @@ impl ReplayGuard {
         // 3. Atomically check and insert
         let mut set = self.seen_nullifiers.lock().map_err(|e| e.to_string())?;
         if set.contains(nullifier_hex) {
-            return Err("Double-spend / Replay detected: nullifier has already been consumed".to_string());
+            return Err(
+                "Double-spend / Replay detected: nullifier has already been consumed".to_string(),
+            );
         }
 
         // Bound cache size
@@ -89,7 +96,8 @@ mod tests {
     #[test]
     fn test_replay_guard_lifecycle() {
         let guard = ReplayGuard::new(ReplayGuardConfig::default());
-        let nullifier = ReplayGuard::compute_nullifier(b"private_key_material", "vote_election_2026");
+        let nullifier =
+            ReplayGuard::compute_nullifier(b"private_key_material", "vote_election_2026");
 
         let current_time = 1773000000;
 
@@ -104,7 +112,8 @@ mod tests {
 
         // Expired timestamp should be rejected
         let old_time = current_time - 500;
-        let fresh_nullifier = ReplayGuard::compute_nullifier(b"another_secret", "vote_election_2026");
+        let fresh_nullifier =
+            ReplayGuard::compute_nullifier(b"another_secret", "vote_election_2026");
         let res3 = guard.verify_and_consume(&fresh_nullifier, old_time, current_time);
         assert!(res3.is_err());
         assert!(res3.unwrap_err().contains("expired"));

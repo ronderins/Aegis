@@ -53,15 +53,24 @@ impl RecursiveGroth16Engine {
         public_inputs_hash: &str,
         challenge_r: u64,
     ) {
-        let new_a = blake3::hash(format!("{}_{}_{}", acc.accumulated_a, proof_a, challenge_r).as_bytes());
-        let new_b = blake3::hash(format!("{}_{}_{}", acc.accumulated_b, proof_b, challenge_r).as_bytes());
-        let new_c = blake3::hash(format!("{}_{}_{}", acc.accumulated_c, proof_c, challenge_r).as_bytes());
+        let new_a =
+            blake3::hash(format!("{}_{}_{}", acc.accumulated_a, proof_a, challenge_r).as_bytes());
+        let new_b =
+            blake3::hash(format!("{}_{}_{}", acc.accumulated_b, proof_b, challenge_r).as_bytes());
+        let new_c =
+            blake3::hash(format!("{}_{}_{}", acc.accumulated_c, proof_c, challenge_r).as_bytes());
 
         acc.accumulated_a = format!("A_fold_{:x}", new_a);
         acc.accumulated_b = format!("B_fold_{:x}", new_b);
         acc.accumulated_c = format!("C_fold_{:x}", new_c);
 
-        let new_inputs = blake3::hash(format!("{}_{}", acc.accumulated_public_inputs_digest, public_inputs_hash).as_bytes());
+        let new_inputs = blake3::hash(
+            format!(
+                "{}_{}",
+                acc.accumulated_public_inputs_digest, public_inputs_hash
+            )
+            .as_bytes(),
+        );
         acc.accumulated_public_inputs_digest = format!("{:x}", new_inputs);
 
         acc.folded_proof_count += 1;
@@ -89,9 +98,15 @@ mod tests {
         let mut acc = RecursiveGroth16Engine::new_accumulator();
 
         // Fold 3 proofs
-        RecursiveGroth16Engine::fold_proof(&mut acc, "proof1_a", "proof1_b", "proof1_c", "in1", 101);
-        RecursiveGroth16Engine::fold_proof(&mut acc, "proof2_a", "proof2_b", "proof2_c", "in2", 102);
-        RecursiveGroth16Engine::fold_proof(&mut acc, "proof3_a", "proof3_b", "proof3_c", "in3", 103);
+        RecursiveGroth16Engine::fold_proof(
+            &mut acc, "proof1_a", "proof1_b", "proof1_c", "in1", 101,
+        );
+        RecursiveGroth16Engine::fold_proof(
+            &mut acc, "proof2_a", "proof2_b", "proof2_c", "in2", 102,
+        );
+        RecursiveGroth16Engine::fold_proof(
+            &mut acc, "proof3_a", "proof3_b", "proof3_c", "in3", 103,
+        );
 
         assert_eq!(acc.folded_proof_count, 3);
         assert!(acc.accumulated_a.starts_with("A_fold_"));

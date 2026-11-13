@@ -30,13 +30,9 @@ pub enum ZkCliCommand {
         end_block: Option<u64>,
     },
     /// Runs continuous NIST SP 800-90B entropy diagnostics
-    AssessEntropy {
-        samples: usize,
-    },
+    AssessEntropy { samples: usize },
     /// Triggers Canary Dead-Man binary tamper check
-    CheckCanary {
-        expected_hash: Option<String>,
-    },
+    CheckCanary { expected_hash: Option<String> },
     /// Generates W3C Verifiable Credential envelope with Groth16 proof
     ExportVerifiableCredential {
         subject_did: String,
@@ -45,9 +41,7 @@ pub enum ZkCliCommand {
         nullifier_hex: String,
     },
     /// Exports EVM-compatible Solidity Groth16 Verifier Contract
-    ExportSolidityVerifier {
-        contract_name: String,
-    },
+    ExportSolidityVerifier { contract_name: String },
     /// Launches interactive terminal UI dashboard
     InteractiveDashboard,
 }
@@ -62,7 +56,10 @@ impl CliParser {
 
         match args[1].as_str() {
             "generate-key" => {
-                let algo = args.get(2).cloned().unwrap_or_else(|| "BN254-Groth16".to_string());
+                let algo = args
+                    .get(2)
+                    .cloned()
+                    .unwrap_or_else(|| "BN254-Groth16".to_string());
                 let out = args.get(3).cloned();
                 Ok(ZkCliCommand::GenerateKey {
                     algorithm: algo,
@@ -73,7 +70,9 @@ impl CliParser {
                 let birth_year = args.get(2).and_then(|s| s.parse().ok()).unwrap_or(2000);
                 let current_year = args.get(3).and_then(|s| s.parse().ok()).unwrap_or(2026);
                 let threshold = args.get(4).and_then(|s| s.parse().ok()).unwrap_or(18);
-                let salt = args.get(5).cloned().unwrap_or_else(|| "5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a".to_string());
+                let salt = args.get(5).cloned().unwrap_or_else(|| {
+                    "5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a".to_string()
+                });
                 Ok(ZkCliCommand::ProveAge {
                     birth_year,
                     current_year,
@@ -93,10 +92,17 @@ impl CliParser {
                 end_block: None,
             }),
             "entropy" => Ok(ZkCliCommand::AssessEntropy { samples: 4096 }),
-            "canary" => Ok(ZkCliCommand::CheckCanary { expected_hash: None }),
+            "canary" => Ok(ZkCliCommand::CheckCanary {
+                expected_hash: None,
+            }),
             "export-solidity" => {
-                let name = args.get(2).cloned().unwrap_or_else(|| "ZKIdentityVerifier".to_string());
-                Ok(ZkCliCommand::ExportSolidityVerifier { contract_name: name })
+                let name = args
+                    .get(2)
+                    .cloned()
+                    .unwrap_or_else(|| "ZKIdentityVerifier".to_string());
+                Ok(ZkCliCommand::ExportSolidityVerifier {
+                    contract_name: name,
+                })
             }
             _ => Ok(ZkCliCommand::InteractiveDashboard),
         }

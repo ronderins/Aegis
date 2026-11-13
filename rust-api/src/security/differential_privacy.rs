@@ -12,8 +12,8 @@ use std::sync::{Arc, Mutex};
 /// Differential privacy parameters
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DpParameters {
-    pub epsilon: f64, // Privacy loss parameter (e.g. 0.5 - 1.0)
-    pub delta: f64,   // Probability of privacy failure (e.g. 1e-6)
+    pub epsilon: f64,     // Privacy loss parameter (e.g. 0.5 - 1.0)
+    pub delta: f64,       // Probability of privacy failure (e.g. 1e-6)
     pub sensitivity: f64, // L1/L2 global sensitivity bound
 }
 
@@ -62,7 +62,10 @@ impl DifferentialPrivacyEngine {
         let mut state = self.state.lock().map_err(|e| e.to_string())?;
         if state.is_exhausted || state.remaining_epsilon < self.params.epsilon {
             state.is_exhausted = true;
-            return Err("Differential privacy budget exhausted: Query rejected to prevent identity linkage".to_string());
+            return Err(
+                "Differential privacy budget exhausted: Query rejected to prevent identity linkage"
+                    .to_string(),
+            );
         }
 
         // Scale parameter b = sensitivity / epsilon
@@ -95,11 +98,14 @@ mod tests {
 
     #[test]
     fn test_differential_privacy_budget_depletion() {
-        let engine = DifferentialPrivacyEngine::new(1.0, DpParameters {
-            epsilon: 0.5,
-            delta: 1e-6,
-            sensitivity: 1.0,
-        });
+        let engine = DifferentialPrivacyEngine::new(
+            1.0,
+            DpParameters {
+                epsilon: 0.5,
+                delta: 1e-6,
+                sensitivity: 1.0,
+            },
+        );
 
         // Query 1
         let val1 = engine.privatize_count(100.0, 1234);

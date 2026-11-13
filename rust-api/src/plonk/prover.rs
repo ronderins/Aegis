@@ -41,9 +41,18 @@ impl PlonkProver {
         }
 
         // 1. Round 1: Commit to wire polynomials
-        let a_vals: Vec<Fp> = gates.iter().map(|g| witness.get(g.wire_a).copied().unwrap_or_else(Fp::zero)).collect();
-        let b_vals: Vec<Fp> = gates.iter().map(|g| witness.get(g.wire_b).copied().unwrap_or_else(Fp::zero)).collect();
-        let c_vals: Vec<Fp> = gates.iter().map(|g| witness.get(g.wire_c).copied().unwrap_or_else(Fp::zero)).collect();
+        let a_vals: Vec<Fp> = gates
+            .iter()
+            .map(|g| witness.get(g.wire_a).copied().unwrap_or_else(Fp::zero))
+            .collect();
+        let b_vals: Vec<Fp> = gates
+            .iter()
+            .map(|g| witness.get(g.wire_b).copied().unwrap_or_else(Fp::zero))
+            .collect();
+        let c_vals: Vec<Fp> = gates
+            .iter()
+            .map(|g| witness.get(g.wire_c).copied().unwrap_or_else(Fp::zero))
+            .collect();
 
         let poly_a = Polynomial::new(a_vals.clone());
         let poly_b = Polynomial::new(b_vals.clone());

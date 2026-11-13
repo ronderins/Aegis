@@ -1,3 +1,10 @@
+use crate::crypto::constant_time_eq;
+use crate::error::ApiError;
+use crate::models::{
+    LedgerChainResponse, PerformanceMetricsResponse, ProofListResponse, StatsResponse,
+    VerifyRequest,
+};
+use crate::store::AppState;
 use axum::{
     extract::{Path, State},
     http::{HeaderMap, StatusCode},
@@ -7,13 +14,6 @@ use axum::{
 use std::collections::HashMap;
 use std::env;
 use uuid::Uuid;
-use crate::error::ApiError;
-use crate::models::{
-    LedgerChainResponse, PerformanceMetricsResponse, ProofListResponse, StatsResponse,
-    VerifyRequest,
-};
-use crate::store::AppState;
-use crate::crypto::constant_time_eq;
 
 fn get_request_id(headers: &HeaderMap) -> String {
     headers
@@ -25,7 +25,9 @@ fn get_request_id(headers: &HeaderMap) -> String {
 }
 
 fn check_auth(headers: &HeaderMap, request_id: &str) -> Result<(), ApiError> {
-    let key_var = env::var("API_KEY").or_else(|_| env::var("API_KEYS")).unwrap_or_default();
+    let key_var = env::var("API_KEY")
+        .or_else(|_| env::var("API_KEYS"))
+        .unwrap_or_default();
     let configured_keys: Vec<String> = key_var
         .split(',')
         .map(|s| s.trim().to_string())
@@ -105,16 +107,26 @@ pub async fn create_verify_proof(
     let trimmed_doc_hash = payload.doc_hash.trim().to_lowercase();
 
     if trimmed_user_id.is_empty() || trimmed_user_id.len() > 256 {
-        violations.insert("user_id".to_string(), "must contain between 1 and 256 characters".to_string());
+        violations.insert(
+            "user_id".to_string(),
+            "must contain between 1 and 256 characters".to_string(),
+        );
     }
 
-    let hex_chars_valid = trimmed_doc_hash.len() == 64 && trimmed_doc_hash.chars().all(|c| c.is_ascii_hexdigit());
+    let hex_chars_valid =
+        trimmed_doc_hash.len() == 64 && trimmed_doc_hash.chars().all(|c| c.is_ascii_hexdigit());
     if !hex_chars_valid {
-        violations.insert("doc_hash".to_string(), "must be a 64-character SHA-256 hexadecimal digest".to_string());
+        violations.insert(
+            "doc_hash".to_string(),
+            "must be a 64-character SHA-256 hexadecimal digest".to_string(),
+        );
     }
 
     if payload.age_threshold > 130 {
-        violations.insert("age_threshold".to_string(), "must be between 0 and 130".to_string());
+        violations.insert(
+            "age_threshold".to_string(),
+            "must be between 0 and 130".to_string(),
+        );
     }
 
     if !violations.is_empty() {
@@ -126,7 +138,10 @@ pub async fn create_verify_proof(
         .into_response();
     }
 
-    match state.create_proof(trimmed_user_id, &trimmed_doc_hash, payload.age_threshold).await {
+    match state
+        .create_proof(trimmed_user_id, &trimmed_doc_hash, payload.age_threshold)
+        .await
+    {
         Ok(res) => (StatusCode::CREATED, Json(res)).into_response(),
         Err(err_msg) => ApiError::VerificationFailed {
             reason: err_msg.to_string(),
@@ -165,10 +180,7 @@ pub async fn get_proof(
     }
 }
 
-pub async fn list_proofs(
-    State(state): State<AppState>,
-    headers: HeaderMap,
-) -> impl IntoResponse {
+pub async fn list_proofs(State(state): State<AppState>, headers: HeaderMap) -> impl IntoResponse {
     let request_id = get_request_id(&headers);
 
     if let Err(auth_err) = check_auth(&headers, &request_id) {
@@ -195,10 +207,7 @@ pub async fn create_session(
     (StatusCode::OK, Json(session)).into_response()
 }
 
-pub async fn get_ledger(
-    State(state): State<AppState>,
-    headers: HeaderMap,
-) -> impl IntoResponse {
+pub async fn get_ledger(State(state): State<AppState>, headers: HeaderMap) -> impl IntoResponse {
     let request_id = get_request_id(&headers);
 
     if let Err(auth_err) = check_auth(&headers, &request_id) {
@@ -209,10 +218,7 @@ pub async fn get_ledger(
     (StatusCode::OK, Json(ledger)).into_response()
 }
 
-pub async fn get_metrics(
-    State(state): State<AppState>,
-    headers: HeaderMap,
-) -> impl IntoResponse {
+pub async fn get_metrics(State(state): State<AppState>, headers: HeaderMap) -> impl IntoResponse {
     let request_id = get_request_id(&headers);
 
     if let Err(auth_err) = check_auth(&headers, &request_id) {
@@ -224,8 +230,14 @@ pub async fn get_metrics(
 }
 
 pub async fn get_stats(State(state): State<AppState>) -> impl IntoResponse {
-    let (total_proofs, total_audit_events, active_commitments, total_ledger_blocks, latest_merkle_root, uptime_secs) =
-        state.get_stats().await;
+    let (
+        total_proofs,
+        total_audit_events,
+        active_commitments,
+        total_ledger_blocks,
+        latest_merkle_root,
+        uptime_secs,
+    ) = state.get_stats().await;
 
     (
         StatusCode::OK,
@@ -257,7 +269,8 @@ pub async fn verify_token(
     let token_trimmed = payload.token.trim();
     if token_trimmed.is_empty() || token_trimmed.len() > 8192 {
         return ApiError::ValidationError {
-            message: "Token parameter is invalid or exceeds maximum size limit (8192 chars).".to_string(),
+            message: "Token parameter is invalid or exceeds maximum size limit (8192 chars)."
+                .to_string(),
             request_id,
             details: None,
         }
@@ -375,7 +388,8 @@ pub async fn sd_jwt_verify(
             message: if res.is_valid {
                 "SD-JWT verified with zero disclosure of concealed attributes".to_string()
             } else {
-                res.error_message.unwrap_or_else(|| "SD-JWT verification failed".to_string())
+                res.error_message
+                    .unwrap_or_else(|| "SD-JWT verification failed".to_string())
             },
             timestamp: chrono::Utc::now().to_rfc3339(),
         }),
@@ -393,14 +407,17 @@ pub async fn enclave_attestation_verify(
         return auth_err.into_response();
     }
 
-    let is_valid = crate::security::confidential_mpc_enclave::ConfidentialEnclaveEngine::verify_quote(
-        &payload.quote,
-        &payload.policy,
-        payload.challenge.as_bytes(),
-    )
-    .unwrap_or(false);
+    let is_valid =
+        crate::security::confidential_mpc_enclave::ConfidentialEnclaveEngine::verify_quote(
+            &payload.quote,
+            &payload.policy,
+            payload.challenge.as_bytes(),
+        )
+        .unwrap_or(false);
 
-    let receipt = hex::encode(sha2::Sha256::digest(payload.quote.measurement.mr_enclave.as_bytes()));
+    let receipt = hex::encode(sha2::Sha256::digest(
+        payload.quote.measurement.mr_enclave.as_bytes(),
+    ));
 
     (
         StatusCode::OK,
@@ -466,7 +483,12 @@ pub async fn sanctions_psi_check(
         Json(crate::models::SanctionsPsiResponse {
             is_cleared: true,
             oracle_evaluated_point: evaluated.evaluated_point,
-            oracle_signature: format!("0x{}", hex::encode(sha2::Sha256::digest(evaluated.oracle_pubkey_commitment.as_bytes()))),
+            oracle_signature: format!(
+                "0x{}",
+                hex::encode(sha2::Sha256::digest(
+                    evaluated.oracle_pubkey_commitment.as_bytes()
+                ))
+            ),
             epoch: payload.expected_epoch,
             timestamp: chrono::Utc::now().to_rfc3339(),
         }),
@@ -484,7 +506,10 @@ pub async fn mmr_audit_verify(
         return auth_err.into_response();
     }
 
-    let is_valid = crate::security::audit_merkle_mountain_range::MerkleMountainRange::verify_inclusion(&payload.proof);
+    let is_valid =
+        crate::security::audit_merkle_mountain_range::MerkleMountainRange::verify_inclusion(
+            &payload.proof,
+        );
 
     (
         StatusCode::OK,
@@ -509,8 +534,13 @@ pub async fn circuit_formal_check(
         return auth_err.into_response();
     }
 
-    let report = crate::security::formal_proof_verifier::FormalCircuitVerifier::verify_circuit(&payload.circuit);
-    let smt_lib2_code = crate::security::formal_proof_verifier::FormalCircuitVerifier::export_smt_lib2(&payload.circuit);
+    let report = crate::security::formal_proof_verifier::FormalCircuitVerifier::verify_circuit(
+        &payload.circuit,
+    );
+    let smt_lib2_code =
+        crate::security::formal_proof_verifier::FormalCircuitVerifier::export_smt_lib2(
+            &payload.circuit,
+        );
 
     (
         StatusCode::OK,
@@ -549,8 +579,10 @@ pub async fn get_security_overview() -> impl IntoResponse {
                 "FIDO2 / WebAuthn CTAP2 Hardware Authenticator Guard".to_string(),
                 "Rate-Limiting Nullifier (RLN) Anti-Spam Slashing".to_string(),
             ],
-            hardware_enclave_status: "Hardware Attestation Active (AMD SEV-SNP + Intel SGX)".to_string(),
-            post_quantum_status: "NIST FIPS 203 (ML-KEM-768) + NIST FIPS 204 (ML-DSA-65) Active".to_string(),
+            hardware_enclave_status: "Hardware Attestation Active (AMD SEV-SNP + Intel SGX)"
+                .to_string(),
+            post_quantum_status: "NIST FIPS 203 (ML-KEM-768) + NIST FIPS 204 (ML-DSA-65) Active"
+                .to_string(),
             rln_rate_limiter_epoch: 1,
             mmr_audit_tree_size: 1024,
             timestamp: chrono::Utc::now().to_rfc3339(),
@@ -571,8 +603,11 @@ mod tests {
     async fn test_successful_verification_flow() {
         let repo = Arc::new(Repository::new().await);
         let result = repo.create_proof("user_alice_42", VALID_DOC_HASH, 18).await;
-        
-        assert!(result.is_ok(), "Verification for valid witness must succeed");
+
+        assert!(
+            result.is_ok(),
+            "Verification for valid witness must succeed"
+        );
         let res = result.unwrap();
         assert!(res.verified);
         assert_eq!(res.criteria_met, "age_over_18");
@@ -582,10 +617,13 @@ mod tests {
     #[tokio::test]
     async fn test_failed_verification_invalid_doc_hash() {
         let repo = Arc::new(Repository::new().await);
-        
+
         // 1. Too short doc_hash
         let result_short = repo.create_proof("user_alice", "abcdef1234", 18).await;
-        assert!(result_short.is_err(), "Short doc_hash must fail verification");
+        assert!(
+            result_short.is_err(),
+            "Short doc_hash must fail verification"
+        );
         assert_eq!(
             result_short.unwrap_err(),
             "Invalid document hash: must be a 64-character SHA-256 hexadecimal string"
@@ -594,16 +632,22 @@ mod tests {
         // 2. Non-hex characters
         let invalid_hex = "g".repeat(64);
         let result_non_hex = repo.create_proof("user_alice", &invalid_hex, 18).await;
-        assert!(result_non_hex.is_err(), "Non-hex characters in doc_hash must fail");
+        assert!(
+            result_non_hex.is_err(),
+            "Non-hex characters in doc_hash must fail"
+        );
     }
 
     #[tokio::test]
     async fn test_failed_verification_invalid_age_threshold() {
         let repo = Arc::new(Repository::new().await);
-        
+
         // Age threshold exceeding 130
         let result_out_of_bounds = repo.create_proof("user_alice", VALID_DOC_HASH, 150).await;
-        assert!(result_out_of_bounds.is_err(), "Age threshold > 130 must fail");
+        assert!(
+            result_out_of_bounds.is_err(),
+            "Age threshold > 130 must fail"
+        );
         assert_eq!(
             result_out_of_bounds.unwrap_err(),
             "Age threshold exceeds maximum allowed value (130)"
@@ -627,7 +671,7 @@ mod tests {
 
         // With API_KEY set
         env::set_var("API_KEY", "super-secret-key-123");
-        
+
         // Missing key
         let mut headers_missing = HeaderMap::new();
         let err_missing = check_auth(&headers_missing, "req-2");
@@ -651,7 +695,10 @@ mod tests {
 
         // Bearer token support
         let mut headers_bearer = HeaderMap::new();
-        headers_bearer.insert("authorization", "Bearer super-secret-key-123".parse().unwrap());
+        headers_bearer.insert(
+            "authorization",
+            "Bearer super-secret-key-123".parse().unwrap(),
+        );
         assert!(check_auth(&headers_bearer, "req-5").is_ok());
 
         // Comma-delimited customizable keys (partner-1, partner-2)

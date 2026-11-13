@@ -22,7 +22,16 @@ pub struct PlonkGateRow {
 }
 
 impl PlonkGateRow {
-    pub fn new_arithmetic(ql: Fp, qr: Fp, qo: Fp, qm: Fp, qc: Fp, a: usize, b: usize, c: usize) -> Self {
+    pub fn new_arithmetic(
+        ql: Fp,
+        qr: Fp,
+        qo: Fp,
+        qm: Fp,
+        qc: Fp,
+        a: usize,
+        b: usize,
+        c: usize,
+    ) -> Self {
         Self {
             q_l: ql,
             q_r: qr,

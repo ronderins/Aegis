@@ -68,7 +68,8 @@ impl HyperplonkProverEngine {
         let cm_b = format!("cm_b_{:x}", w_b_hasher.finalize());
         let cm_c = format!("cm_c_{:x}", w_c_hasher.finalize());
 
-        let proof_h = blake3::hash(format!("{}_{}_{}_{}", cm_a, cm_b, cm_c, challenge_beta).as_bytes());
+        let proof_h =
+            blake3::hash(format!("{}_{}_{}_{}", cm_a, cm_b, cm_c, challenge_beta).as_bytes());
 
         Ok(HyperplonkProof {
             num_constraints: n,
@@ -108,7 +109,8 @@ mod tests {
         let wires_b = vec![5, 6, 7, 8];
         let wires_c = vec![6, 8, 10, 12]; // Additions: a + b = c
 
-        let proof = HyperplonkProverEngine::prove_hyperplonk(&wires_a, &wires_b, &wires_c, 0x1337).unwrap();
+        let proof =
+            HyperplonkProverEngine::prove_hyperplonk(&wires_a, &wires_b, &wires_c, 0x1337).unwrap();
         assert_eq!(proof.num_constraints, 4);
         assert_eq!(proof.sumcheck_claimed_zero, 0);
 

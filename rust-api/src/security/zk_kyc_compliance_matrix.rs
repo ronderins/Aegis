@@ -69,7 +69,8 @@ impl ZkKycComplianceMatrix {
 
         let us_sec_rule = CompliancePolicyRule {
             rule_id: "US_SEC_REG_D_506C".to_string(),
-            description: "US SEC Accredited Investor Verification with OFAC & Patriot Act checks".to_string(),
+            description: "US SEC Accredited Investor Verification with OFAC & Patriot Act checks"
+                .to_string(),
             min_age_required: 21,
             sanctions_screening_required: true,
             source_of_funds_required: true,
@@ -79,7 +80,9 @@ impl ZkKycComplianceMatrix {
 
         let eu_mifid2_rule = CompliancePolicyRule {
             rule_id: "EU_MIFID_II_RETAIL".to_string(),
-            description: "EU MiFID II General Investor Compliance with GDPR Article 25 zero-data retention".to_string(),
+            description:
+                "EU MiFID II General Investor Compliance with GDPR Article 25 zero-data retention"
+                    .to_string(),
             min_age_required: 18,
             sanctions_screening_required: true,
             source_of_funds_required: false,

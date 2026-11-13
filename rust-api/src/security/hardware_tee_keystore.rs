@@ -83,12 +83,17 @@ impl HardwareTeeKeystore {
 
     /// Generates hardware attestation quote bound to a fresh session challenge
     pub fn generate_attestation_quote(&self, challenge_nonce: &str) -> TeeAttestationReport {
-        let pcr0 = format!("pcr0_{:x}", blake3::hash(format!("{}_build_meas", self.slots.len()).as_bytes()));
+        let pcr0 = format!(
+            "pcr0_{:x}",
+            blake3::hash(format!("{}_build_meas", self.slots.len()).as_bytes())
+        );
         let pcr1 = format!("pcr1_{:x}", blake3::hash(b"FIRMWARE_VERIFIED_BOOT"));
 
         let sig = format!(
             "tee_sig_{:x}",
-            blake3::hash(format!("{:?}_{}_{}_{}", self.tee_type, pcr0, pcr1, challenge_nonce).as_bytes())
+            blake3::hash(
+                format!("{:?}_{}_{}_{}", self.tee_type, pcr0, pcr1, challenge_nonce).as_bytes()
+            )
         );
 
         TeeAttestationReport {
@@ -101,7 +106,10 @@ impl HardwareTeeKeystore {
     }
 
     /// Verifier: Verifies hardware attestation report against expected nonce
-    pub fn verify_report(report: &TeeAttestationReport, expected_nonce: &str) -> Result<bool, &'static str> {
+    pub fn verify_report(
+        report: &TeeAttestationReport,
+        expected_nonce: &str,
+    ) -> Result<bool, &'static str> {
         if report.nonce_challenge != expected_nonce {
             return Err("Nonce challenge mismatch in TEE attestation report");
         }
@@ -119,7 +127,9 @@ mod tests {
     #[test]
     fn test_hardware_tee_keystore_nitro_and_arm() {
         let mut nitro = HardwareTeeKeystore::new(HardwareTeeType::AwsNitroEnclave);
-        let slot = nitro.allocate_key_slot(1, "master_zk_key", &[0x55; 32]).unwrap();
+        let slot = nitro
+            .allocate_key_slot(1, "master_zk_key", &[0x55; 32])
+            .unwrap();
         assert!(slot.is_hardware_backed);
 
         let nonce = "unique_client_session_9921";

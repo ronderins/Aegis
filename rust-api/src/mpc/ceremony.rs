@@ -62,29 +62,42 @@ impl MpcCoordinator {
                 CeremonyContribution {
                     participant_id: "ceremony_coordinator_genesis".to_string(),
                     round_number: 1,
-                    previous_accumulator_hash: "0000000000000000000000000000000000000000000000000000000000000000".to_string(),
-                    new_accumulator_hash: "3a8f9c1b2e5d7a4f6c8b0e2d4a6f8b0e2d4a6f8b0e2d4a6f8b0e2d4a6f8b0e2d".to_string(),
+                    previous_accumulator_hash:
+                        "0000000000000000000000000000000000000000000000000000000000000000"
+                            .to_string(),
+                    new_accumulator_hash:
+                        "3a8f9c1b2e5d7a4f6c8b0e2d4a6f8b0e2d4a6f8b0e2d4a6f8b0e2d4a6f8b0e2d"
+                            .to_string(),
                     schnorr_pok_signature: "e4f8a2b6c0...112233".to_string(),
                     timestamp: 1768435200,
                 },
                 CeremonyContribution {
                     participant_id: "trusted_signer_node_01".to_string(),
                     round_number: 2,
-                    previous_accumulator_hash: "3a8f9c1b2e5d7a4f6c8b0e2d4a6f8b0e2d4a6f8b0e2d4a6f8b0e2d4a6f8b0e2d".to_string(),
-                    new_accumulator_hash: "7c1b4e9f0a2d5e8b3c6f9a1d4e7b0c3f6a9d2e5b8c1f4a7d0e3b6f9a2c5e8b1d".to_string(),
+                    previous_accumulator_hash:
+                        "3a8f9c1b2e5d7a4f6c8b0e2d4a6f8b0e2d4a6f8b0e2d4a6f8b0e2d4a6f8b0e2d"
+                            .to_string(),
+                    new_accumulator_hash:
+                        "7c1b4e9f0a2d5e8b3c6f9a1d4e7b0c3f6a9d2e5b8c1f4a7d0e3b6f9a2c5e8b1d"
+                            .to_string(),
                     schnorr_pok_signature: "11aa22bb33...44cc55".to_string(),
                     timestamp: 1768438800,
                 },
                 CeremonyContribution {
                     participant_id: "community_witness_node_02".to_string(),
                     round_number: 3,
-                    previous_accumulator_hash: "7c1b4e9f0a2d5e8b3c6f9a1d4e7b0c3f6a9d2e5b8c1f4a7d0e3b6f9a2c5e8b1d".to_string(),
-                    new_accumulator_hash: "f4e1d7a9b2c5e8f0a3d6b9c2e5f8a1d4b7e0c3f6a9d2e5b8c1f4a7d0e3b6f9a2".to_string(),
+                    previous_accumulator_hash:
+                        "7c1b4e9f0a2d5e8b3c6f9a1d4e7b0c3f6a9d2e5b8c1f4a7d0e3b6f9a2c5e8b1d"
+                            .to_string(),
+                    new_accumulator_hash:
+                        "f4e1d7a9b2c5e8f0a3d6b9c2e5f8a1d4b7e0c3f6a9d2e5b8c1f4a7d0e3b6f9a2"
+                            .to_string(),
                     schnorr_pok_signature: "8899aabbcc...ddeeff".to_string(),
                     timestamp: 1768442400,
                 },
             ],
-            final_beacon_hash: "000000000000000000017a8f9c1b2e5d7a4f6c8b0e2d4a6f8b0e2d4a6f8b0e2d".to_string(),
+            final_beacon_hash: "000000000000000000017a8f9c1b2e5d7a4f6c8b0e2d4a6f8b0e2d4a6f8b0e2d"
+                .to_string(),
         }
     }
 }

@@ -92,7 +92,10 @@ impl VerifiableShuffleProver {
         let prod_acc = format!("{:x}", prod_hasher.finalize());
 
         // Fiat-Shamir challenge generation
-        let tau = format!("{:x}", blake3::hash(format!("tau_{}_{}", n, prod_acc).as_bytes()));
+        let tau = format!(
+            "{:x}",
+            blake3::hash(format!("tau_{}_{}", n, prod_acc).as_bytes())
+        );
         let lambda = format!("{:x}", blake3::hash(format!("lambda_{}", tau).as_bytes()));
 
         let mut responses = Vec::with_capacity(n);
@@ -101,7 +104,10 @@ impl VerifiableShuffleProver {
             responses.push(format!("z_{:x}", resp));
         }
 
-        let blind_t = format!("{:x}", blake3::hash(format!("t_{}_{}", lambda, rerandomizers[0]).as_bytes()));
+        let blind_t = format!(
+            "{:x}",
+            blake3::hash(format!("t_{}_{}", lambda, rerandomizers[0]).as_bytes())
+        );
 
         Ok(VerifiableShuffleArgument {
             batch_size: n,
@@ -140,7 +146,10 @@ impl VerifiableShuffleProver {
         }
 
         // Verify challenge derivation
-        let expected_tau = format!("{:x}", blake3::hash(format!("tau_{}_{}", n, expected_acc).as_bytes()));
+        let expected_tau = format!(
+            "{:x}",
+            blake3::hash(format!("tau_{}_{}", n, expected_acc).as_bytes())
+        );
         if expected_tau != arg.challenge_tau {
             return Err("Fiat-Shamir challenge tau verification failed");
         }
@@ -156,9 +165,18 @@ mod tests {
     #[test]
     fn test_verifiable_secret_shuffle() {
         let inputs = vec![
-            ElGamalPair { c1_point: "A1".into(), c2_point: "A2".into() },
-            ElGamalPair { c1_point: "B1".into(), c2_point: "B2".into() },
-            ElGamalPair { c1_point: "C1".into(), c2_point: "C2".into() },
+            ElGamalPair {
+                c1_point: "A1".into(),
+                c2_point: "A2".into(),
+            },
+            ElGamalPair {
+                c1_point: "B1".into(),
+                c2_point: "B2".into(),
+            },
+            ElGamalPair {
+                c1_point: "C1".into(),
+                c2_point: "C2".into(),
+            },
         ];
         let perm = vec![1, 2, 0];
         let r = vec![101, 102, 103];

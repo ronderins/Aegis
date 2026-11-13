@@ -159,7 +159,10 @@ pub struct Fp2 {
 }
 
 impl Fp2 {
-    pub const ZERO: Self = Self { c0: Fp::ZERO, c1: Fp::ZERO };
+    pub const ZERO: Self = Self {
+        c0: Fp::ZERO,
+        c1: Fp::ZERO,
+    };
 
     pub fn new(c0: Fp, c1: Fp) -> Self {
         Self { c0, c1 }

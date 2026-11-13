@@ -206,10 +206,7 @@ impl MlKem768Engine {
     }
 
     /// Decapsulates ciphertext using private key to recover the 256-bit shared secret.
-    pub fn decapsulate(
-        secret_key: &MlKemSecretKey,
-        ciphertext: &MlKemCiphertext,
-    ) -> [u8; 32] {
+    pub fn decapsulate(secret_key: &MlKemSecretKey, ciphertext: &MlKemCiphertext) -> [u8; 32] {
         let mut hasher = blake3::Hasher::new();
         hasher.update(b"ml-kem-encap-v1:");
         hasher.update(&secret_key.public_key.matrix_seed);

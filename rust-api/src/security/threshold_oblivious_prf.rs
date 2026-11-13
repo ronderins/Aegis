@@ -68,10 +68,7 @@ impl ObliviousPrfEngine {
     }
 
     /// Client blinds input x: computes B = H_to_curve(x)^r
-    pub fn client_blind(
-        input_x: &[u8],
-        client_blinding_seed: &[u8],
-    ) -> (OprfBlindQuery, [u8; 32]) {
+    pub fn client_blind(input_x: &[u8], client_blinding_seed: &[u8]) -> (OprfBlindQuery, [u8; 32]) {
         let mut r_hasher = Sha256::new();
         r_hasher.update(b"AEGIS_OPRF_CLIENT_BLINDING_SCALAR_R");
         r_hasher.update(client_blinding_seed);
@@ -144,7 +141,9 @@ impl ObliviousPrfEngine {
         finalize_hasher.update(n_bytes.as_bytes());
         let output: [u8; 32] = finalize_hasher.finalize().into();
 
-        OprfOutputKey { output_bytes: output }
+        OprfOutputKey {
+            output_bytes: output,
+        }
     }
 }
 
@@ -157,13 +156,15 @@ mod tests {
         let server_key = ObliviousPrfEngine::server_keygen(b"server_master_entropy_seed");
 
         let password_or_id = b"user_alice_secret_credential_token";
-        let (query, r) = ObliviousPrfEngine::client_blind(password_or_id, b"client_blinding_entropy");
+        let (query, r) =
+            ObliviousPrfEngine::client_blind(password_or_id, b"client_blinding_entropy");
 
         let server_resp = ObliviousPrfEngine::server_evaluate(&server_key, &query);
         let output1 = ObliviousPrfEngine::client_unblind(password_or_id, &server_resp, &r);
 
         // Same input must produce exact same PRF output
-        let (query2, r2) = ObliviousPrfEngine::client_blind(password_or_id, b"different_blinding_entropy");
+        let (query2, r2) =
+            ObliviousPrfEngine::client_blind(password_or_id, b"different_blinding_entropy");
         let server_resp2 = ObliviousPrfEngine::server_evaluate(&server_key, &query2);
         let output2 = ObliviousPrfEngine::client_unblind(password_or_id, &server_resp2, &r2);
 

@@ -29,7 +29,10 @@ impl BlindedSearchTrapdoor {
         hasher.update(&epoch.to_le_bytes());
         let token = format!("{:x}", hasher.finalize());
 
-        let mac = format!("{:x}", blake3::hash(format!("mac_{}_{}", token, epoch).as_bytes()));
+        let mac = format!(
+            "{:x}",
+            blake3::hash(format!("mac_{}_{}", token, epoch).as_bytes())
+        );
 
         Self {
             trapdoor_token: token,

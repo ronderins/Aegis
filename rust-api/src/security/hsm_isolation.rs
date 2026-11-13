@@ -113,13 +113,24 @@ mod tests {
         let pin = HsmUserPin::new("Secr3t_P!N_2026#");
         let payload = b"attest_proof_validity_epoch_1773000000";
 
-        let sig = HardwareSecurityModule::sign_in_hardware(1, "master_ed25519_key", payload, &pin).unwrap();
+        let sig = HardwareSecurityModule::sign_in_hardware(1, "master_ed25519_key", payload, &pin)
+            .unwrap();
         assert_eq!(sig.len(), 64);
 
-        let is_valid = HardwareSecurityModule::verify_hardware_signature(1, "master_ed25519_key", payload, &sig);
+        let is_valid = HardwareSecurityModule::verify_hardware_signature(
+            1,
+            "master_ed25519_key",
+            payload,
+            &sig,
+        );
         assert!(is_valid);
 
-        let tampered = HardwareSecurityModule::verify_hardware_signature(1, "master_ed25519_key", b"tampered_payload", &sig);
+        let tampered = HardwareSecurityModule::verify_hardware_signature(
+            1,
+            "master_ed25519_key",
+            b"tampered_payload",
+            &sig,
+        );
         assert!(!tampered);
     }
 }

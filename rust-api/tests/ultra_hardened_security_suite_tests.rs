@@ -27,31 +27,31 @@
 //! 24. Fuzzy Biometric Commitment Scheme (Juels-Wattenberg) Error-Correction
 //! 25. Adaptive Threat Response & Automated Circuit-Breaker Quarantine
 
-use zk_identity_api_rust::security::fhe_bfv_ckks::*;
-use zk_identity_api_rust::security::zkvm_jit_armor::*;
-use zk_identity_api_rust::security::threshold_bls_aggregation::*;
-use zk_identity_api_rust::security::verifiable_delay_function::*;
-use zk_identity_api_rust::security::stark_fri_engine::*;
-use zk_identity_api_rust::security::oblivious_keyword_search::*;
-use zk_identity_api_rust::security::falcon_fips206::*;
-use zk_identity_api_rust::security::w3c_did_vp_engine::*;
+use zk_identity_api_rust::security::blind_zk_threshold_credentials::*;
 use zk_identity_api_rust::security::bulletproofs_plus_range::*;
-use zk_identity_api_rust::security::pkcs11_session_armor::*;
-use zk_identity_api_rust::security::homomorphic_secret_sharing::*;
 use zk_identity_api_rust::security::confidential_query_guard::*;
 use zk_identity_api_rust::security::dynamic_vector_accumulator::*;
-use zk_identity_api_rust::security::zk_cross_chain_relayer::*;
-use zk_identity_api_rust::security::ring_signatures_clsag::*;
-use zk_identity_api_rust::security::oprf_blind_tokens::*;
-use zk_identity_api_rust::security::zk_kyc_compliance_matrix::*;
+use zk_identity_api_rust::security::falcon_fips206::*;
+use zk_identity_api_rust::security::fhe_bfv_ckks::*;
+use zk_identity_api_rust::security::homomorphic_secret_sharing::*;
 use zk_identity_api_rust::security::kernel_memory_armor::*;
-use zk_identity_api_rust::security::zk_plonk_hypercube::*;
+use zk_identity_api_rust::security::oblivious_keyword_search::*;
+use zk_identity_api_rust::security::oprf_blind_tokens::*;
+use zk_identity_api_rust::security::pkcs11_session_armor::*;
+use zk_identity_api_rust::security::ring_signatures_clsag::*;
+use zk_identity_api_rust::security::stark_fri_engine::*;
+use zk_identity_api_rust::security::threshold_bls_aggregation::*;
 use zk_identity_api_rust::security::threshold_oblivious_transfer_psi::*;
-use zk_identity_api_rust::security::zk_plonk_fri_composer::*;
-use zk_identity_api_rust::security::blind_zk_threshold_credentials::*;
-use zk_identity_api_rust::security::zk_confidential_state_channels::*;
-use zk_identity_api_rust::security::zk_fuzzy_commitment_biometrics::*;
+use zk_identity_api_rust::security::verifiable_delay_function::*;
+use zk_identity_api_rust::security::w3c_did_vp_engine::*;
 use zk_identity_api_rust::security::zk_adaptive_threat_response::*;
+use zk_identity_api_rust::security::zk_confidential_state_channels::*;
+use zk_identity_api_rust::security::zk_cross_chain_relayer::*;
+use zk_identity_api_rust::security::zk_fuzzy_commitment_biometrics::*;
+use zk_identity_api_rust::security::zk_kyc_compliance_matrix::*;
+use zk_identity_api_rust::security::zk_plonk_fri_composer::*;
+use zk_identity_api_rust::security::zk_plonk_hypercube::*;
+use zk_identity_api_rust::security::zkvm_jit_armor::*;
 
 #[test]
 fn test_e2e_fhe_homomorphic_pipeline() {
@@ -169,7 +169,9 @@ fn test_e2e_bulletproofs_plus_range() {
 fn test_e2e_pkcs11_hsm_isolation() {
     let mut hsm = Pkcs11SessionArmor::new(1, "valid_pin");
     hsm.c_login("valid_pin").unwrap();
-    let handle = hsm.c_generate_key_pair("key1", HsmKeyClass::Ed25519PrivateKey).unwrap();
+    let handle = hsm
+        .c_generate_key_pair("key1", HsmKeyClass::Ed25519PrivateKey)
+        .unwrap();
     let sig = hsm.c_sign(handle, b"Data").unwrap();
     assert!(sig.starts_with("hsm_sig_"));
 }
@@ -193,6 +195,8 @@ fn test_e2e_oprf_privacy_pass_tokens() {
 #[test]
 fn test_e2e_adaptive_threat_response() {
     let mut threat = AdaptiveThreatEngine::new();
-    let status = threat.evaluate_request("ip_ok", "nullifier_clean", 7.9).unwrap();
+    let status = threat
+        .evaluate_request("ip_ok", "nullifier_clean", 7.9)
+        .unwrap();
     assert_eq!(status, ThreatSeverityLevel::Normal);
 }

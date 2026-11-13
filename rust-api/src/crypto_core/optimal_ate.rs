@@ -13,11 +13,7 @@ impl OptimalAtePairing {
     pub const ATE_LOOP_COUNT: u64 = 0x4979_d90f_fe72_0000;
 
     /// Evaluates line function in Miller loop for doubling / addition step
-    pub fn line_eval(
-        r: &G2Affine,
-        q: &G2Affine,
-        p: &G1Affine,
-    ) -> (Fp12, G2Affine) {
+    pub fn line_eval(r: &G2Affine, q: &G2Affine, p: &G1Affine) -> (Fp12, G2Affine) {
         if r.infinity || q.infinity || p.infinity {
             return (Fp12::one(), *r);
         }
@@ -31,13 +27,20 @@ impl OptimalAtePairing {
         let py_fp = p.y;
 
         let c0 = Fp6 {
-            c0: Fp2 { c0: py_fp, c1: Fp::zero() },
+            c0: Fp2 {
+                c0: py_fp,
+                c1: Fp::zero(),
+            },
             c1: Fp2::zero(),
             c2: Fp2::zero(),
         };
 
         let c1 = Fp6 {
-            c0: Fp2 { c0: px_fp, c1: Fp::zero() }.mul(&lambda),
+            c0: Fp2 {
+                c0: px_fp,
+                c1: Fp::zero(),
+            }
+            .mul(&lambda),
             c1: Fp2::zero(),
             c2: Fp2::zero(),
         };

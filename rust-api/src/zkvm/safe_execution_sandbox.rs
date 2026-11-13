@@ -7,8 +7,8 @@
 //! - Opcode authorization enforcement (blocking unverified/illegal instructions)
 //! - Register state zeroization on completion
 
-use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use zeroize::Zeroize;
 
 /// zkVM Execution Safety Violation
@@ -98,10 +98,12 @@ impl SafeZkVmSandbox {
     pub fn write_memory_u64(&mut self, address: usize, value: u64) -> Result<(), SandboxViolation> {
         self.deduct_gas(10)?;
 
-        let end = address.checked_add(8).ok_or_else(|| SandboxViolation::MemoryOutOfBounds {
-            address,
-            memory_limit: self.config.memory_limit_bytes,
-        })?;
+        let end = address
+            .checked_add(8)
+            .ok_or_else(|| SandboxViolation::MemoryOutOfBounds {
+                address,
+                memory_limit: self.config.memory_limit_bytes,
+            })?;
 
         if end > self.config.memory_limit_bytes {
             return Err(SandboxViolation::MemoryOutOfBounds {
@@ -111,7 +113,8 @@ impl SafeZkVmSandbox {
         }
 
         if end > self.linear_memory.len() {
-            self.linear_memory.resize(end.max(self.linear_memory.len() * 2), 0);
+            self.linear_memory
+                .resize(end.max(self.linear_memory.len() * 2), 0);
         }
 
         let bytes = value.to_le_bytes();
@@ -123,10 +126,12 @@ impl SafeZkVmSandbox {
     pub fn read_memory_u64(&mut self, address: usize) -> Result<u64, SandboxViolation> {
         self.deduct_gas(5)?;
 
-        let end = address.checked_add(8).ok_or_else(|| SandboxViolation::MemoryOutOfBounds {
-            address,
-            memory_limit: self.config.memory_limit_bytes,
-        })?;
+        let end = address
+            .checked_add(8)
+            .ok_or_else(|| SandboxViolation::MemoryOutOfBounds {
+                address,
+                memory_limit: self.config.memory_limit_bytes,
+            })?;
 
         if end > self.linear_memory.len() {
             return Err(SandboxViolation::MemoryOutOfBounds {
@@ -240,7 +245,10 @@ mod tests {
 
         // Out of memory limit test
         let oom_err = sandbox.write_memory_u64(5000, 42);
-        assert!(matches!(oom_err, Err(SandboxViolation::MemoryOutOfBounds { .. })));
+        assert!(matches!(
+            oom_err,
+            Err(SandboxViolation::MemoryOutOfBounds { .. })
+        ));
 
         // Call stack recursion depth limit test
         assert!(sandbox.push_call_stack(1).is_ok());
@@ -248,6 +256,9 @@ mod tests {
         assert!(sandbox.push_call_stack(3).is_ok());
         assert!(sandbox.push_call_stack(4).is_ok());
         let stack_err = sandbox.push_call_stack(5);
-        assert!(matches!(stack_err, Err(SandboxViolation::StackOverflow { .. })));
+        assert!(matches!(
+            stack_err,
+            Err(SandboxViolation::StackOverflow { .. })
+        ));
     }
 }

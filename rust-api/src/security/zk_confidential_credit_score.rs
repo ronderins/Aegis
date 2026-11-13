@@ -103,10 +103,14 @@ impl ConfidentialCreditEngine {
         }
 
         // 2. Generate Pedersen Commitments
-        let score_comm = Self::commit_value(witness.credit_score as u64, &witness.blinding_factor_score);
-        let inc_comm = Self::commit_value(witness.annual_income_cents, &witness.blinding_factor_income);
-        let debt_comm = Self::commit_value(witness.monthly_debt_cents, &witness.blinding_factor_debt);
-        let asset_comm = Self::commit_value(witness.liquid_assets_cents, &witness.blinding_factor_income);
+        let score_comm =
+            Self::commit_value(witness.credit_score as u64, &witness.blinding_factor_score);
+        let inc_comm =
+            Self::commit_value(witness.annual_income_cents, &witness.blinding_factor_income);
+        let debt_comm =
+            Self::commit_value(witness.monthly_debt_cents, &witness.blinding_factor_debt);
+        let asset_comm =
+            Self::commit_value(witness.liquid_assets_cents, &witness.blinding_factor_income);
 
         let commitments = FinancialCommitmentBundle {
             score_commitment: format!("0x{}", score_comm),
@@ -167,7 +171,11 @@ impl ConfidentialCreditEngine {
         let mut policy_hasher = Sha256::new();
         policy_hasher.update(&expected_policy.min_credit_score.to_be_bytes());
         policy_hasher.update(&expected_policy.min_annual_income_usd.to_be_bytes());
-        policy_hasher.update(&expected_policy.max_debt_to_income_basis_points.to_be_bytes());
+        policy_hasher.update(
+            &expected_policy
+                .max_debt_to_income_basis_points
+                .to_be_bytes(),
+        );
         policy_hasher.update(&expected_policy.min_liquid_assets_usd.to_be_bytes());
         let expected_pol_hash = hex::encode(policy_hasher.finalize());
 
@@ -190,8 +198,8 @@ mod tests {
         let witness = ConfidentialFinancialWitness {
             credit_score: 750,
             annual_income_cents: 120_000_00, // $120,000
-            monthly_debt_cents: 2_500_00,     // $2,500/mo -> $30,000/yr (25% DTI)
-            liquid_assets_cents: 50_000_00,   // $50,000
+            monthly_debt_cents: 2_500_00,    // $2,500/mo -> $30,000/yr (25% DTI)
+            liquid_assets_cents: 50_000_00,  // $50,000
             blinding_factor_score: [0x11; 32],
             blinding_factor_income: [0x22; 32],
             blinding_factor_debt: [0x33; 32],
@@ -206,6 +214,8 @@ mod tests {
 
         let receipt = ConfidentialCreditEngine::prove_solvency(&witness, &policy).unwrap();
         assert!(receipt.is_solvent);
-        assert!(ConfidentialCreditEngine::verify_solvency_receipt(&receipt, &policy));
+        assert!(ConfidentialCreditEngine::verify_solvency_receipt(
+            &receipt, &policy
+        ));
     }
 }

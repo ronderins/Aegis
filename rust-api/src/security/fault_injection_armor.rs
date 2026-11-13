@@ -167,7 +167,13 @@ mod tests {
         let secret2 = [0x42; 32];
         let diff = [0x43; 32];
 
-        assert_eq!(FaultInjectionArmor::secure_compare_tamper_resistant(&secret1, &secret2).unwrap(), true);
-        assert_eq!(FaultInjectionArmor::secure_compare_tamper_resistant(&secret1, &diff).unwrap(), false);
+        assert_eq!(
+            FaultInjectionArmor::secure_compare_tamper_resistant(&secret1, &secret2).unwrap(),
+            true
+        );
+        assert_eq!(
+            FaultInjectionArmor::secure_compare_tamper_resistant(&secret1, &diff).unwrap(),
+            false
+        );
     }
 }

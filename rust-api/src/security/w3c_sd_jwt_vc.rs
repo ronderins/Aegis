@@ -233,7 +233,8 @@ impl SdJwtEngine {
 
         // Verify each revealed disclosure matches its digest in _sd
         for disc in &presentation.revealed_disclosures {
-            let serialized = serde_json::json!([disc.salt, disc.claim_name, disc.claim_value]).to_string();
+            let serialized =
+                serde_json::json!([disc.salt, disc.claim_name, disc.claim_value]).to_string();
             let mut hasher = Sha256::new();
             hasher.update(serialized.as_bytes());
             let computed_digest = hex::encode(hasher.finalize());
@@ -256,7 +257,9 @@ impl SdJwtEngine {
             unmasked_claims.insert(disc.claim_name.clone(), disc.claim_value.clone());
         }
 
-        let hidden_count = digest_strings.len().saturating_sub(presentation.revealed_disclosures.len());
+        let hidden_count = digest_strings
+            .len()
+            .saturating_sub(presentation.revealed_disclosures.len());
 
         // Verify Key Binding JWT if present
         let holder_binding_verified = if let Some(ref kb) = presentation.key_binding_jwt {
@@ -293,8 +296,14 @@ mod tests {
         claims.insert("given_name".to_string(), serde_json::json!("Alice"));
         claims.insert("family_name".to_string(), serde_json::json!("Smith"));
         claims.insert("age_over_21".to_string(), serde_json::json!(true));
-        claims.insert("passport_number".to_string(), serde_json::json!("X98234190"));
-        claims.insert("residential_address".to_string(), serde_json::json!("123 Stealth Ave"));
+        claims.insert(
+            "passport_number".to_string(),
+            serde_json::json!("X98234190"),
+        );
+        claims.insert(
+            "residential_address".to_string(),
+            serde_json::json!("123 Stealth Ave"),
+        );
 
         let cred = SdJwtEngine::issue_credential(
             "did:aegis:authority",
@@ -307,12 +316,17 @@ mod tests {
         .unwrap();
 
         // Reveal ONLY "age_over_21", concealing name, passport, and address
-        let presentation = SdJwtEngine::create_presentation(&cred, &["age_over_21"], "nonce_nonce_12345").unwrap();
+        let presentation =
+            SdJwtEngine::create_presentation(&cred, &["age_over_21"], "nonce_nonce_12345").unwrap();
 
-        let result = SdJwtEngine::verify_presentation(&presentation, b"test_issuer_secret_signing_key_2026");
+        let result =
+            SdJwtEngine::verify_presentation(&presentation, b"test_issuer_secret_signing_key_2026");
         assert!(result.is_valid);
         assert_eq!(result.unmasked_claims.len(), 1);
-        assert_eq!(result.unmasked_claims.get("age_over_21"), Some(&serde_json::json!(true)));
+        assert_eq!(
+            result.unmasked_claims.get("age_over_21"),
+            Some(&serde_json::json!(true))
+        );
         assert!(!result.unmasked_claims.contains_key("passport_number"));
         assert!(!result.unmasked_claims.contains_key("residential_address"));
     }

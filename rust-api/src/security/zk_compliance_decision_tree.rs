@@ -107,10 +107,15 @@ impl ComplianceDecisionTree {
                     left_child_id,
                     right_child_id,
                 } => {
-                    let feat_val = features.get(*feature_index).copied().ok_or("Feature index out of range")?;
+                    let feat_val = features
+                        .get(*feature_index)
+                        .copied()
+                        .ok_or("Feature index out of range")?;
                     let go_left = feat_val < *threshold_value;
 
-                    let step_h = blake3::hash(format!("{}_{}_{}", current_node_id, feature_index, go_left).as_bytes());
+                    let step_h = blake3::hash(
+                        format!("{}_{}_{}", current_node_id, feature_index, go_left).as_bytes(),
+                    );
                     mac_hasher.update(step_h.as_bytes());
 
                     steps.push(DecisionBranchWitness {
@@ -158,7 +163,13 @@ impl ComplianceDecisionTree {
         expected_mac.update(self.tree_id.as_bytes());
 
         for step in &proof.traversal_steps {
-            let step_h = blake3::hash(format!("{}_{}_{}", step.node_id, step.feature_index, step.branch_taken_left).as_bytes());
+            let step_h = blake3::hash(
+                format!(
+                    "{}_{}_{}",
+                    step.node_id, step.feature_index, step.branch_taken_left
+                )
+                .as_bytes(),
+            );
             expected_mac.update(step_h.as_bytes());
         }
 

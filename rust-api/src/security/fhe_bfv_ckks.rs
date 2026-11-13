@@ -69,7 +69,8 @@ impl RingPolynomial {
         }
         let mut result = vec![0u64; RING_DEGREE];
         for i in 0..RING_DEGREE {
-            result[i] = (self.coeffs[i] + self.modulus - (other.coeffs[i] % self.modulus)) % self.modulus;
+            result[i] =
+                (self.coeffs[i] + self.modulus - (other.coeffs[i] % self.modulus)) % self.modulus;
         }
         Ok(Self {
             coeffs: result,
@@ -148,11 +149,7 @@ impl RingPolynomial {
         let half_q = self.modulus / 2;
         let mut max_val = 0u64;
         for &c in &self.coeffs {
-            let centered = if c > half_q {
-                self.modulus - c
-            } else {
-                c
-            };
+            let centered = if c > half_q { self.modulus - c } else { c };
             if centered > max_val {
                 max_val = centered;
             }
@@ -226,12 +223,19 @@ impl BfvContext {
     }
 
     /// Derives public key (pk0, pk1) and relinearization key from secret key.
-    pub fn generate_keys(&self, sk: &FheSecretKey, public_seed: &[u8; 32]) -> (FhePublicKey, FheRelinearizationKey) {
+    pub fn generate_keys(
+        &self,
+        sk: &FheSecretKey,
+        public_seed: &[u8; 32],
+    ) -> (FhePublicKey, FheRelinearizationKey) {
         // Uniform random polynomial 'a'
         let mut a_coeffs = vec![0u64; RING_DEGREE];
         for i in 0..RING_DEGREE {
             let byte_val = public_seed[i % 32] as u64;
-            a_coeffs[i] = (byte_val.wrapping_mul(6364136223846793005).wrapping_add(i as u64)) % self.q;
+            a_coeffs[i] = (byte_val
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(i as u64))
+                % self.q;
         }
         let a = RingPolynomial::from_coeffs(&a_coeffs, self.q);
 
@@ -270,7 +274,12 @@ impl BfvContext {
     }
 
     /// Encrypts an integer message m in [0, t-1] encoded into constant term of plaintext polynomial.
-    pub fn encrypt_scalar(&self, pk: &FhePublicKey, message: u64, ephemeral_seed: &[u8; 32]) -> FheCiphertext {
+    pub fn encrypt_scalar(
+        &self,
+        pk: &FhePublicKey,
+        message: u64,
+        ephemeral_seed: &[u8; 32],
+    ) -> FheCiphertext {
         let m_clamped = message % self.t;
         let mut m_coeffs = vec![0u64; RING_DEGREE];
         m_coeffs[0] = (m_clamped as u128 * self.delta as u128 % self.q as u128) as u64;
@@ -332,10 +341,17 @@ impl BfvContext {
 
     /// Homomorphic Addition: CT3 = CT1 + CT2.
     /// Noise increases additively: V(CT3) = V(CT1) + V(CT2).
-    pub fn homomorphic_add(&self, ct1: &FheCiphertext, ct2: &FheCiphertext) -> Result<FheCiphertext, &'static str> {
+    pub fn homomorphic_add(
+        &self,
+        ct1: &FheCiphertext,
+        ct2: &FheCiphertext,
+    ) -> Result<FheCiphertext, &'static str> {
         let c0 = ct1.c0.add(&ct2.c0)?;
         let c1 = ct1.c1.add(&ct2.c1)?;
-        let budget = ct1.noise_budget_estimate.min(ct2.noise_budget_estimate).saturating_sub(1);
+        let budget = ct1
+            .noise_budget_estimate
+            .min(ct2.noise_budget_estimate)
+            .saturating_sub(1);
 
         Ok(FheCiphertext {
             c0,
@@ -345,9 +361,14 @@ impl BfvContext {
     }
 
     /// Homomorphic Scalar Addition: CT' = CT + plain_scalar.
-    pub fn homomorphic_add_plain(&self, ct: &FheCiphertext, plain_scalar: u64) -> Result<FheCiphertext, &'static str> {
+    pub fn homomorphic_add_plain(
+        &self,
+        ct: &FheCiphertext,
+        plain_scalar: u64,
+    ) -> Result<FheCiphertext, &'static str> {
         let mut m_coeffs = vec![0u64; RING_DEGREE];
-        m_coeffs[0] = ((plain_scalar % self.t) as u128 * self.delta as u128 % self.q as u128) as u64;
+        m_coeffs[0] =
+            ((plain_scalar % self.t) as u128 * self.delta as u128 % self.q as u128) as u64;
         let delta_m = RingPolynomial::from_coeffs(&m_coeffs, self.q);
 
         let c0 = ct.c0.add(&delta_m)?;
@@ -359,7 +380,11 @@ impl BfvContext {
     }
 
     /// Homomorphic Scalar Multiplication: CT' = plain_scalar * CT.
-    pub fn homomorphic_mul_plain(&self, ct: &FheCiphertext, plain_scalar: u64) -> Result<FheCiphertext, &'static str> {
+    pub fn homomorphic_mul_plain(
+        &self,
+        ct: &FheCiphertext,
+        plain_scalar: u64,
+    ) -> Result<FheCiphertext, &'static str> {
         let s = plain_scalar % self.t;
         let c0 = ct.c0.mul_scalar(s);
         let c1 = ct.c1.mul_scalar(s);
@@ -391,7 +416,10 @@ impl BfvContext {
         let c0 = c0_prod.mul_scalar(scale_factor);
         let c1 = c1_prod.mul_scalar(scale_factor);
 
-        let budget = ct1.noise_budget_estimate.min(ct2.noise_budget_estimate).saturating_sub(12);
+        let budget = ct1
+            .noise_budget_estimate
+            .min(ct2.noise_budget_estimate)
+            .saturating_sub(12);
 
         Ok(FheCiphertext {
             c0,
@@ -427,7 +455,11 @@ impl BlindedIdentityAttributeAggregator {
             acc = context.homomorphic_add(&acc, &weighted_term)?;
         }
 
-        let hash_input = format!("fhe_agg_v1_{}_{}", acc.noise_budget_estimate, ciphertexts.len());
+        let hash_input = format!(
+            "fhe_agg_v1_{}_{}",
+            acc.noise_budget_estimate,
+            ciphertexts.len()
+        );
         let digest = format!("{:x}", blake3::hash(hash_input.as_bytes()));
 
         Ok(Self {
@@ -504,7 +536,8 @@ mod tests {
             &ctx,
             &[ct_kyc, ct_aml, ct_res],
             &weights,
-        ).unwrap();
+        )
+        .unwrap();
 
         assert_eq!(agg.attribute_count, 3);
         let dec_total = ctx.decrypt_scalar(&sk, &agg.encrypted_aggregate);

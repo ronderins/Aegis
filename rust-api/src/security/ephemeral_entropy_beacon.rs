@@ -19,7 +19,10 @@ pub enum EntropyFailureReason {
     /// Repetition Count Test failed: identical value repeated beyond cutoff threshold $C$
     RepetitionCountExceeded { sample_val: u8, repeat_count: usize },
     /// Adaptive Proportion Test failed: sample frequency exceeded window bound $W$
-    AdaptiveProportionExceeded { sample_val: u8, occurrences_in_window: usize },
+    AdaptiveProportionExceeded {
+        sample_val: u8,
+        occurrences_in_window: usize,
+    },
     /// DRBG reseed counter reached maximum permitted invocations ($2^{48}$)
     ReseedIntervalExceeded,
 }
@@ -71,7 +74,11 @@ impl ContinuousHealthTester {
         self.window_samples.push(sample);
         if self.window_samples.len() >= self.window_size {
             let target_byte = self.window_samples[0];
-            let occurrences = self.window_samples.iter().filter(|&&b| b == target_byte).count();
+            let occurrences = self
+                .window_samples
+                .iter()
+                .filter(|&&b| b == target_byte)
+                .count();
 
             if occurrences >= self.cutoff_proportion {
                 ENTROPY_HALT_TRIPWIRE.store(true, Ordering::SeqCst);
@@ -111,7 +118,10 @@ impl Drop for HardenedHmacDrbg {
 
 impl HardenedHmacDrbg {
     /// Initializes HMAC-DRBG with tested hardware entropy seed and personalization string.
-    pub fn instantiate(seed_material: &[u8; 64], personalization: &[u8]) -> Result<Self, EntropyFailureReason> {
+    pub fn instantiate(
+        seed_material: &[u8; 64],
+        personalization: &[u8],
+    ) -> Result<Self, EntropyFailureReason> {
         let mut tester = ContinuousHealthTester::new();
 
         // Ingest and verify all initial seed bytes through NIST tests
@@ -133,7 +143,12 @@ impl HardenedHmacDrbg {
         })
     }
 
-    fn hmac_drbg_update(key: &mut [u8; 32], v: &mut [u8; 32], data1: Option<&[u8]>, data2: Option<&[u8]>) {
+    fn hmac_drbg_update(
+        key: &mut [u8; 32],
+        v: &mut [u8; 32],
+        data1: Option<&[u8]>,
+        data2: Option<&[u8]>,
+    ) {
         // Step 1: K = HMAC(K, V || 0x00 || data)
         let mut k_hasher = blake3::Hasher::new_keyed(key);
         k_hasher.update(v);
@@ -221,13 +236,13 @@ mod tests {
     #[test]
     fn test_drbg_instantiation_and_generation() {
         let seed = [
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-            17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
-            33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
-            49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+            25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46,
+            47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64,
         ];
 
-        let mut drbg = HardenedHmacDrbg::instantiate(&seed, b"aegis_zero_knowledge_session").unwrap();
+        let mut drbg =
+            HardenedHmacDrbg::instantiate(&seed, b"aegis_zero_knowledge_session").unwrap();
         let mut out = [0u8; 32];
         assert!(drbg.generate_bytes(&mut out).is_ok());
         assert!(!out.ct_eq(&[0u8; 32]).into());

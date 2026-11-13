@@ -66,8 +66,13 @@ impl MdlZkVerifier {
         }
 
         // Verify digest matches MSO value_digests
-        let iso_digests = mso.value_digests.get(MDL_NAMESPACE_ISO).ok_or("Missing ISO namespace in MSO")?;
-        let expected_digest = iso_digests.get(&disclosed_item.digest_id).ok_or("Digest ID not found in MSO")?;
+        let iso_digests = mso
+            .value_digests
+            .get(MDL_NAMESPACE_ISO)
+            .ok_or("Missing ISO namespace in MSO")?;
+        let expected_digest = iso_digests
+            .get(&disclosed_item.digest_id)
+            .ok_or("Digest ID not found in MSO")?;
 
         let mut hasher = blake3::Hasher::new();
         hasher.update(disclosed_item.random_salt_hex.as_bytes());

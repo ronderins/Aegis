@@ -172,7 +172,10 @@ impl ZkPkiBridgeEngine {
         zk_token_hasher.update(trusted_root_fingerprint.as_bytes());
         zk_token_hasher.update(blinded_commitment.as_bytes());
         zk_token_hasher.update(cert.certificate_sha256_fingerprint.as_bytes());
-        let zk_token = format!("zk-x509-{}", hex::encode(&zk_token_hasher.finalize()[0..16]));
+        let zk_token = format!(
+            "zk-x509-{}",
+            hex::encode(&zk_token_hasher.finalize()[0..16])
+        );
 
         Ok(ZkPkiAttestationReceipt {
             trusted_root_ca_pinned_fingerprint: trusted_root_fingerprint.to_string(),
@@ -190,7 +193,10 @@ impl ZkPkiBridgeEngine {
         receipt: &ZkPkiAttestationReceipt,
         expected_root_fingerprint: &str,
     ) -> bool {
-        if !crate::crypto::constant_time_eq(&receipt.trusted_root_ca_pinned_fingerprint, expected_root_fingerprint) {
+        if !crate::crypto::constant_time_eq(
+            &receipt.trusted_root_ca_pinned_fingerprint,
+            expected_root_fingerprint,
+        ) {
             return false;
         }
 
@@ -217,6 +223,9 @@ mod tests {
 
         assert!(receipt.is_not_expired);
         assert_eq!(receipt.concealed_attribute_count, 1); // CommonName concealed!
-        assert!(ZkPkiBridgeEngine::verify_attestation(&receipt, trusted_root_fp));
+        assert!(ZkPkiBridgeEngine::verify_attestation(
+            &receipt,
+            trusted_root_fp
+        ));
     }
 }

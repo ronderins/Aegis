@@ -48,7 +48,8 @@ impl ForwardSecureAuditTrail {
             timestamp_epoch_secs: 1774310000,
             previous_block_hash: [0u8; 32],
             proof_id: "genesis_block".to_string(),
-            subject_commitment: "0000000000000000000000000000000000000000000000000000000000000000".to_string(),
+            subject_commitment: "0000000000000000000000000000000000000000000000000000000000000000"
+                .to_string(),
             predicate_evaluated: "system_genesis_initialization".to_string(),
             verification_passed: true,
             block_hash: [0xAA; 32],

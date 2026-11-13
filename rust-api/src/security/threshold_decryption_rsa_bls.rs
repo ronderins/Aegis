@@ -222,24 +222,42 @@ mod tests {
 
     #[test]
     fn test_threshold_decryption_3_of_5() {
-        let (shares, _group_pk) = ThresholdDecryptionEngine::setup_shares(3, 5, b"master_escrow_seed_2026").unwrap();
+        let (shares, _group_pk) =
+            ThresholdDecryptionEngine::setup_shares(3, 5, b"master_escrow_seed_2026").unwrap();
         assert_eq!(shares.len(), 5);
 
         let ciphertext_point = "0x0289a7cf89234bce98129034afecdb8912783456";
         let secret_payload = b"Top secret zero-knowledge identity attribute claim";
 
         // Generate partial shares for nodes 1, 2, 4
-        let s1 = ThresholdDecryptionEngine::compute_decryption_share(&shares[0], ciphertext_point).unwrap();
-        let s2 = ThresholdDecryptionEngine::compute_decryption_share(&shares[1], ciphertext_point).unwrap();
-        let s4 = ThresholdDecryptionEngine::compute_decryption_share(&shares[3], ciphertext_point).unwrap();
+        let s1 = ThresholdDecryptionEngine::compute_decryption_share(&shares[0], ciphertext_point)
+            .unwrap();
+        let s2 = ThresholdDecryptionEngine::compute_decryption_share(&shares[1], ciphertext_point)
+            .unwrap();
+        let s4 = ThresholdDecryptionEngine::compute_decryption_share(&shares[3], ciphertext_point)
+            .unwrap();
 
         // Verify individual DLEQ proofs
-        assert!(ThresholdDecryptionEngine::verify_decryption_share(&s1, &shares[0].public_verification_key, ciphertext_point));
-        assert!(ThresholdDecryptionEngine::verify_decryption_share(&s2, &shares[1].public_verification_key, ciphertext_point));
-        assert!(ThresholdDecryptionEngine::verify_decryption_share(&s4, &shares[3].public_verification_key, ciphertext_point));
+        assert!(ThresholdDecryptionEngine::verify_decryption_share(
+            &s1,
+            &shares[0].public_verification_key,
+            ciphertext_point
+        ));
+        assert!(ThresholdDecryptionEngine::verify_decryption_share(
+            &s2,
+            &shares[1].public_verification_key,
+            ciphertext_point
+        ));
+        assert!(ThresholdDecryptionEngine::verify_decryption_share(
+            &s4,
+            &shares[3].public_verification_key,
+            ciphertext_point
+        ));
 
         let partials = vec![s1, s2, s4];
-        let res = ThresholdDecryptionEngine::combine_shares_and_decrypt(&partials, secret_payload, 3).unwrap();
+        let res =
+            ThresholdDecryptionEngine::combine_shares_and_decrypt(&partials, secret_payload, 3)
+                .unwrap();
 
         assert_eq!(res.participating_nodes, vec![1, 2, 4]);
         assert_eq!(res.plaintext.len(), secret_payload.len());

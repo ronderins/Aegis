@@ -1,6 +1,8 @@
 //! Identity, Smart Contract Generator, and WASM Browser Prover Tests
 
-use zk_identity_microservice::identity::anon_creds::{AnonCredentialPresentation, AnonCredsVerifier};
+use zk_identity_microservice::identity::anon_creds::{
+    AnonCredentialPresentation, AnonCredsVerifier,
+};
 use zk_identity_microservice::identity::did::DidResolver;
 use zk_identity_microservice::identity::revocation::RevocationAccumulator;
 use zk_identity_microservice::smart_contracts::calldata::EvmCalldataEncoder;
@@ -54,7 +56,8 @@ fn test_wasm_browser_prover_synthesis() {
         birth_year: 1998,
         current_year: 2026,
         threshold: 21,
-        user_salt_hex: "5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a".to_string(),
+        user_salt_hex: "5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a"
+            .to_string(),
     };
 
     let res = BrowserProverEngine::synthesize_proof_in_wasm(&req).expect("WASM proof synthesis");

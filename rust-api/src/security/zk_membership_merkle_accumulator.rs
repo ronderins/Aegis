@@ -82,12 +82,14 @@ impl SparseMerkleTree256 {
 
     /// Inserts or updates a key-value pair in the tree.
     pub fn insert(&mut self, key_hex: &str, value_hex: &str) -> Result<String, String> {
-        let key_bytes = hex::decode(key_hex.trim()).map_err(|e| format!("Invalid key hex: {}", e))?;
+        let key_bytes =
+            hex::decode(key_hex.trim()).map_err(|e| format!("Invalid key hex: {}", e))?;
         if key_bytes.len() != 32 {
             return Err("Key must be 32 bytes (256 bits)".to_string());
         }
 
-        self.leaves.insert(key_hex.to_string(), value_hex.to_string());
+        self.leaves
+            .insert(key_hex.to_string(), value_hex.to_string());
 
         // Recompute root hash incrementally
         let mut root_hasher = blake3::Hasher::new();
@@ -102,13 +104,18 @@ impl SparseMerkleTree256 {
 
     /// Generates an inclusion or non-membership exclusion proof for a target key.
     pub fn generate_proof(&self, key_hex: &str) -> Result<SmtMembershipProof, String> {
-        let key_bytes = hex::decode(key_hex.trim()).map_err(|e| format!("Invalid key hex: {}", e))?;
+        let key_bytes =
+            hex::decode(key_hex.trim()).map_err(|e| format!("Invalid key hex: {}", e))?;
         if key_bytes.len() != 32 {
             return Err("Key must be 32 bytes".to_string());
         }
 
         let is_non_membership = !self.leaves.contains_key(key_hex);
-        let value = self.leaves.get(key_hex).cloned().unwrap_or_else(|| "0".repeat(64));
+        let value = self
+            .leaves
+            .get(key_hex)
+            .cloned()
+            .unwrap_or_else(|| "0".repeat(64));
 
         let mut path_steps = Vec::new();
         // Collect proof path steps using bit-decomposition of the key

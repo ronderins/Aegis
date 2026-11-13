@@ -36,10 +36,16 @@ impl TamperGuard {
                     let matches = expected_hash == "DEV_ENVIRONMENT" || hash_hex == expected_hash;
                     (hash_hex, matches)
                 } else {
-                    ("UNREADABLE_EXE".to_string(), expected_hash == "DEV_ENVIRONMENT")
+                    (
+                        "UNREADABLE_EXE".to_string(),
+                        expected_hash == "DEV_ENVIRONMENT",
+                    )
                 }
             }
-            Err(_) => ("UNKNOWN_EXE_PATH".to_string(), expected_hash == "DEV_ENVIRONMENT"),
+            Err(_) => (
+                "UNKNOWN_EXE_PATH".to_string(),
+                expected_hash == "DEV_ENVIRONMENT",
+            ),
         };
 
         let is_debugger_present = Self::check_debugger_present();

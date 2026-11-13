@@ -38,15 +38,27 @@ impl WirePermutation {
         let mut acc = Fp::from_u64(1);
         for i in 0..n {
             // (a_i + beta * i + gamma) * (b_i + beta * k1 * i + gamma) * (c_i + beta * k2 * i + gamma)
-            let num_a = wire_a_vals[i].add(beta.mul(Fp::from_u64(i as u64))).add(gamma);
-            let num_b = wire_b_vals[i].add(beta.mul(Fp::from_u64((i + n) as u64))).add(gamma);
-            let num_c = wire_c_vals[i].add(beta.mul(Fp::from_u64((i + 2 * n) as u64))).add(gamma);
+            let num_a = wire_a_vals[i]
+                .add(beta.mul(Fp::from_u64(i as u64)))
+                .add(gamma);
+            let num_b = wire_b_vals[i]
+                .add(beta.mul(Fp::from_u64((i + n) as u64)))
+                .add(gamma);
+            let num_c = wire_c_vals[i]
+                .add(beta.mul(Fp::from_u64((i + 2 * n) as u64)))
+                .add(gamma);
             let num = num_a.mul(num_b).mul(num_c);
 
             // (a_i + beta * sigma_a(i) + gamma) * ...
-            let den_a = wire_a_vals[i].add(beta.mul(Fp::from_u64(self.sigma_a[i] as u64))).add(gamma);
-            let den_b = wire_b_vals[i].add(beta.mul(Fp::from_u64(self.sigma_b[i] as u64))).add(gamma);
-            let den_c = wire_c_vals[i].add(beta.mul(Fp::from_u64(self.sigma_c[i] as u64))).add(gamma);
+            let den_a = wire_a_vals[i]
+                .add(beta.mul(Fp::from_u64(self.sigma_a[i] as u64)))
+                .add(gamma);
+            let den_b = wire_b_vals[i]
+                .add(beta.mul(Fp::from_u64(self.sigma_b[i] as u64)))
+                .add(gamma);
+            let den_c = wire_c_vals[i]
+                .add(beta.mul(Fp::from_u64(self.sigma_c[i] as u64)))
+                .add(gamma);
             let den = den_a.mul(den_b).mul(den_c);
 
             let factor = num.mul(den.inv().unwrap_or_else(Fp::zero));

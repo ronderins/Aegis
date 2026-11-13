@@ -16,11 +16,15 @@ impl BlsScalar {
     }
 
     pub fn one() -> Self {
-        Self { limbs: [1, 0, 0, 0] }
+        Self {
+            limbs: [1, 0, 0, 0],
+        }
     }
 
     pub fn from_u64(val: u64) -> Self {
-        Self { limbs: [val, 0, 0, 0] }
+        Self {
+            limbs: [val, 0, 0, 0],
+        }
     }
 
     pub fn add(&self, other: &Self) -> Self {
@@ -39,7 +43,9 @@ impl BlsScalar {
         for i in 0..4 {
             let mut carry = 0u128;
             for j in 0..(4 - i) {
-                let prod = (self.limbs[i] as u128) * (other.limbs[j] as u128) + (result[i + j] as u128) + carry;
+                let prod = (self.limbs[i] as u128) * (other.limbs[j] as u128)
+                    + (result[i + j] as u128)
+                    + carry;
                 result[i + j] = prod as u64;
                 carry = prod >> 64;
             }

@@ -33,8 +33,10 @@ impl OfflineVerifier {
         let start = std::time::Instant::now();
 
         // 1. Validate commitment format
-        let is_valid_hex = commitment_hex.len() == 64 && commitment_hex.chars().all(|c| c.is_ascii_hexdigit());
-        let is_valid_sub = token_claims_sub.len() == 64 && token_claims_sub.chars().all(|c| c.is_ascii_hexdigit());
+        let is_valid_hex =
+            commitment_hex.len() == 64 && commitment_hex.chars().all(|c| c.is_ascii_hexdigit());
+        let is_valid_sub =
+            token_claims_sub.len() == 64 && token_claims_sub.chars().all(|c| c.is_ascii_hexdigit());
 
         // 2. Derive nullifier locally
         let mut hasher = blake3::Hasher::new();

@@ -98,7 +98,10 @@ impl DistributedNullifierGraph {
 
         // Sybil/Replay check
         if self.nullifier_nodes.contains_key(&trimmed) {
-            return Err("Double-spend detected: nullifier has already been executed in this DAG".to_string());
+            return Err(
+                "Double-spend detected: nullifier has already been executed in this DAG"
+                    .to_string(),
+            );
         }
 
         let node = NullifierGraphNode {
@@ -178,10 +181,14 @@ mod tests {
         );
 
         // First registration succeeds
-        assert!(graph.register_nullifier(&nullifier1, "bank.example.com", None).is_ok());
+        assert!(graph
+            .register_nullifier(&nullifier1, "bank.example.com", None)
+            .is_ok());
 
         // Replay of same nullifier must fail
-        assert!(graph.register_nullifier(&nullifier1, "bank.example.com", None).is_err());
+        assert!(graph
+            .register_nullifier(&nullifier1, "bank.example.com", None)
+            .is_err());
 
         // Same user at a different domain yields a DIFFERENT blinded nullifier (uncorrelatable!)
         let nullifier2 = DistributedNullifierGraph::derive_blinded_nullifier(
@@ -190,7 +197,9 @@ mod tests {
             &graph.current_epoch.epoch_entropy_salt,
         );
         assert_ne!(nullifier1, nullifier2);
-        assert!(graph.register_nullifier(&nullifier2, "crypto-exchange.example.org", None).is_ok());
+        assert!(graph
+            .register_nullifier(&nullifier2, "crypto-exchange.example.org", None)
+            .is_ok());
 
         // Advance epoch seals state
         let checkpoint = graph.advance_epoch();

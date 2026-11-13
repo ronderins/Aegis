@@ -78,12 +78,7 @@ pub fn compute_receipt_block_hash(
 /// Builds zero-knowledge proof commitment with strict domain separation and Ephemeral Memory Lockdown:
 /// SHA-256("zk-identity-proof-v1\0" || user_id || 0x00 || doc_hash || 0x00 || age_threshold || 0x00 || nonce)
 /// Uses `Zeroizing` buffer to guarantee memory is wiped immediately after commitment calculation.
-pub fn build_commitment(
-    user_id: &str,
-    doc_hash: &str,
-    age_threshold: u32,
-    nonce: &str,
-) -> String {
+pub fn build_commitment(user_id: &str, doc_hash: &str, age_threshold: u32, nonce: &str) -> String {
     // Wrap sensitive inputs in zeroizing buffers
     let mut sensitive_buf = Zeroizing::new(Vec::<u8>::new());
     sensitive_buf.extend_from_slice(b"zk-identity-proof-v1\0");
@@ -284,8 +279,18 @@ mod tests {
 
     #[test]
     fn test_build_commitment_domain_separation() {
-        let c1 = build_commitment("user-1", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", 18, "nonce-1");
-        let c2 = build_commitment("user-1", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", 18, "nonce-2");
+        let c1 = build_commitment(
+            "user-1",
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            18,
+            "nonce-1",
+        );
+        let c2 = build_commitment(
+            "user-1",
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            18,
+            "nonce-2",
+        );
         assert_ne!(c1, c2, "Different nonces must yield different commitments");
         assert_eq!(c1.len(), 64);
     }
@@ -306,10 +311,20 @@ mod tests {
         let commitment = "f".repeat(64);
 
         let token = signer
-            .create_signed_token(proof_id, &user_id_digest, doc_hash, 21, true, "age_over_21", &commitment)
+            .create_signed_token(
+                proof_id,
+                &user_id_digest,
+                doc_hash,
+                21,
+                true,
+                "age_over_21",
+                &commitment,
+            )
             .expect("Signing must succeed");
 
-        let claims = signer.verify_token(&token).expect("Verification must succeed");
+        let claims = signer
+            .verify_token(&token)
+            .expect("Verification must succeed");
         assert_eq!(claims.custom.proof_id, proof_id);
         assert_eq!(claims.custom.user_id_digest, user_id_digest);
         assert_eq!(claims.custom.age_threshold, 21);
@@ -319,11 +334,17 @@ mod tests {
         // Failure Case: Tampered token signature fails verification
         let tampered_token = format!("{}tampered", token);
         let verify_tampered = signer.verify_token(&tampered_token);
-        assert!(verify_tampered.is_err(), "Tampered token must fail signature check");
+        assert!(
+            verify_tampered.is_err(),
+            "Tampered token must fail signature check"
+        );
 
         // Failure Case: Malformed token string
         let verify_garbage = signer.verify_token("not.a.valid.jwt");
-        assert!(verify_garbage.is_err(), "Malformed token string must fail verification");
+        assert!(
+            verify_garbage.is_err(),
+            "Malformed token string must fail verification"
+        );
     }
 
     #[test]
@@ -343,10 +364,11 @@ mod tests {
 
     #[test]
     fn test_ephemeral_memory_lockdown_zeroize() {
-        let mut witness = EphemeralSensitiveWitness::new("super_secret_user", "abcdef123456", "nonce_999", 25);
+        let mut witness =
+            EphemeralSensitiveWitness::new("super_secret_user", "abcdef123456", "nonce_999", 25);
         assert_eq!(witness.raw_user_id, "super_secret_user");
         assert_eq!(witness.doc_hash, "abcdef123456");
-        
+
         witness.lockdown_and_wipe();
         assert!(witness.raw_user_id.is_empty() || witness.raw_user_id.bytes().all(|b| b == 0));
         assert!(witness.doc_hash.is_empty() || witness.doc_hash.bytes().all(|b| b == 0));
@@ -364,7 +386,13 @@ mod tests {
         assert_eq!(parent_merkle.len(), 64);
         assert_ne!(parent_merkle, digest1);
 
-        let block_hash = compute_receipt_block_hash(1, &digest1, "proof-uuid-1", "commitment-1", "2026-08-14T20:00:00Z");
+        let block_hash = compute_receipt_block_hash(
+            1,
+            &digest1,
+            "proof-uuid-1",
+            "commitment-1",
+            "2026-08-14T20:00:00Z",
+        );
         assert_eq!(block_hash.len(), 64);
     }
 
@@ -401,6 +429,10 @@ mod tests {
 
         assert!(verify_merkle_inclusion_proof(&leaf_1, &path_leaf_1, &root));
         // Failure case: altered root
-        assert!(!verify_merkle_inclusion_proof(&leaf_1, &path_leaf_1, "0".repeat(64).as_str()));
+        assert!(!verify_merkle_inclusion_proof(
+            &leaf_1,
+            &path_leaf_1,
+            "0".repeat(64).as_str()
+        ));
     }
 }

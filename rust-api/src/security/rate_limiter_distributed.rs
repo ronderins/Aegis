@@ -111,7 +111,11 @@ impl GcraRateLimiter {
             }
 
             let next_tat = new_tat + t;
-            if cell.tat_us.compare_exchange_weak(tat, next_tat, Ordering::Release, Ordering::Relaxed).is_ok() {
+            if cell
+                .tat_us
+                .compare_exchange_weak(tat, next_tat, Ordering::Release, Ordering::Relaxed)
+                .is_ok()
+            {
                 return Ok(());
             }
         }
@@ -123,9 +127,7 @@ impl GcraRateLimiter {
         let cutoff_us = now_us.saturating_sub(max_idle.as_micros() as u64);
 
         let mut map = self.cells.write().unwrap();
-        map.retain(|_, cell| {
-            cell.tat_us.load(Ordering::Relaxed) > cutoff_us
-        });
+        map.retain(|_, cell| cell.tat_us.load(Ordering::Relaxed) > cutoff_us);
     }
 
     /// Returns the number of currently tracked client cells.

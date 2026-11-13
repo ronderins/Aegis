@@ -39,7 +39,10 @@ impl RevocationAccumulator {
     }
 
     /// Generates a non-revocation witness statement
-    pub fn generate_non_revocation_witness(&self, nullifier: &[u8; 32]) -> Result<[u8; 32], &'static str> {
+    pub fn generate_non_revocation_witness(
+        &self,
+        nullifier: &[u8; 32],
+    ) -> Result<[u8; 32], &'static str> {
         if self.is_revoked(nullifier) {
             return Err("Credential has been revoked in accumulator");
         }

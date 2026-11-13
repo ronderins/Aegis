@@ -100,7 +100,9 @@ impl AdvancedDpEngine {
     ) -> Result<f64, &'static str> {
         let current_eps = self.convert_rdp_to_approx_dp();
         if current_eps >= self.max_epsilon {
-            return Err("Differential Privacy Error: Privacy budget epsilon depleted for this epoch");
+            return Err(
+                "Differential Privacy Error: Privacy budget epsilon depleted for this epoch",
+            );
         }
 
         // Add calibrated perturbation

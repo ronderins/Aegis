@@ -198,7 +198,8 @@ mod tests {
         );
 
         // Verify embedding B against enrolled A
-        let receipt = BiometricVault::verify_match(&embedding_b, &vault_rec, &enrolled_a, None).unwrap();
+        let receipt =
+            BiometricVault::verify_match(&embedding_b, &vault_rec, &enrolled_a, None).unwrap();
         assert!(receipt.is_matched);
         assert!(receipt.liveness_verified);
     }

@@ -99,24 +99,30 @@ impl BlindedCuckooFilter {
         for _ in 0..50 {
             let victim_pos = cur_fp as usize % self.buckets[cur_idx].len();
             let old_entry = self.buckets[cur_idx][victim_pos];
-            self.buckets[cur_idx][victim_pos] = CuckooEntry { fingerprint: cur_fp };
+            self.buckets[cur_idx][victim_pos] = CuckooEntry {
+                fingerprint: cur_fp,
+            };
 
             // Compute alternate bucket for kicked item
             let mut fp_h = Sha256::new();
             fp_h.update(&old_entry.fingerprint.to_be_bytes());
-            let alt = (((fp_h.finalize()[0] as usize) << 8)) % self.bucket_count;
+            let alt = ((fp_h.finalize()[0] as usize) << 8) % self.bucket_count;
             cur_idx = (cur_idx ^ alt) % self.bucket_count;
             cur_fp = old_entry.fingerprint;
 
             if self.buckets[cur_idx].len() < self.entries_per_bucket {
-                self.buckets[cur_idx].push(CuckooEntry { fingerprint: cur_fp });
+                self.buckets[cur_idx].push(CuckooEntry {
+                    fingerprint: cur_fp,
+                });
                 return true;
             }
         }
 
         // If kicking cycles out, place into stash
         if self.stash.len() < 8 {
-            self.stash.push(CuckooEntry { fingerprint: cur_fp });
+            self.stash.push(CuckooEntry {
+                fingerprint: cur_fp,
+            });
             true
         } else {
             false
@@ -255,8 +261,10 @@ mod tests {
             105,
         );
 
-        let oracle_resp = ZeroLeakageSanctionsEngine::oracle_evaluate_blinded_point(&query, oracle_key);
-        let receipt = ZeroLeakageSanctionsEngine::client_unblind_and_verify(&oracle_resp, &r, &filter, 105);
+        let oracle_resp =
+            ZeroLeakageSanctionsEngine::oracle_evaluate_blinded_point(&query, oracle_key);
+        let receipt =
+            ZeroLeakageSanctionsEngine::client_unblind_and_verify(&oracle_resp, &r, &filter, 105);
 
         assert!(receipt.is_cleared);
         assert!(!receipt.oracle_signature.is_empty());

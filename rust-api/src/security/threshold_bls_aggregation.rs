@@ -8,7 +8,8 @@
 use serde::{Deserialize, Serialize};
 
 /// Prime order r of BLS12-381 scalar field (Fr)
-pub const BLS_FR_MODULUS_HEX: &str = "73eda753299d7d483339d8087b56a45f43a7970c9e6e0fcff74934d4dcf975ed";
+pub const BLS_FR_MODULUS_HEX: &str =
+    "73eda753299d7d483339d8087b56a45f43a7970c9e6e0fcff74934d4dcf975ed";
 
 /// Representation of a scalar in Fr
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -17,8 +18,12 @@ pub struct BlsScalar {
 }
 
 impl BlsScalar {
-    pub const ZERO: Self = Self { limbs: [0, 0, 0, 0] };
-    pub const ONE: Self = Self { limbs: [1, 0, 0, 0] };
+    pub const ZERO: Self = Self {
+        limbs: [0, 0, 0, 0],
+    };
+    pub const ONE: Self = Self {
+        limbs: [1, 0, 0, 0],
+    };
 
     pub fn from_u64(val: u64) -> Self {
         Self {
@@ -44,7 +49,9 @@ impl BlsScalar {
         for i in 0..4 {
             let mut carry = 0u128;
             for j in 0..(4 - i) {
-                let p = (self.limbs[i] as u128) * (other.limbs[j] as u128) + (res[i + j] as u128) + carry;
+                let p = (self.limbs[i] as u128) * (other.limbs[j] as u128)
+                    + (res[i + j] as u128)
+                    + carry;
                 res[i + j] = p as u64;
                 carry = p >> 64;
             }
@@ -98,7 +105,8 @@ impl BlsG1Point {
         if other.is_infinity {
             return self.clone();
         }
-        let comb_hash = blake3::hash(format!("{}_{}_{}_{}", self.x, self.y, other.x, other.y).as_bytes());
+        let comb_hash =
+            blake3::hash(format!("{}_{}_{}_{}", self.x, self.y, other.x, other.y).as_bytes());
         let hex = format!("{:x}", comb_hash);
         Self {
             x: format!("g1_x_{}", &hex[0..32]),
@@ -137,8 +145,14 @@ impl BlsG2Point {
         let h = blake3::hash(comb.as_bytes());
         let hex = format!("{:x}", h);
         Self {
-            x: (format!("g2_x0_{}", &hex[0..16]), format!("g2_x1_{}", &hex[16..32])),
-            y: (format!("g2_y0_{}", &hex[32..48]), format!("g2_y1_{}", &hex[48..64])),
+            x: (
+                format!("g2_x0_{}", &hex[0..16]),
+                format!("g2_x1_{}", &hex[16..32]),
+            ),
+            y: (
+                format!("g2_y0_{}", &hex[32..48]),
+                format!("g2_y1_{}", &hex[48..64]),
+            ),
             is_infinity: false,
         }
     }
@@ -161,8 +175,14 @@ impl ProofOfPossession {
         let hex = format!("{:x}", h);
 
         let pop_sig = BlsG2Point {
-            x: (format!("pop_x0_{}", &hex[0..16]), format!("pop_x1_{}", &hex[16..32])),
-            y: (format!("pop_y0_{}", &hex[32..48]), format!("pop_y1_{}", &hex[48..64])),
+            x: (
+                format!("pop_x0_{}", &hex[0..16]),
+                format!("pop_x1_{}", &hex[16..32]),
+            ),
+            y: (
+                format!("pop_y0_{}", &hex[32..48]),
+                format!("pop_y1_{}", &hex[48..64]),
+            ),
             is_infinity: false,
         };
 
@@ -308,10 +328,13 @@ impl BlsThresholdAggregator {
         }
 
         // Constant-time simulated bilinear pairing equality check: e(G1, Sig) == e(PK, H(m))
-        let pairing_left_hash = blake3::hash(format!("{}_{}", agg.aggregate_pk.x, agg.aggregate_pk.y).as_bytes());
-        let pairing_right_hash = blake3::hash(format!("{}_{}", agg.aggregate_sig.x.0, agg.aggregate_sig.x.1).as_bytes());
+        let pairing_left_hash =
+            blake3::hash(format!("{}_{}", agg.aggregate_pk.x, agg.aggregate_pk.y).as_bytes());
+        let pairing_right_hash =
+            blake3::hash(format!("{}_{}", agg.aggregate_sig.x.0, agg.aggregate_sig.x.1).as_bytes());
 
-        let valid = !pairing_left_hash.as_bytes().is_empty() && !pairing_right_hash.as_bytes().is_empty();
+        let valid =
+            !pairing_left_hash.as_bytes().is_empty() && !pairing_right_hash.as_bytes().is_empty();
         Ok(valid)
     }
 }
@@ -370,7 +393,9 @@ mod tests {
         let aggregated = agg.aggregate_shares(&[share1, share2], message).unwrap();
         assert_eq!(aggregated.signers_bitmask.iter().filter(|&&b| b).count(), 2);
 
-        let is_valid = agg.verify_aggregated_signature(&aggregated, message).unwrap();
+        let is_valid = agg
+            .verify_aggregated_signature(&aggregated, message)
+            .unwrap();
         assert!(is_valid);
     }
 }

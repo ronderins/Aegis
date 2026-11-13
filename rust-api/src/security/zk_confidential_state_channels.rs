@@ -83,11 +83,23 @@ impl ConfidentialStateChannel {
         }
 
         let next_seq = self.current_sequence + 1;
-        let state_h = blake3::hash(format!("{}_{}_{}_{}", self.channel_id, next_seq, new_balance_a, new_balance_b).as_bytes());
+        let state_h = blake3::hash(
+            format!(
+                "{}_{}_{}_{}",
+                self.channel_id, next_seq, new_balance_a, new_balance_b
+            )
+            .as_bytes(),
+        );
         let state_hex = format!("{:x}", state_h);
 
-        let sig_a = format!("sig_a_{:x}", blake3::hash(format!("{}_{}", state_hex, sk_a).as_bytes()));
-        let sig_b = format!("sig_b_{:x}", blake3::hash(format!("{}_{}", state_hex, sk_b).as_bytes()));
+        let sig_a = format!(
+            "sig_a_{:x}",
+            blake3::hash(format!("{}_{}", state_hex, sk_a).as_bytes())
+        );
+        let sig_b = format!(
+            "sig_b_{:x}",
+            blake3::hash(format!("{}_{}", state_hex, sk_b).as_bytes())
+        );
 
         Ok(ChannelStateUpdate {
             channel_id: self.channel_id.clone(),
@@ -120,10 +132,7 @@ impl ConfidentialStateChannel {
     }
 
     /// Evaluates dispute: higher sequence number always supersedes older state
-    pub fn resolve_dispute(
-        &mut self,
-        proof: &ChannelDisputeProof,
-    ) -> Result<bool, &'static str> {
+    pub fn resolve_dispute(&mut self, proof: &ChannelDisputeProof) -> Result<bool, &'static str> {
         if proof.disputed_state.sequence_number > self.current_sequence {
             self.apply_update(&proof.disputed_state)?;
             self.status = ChannelState::Closed;
@@ -140,13 +149,8 @@ mod tests {
 
     #[test]
     fn test_confidential_state_channel_flow() {
-        let mut ch = ConfidentialStateChannel::open(
-            "chan_991827",
-            "0xAlicePub",
-            "0xBobPub",
-            1000,
-            500,
-        );
+        let mut ch =
+            ConfidentialStateChannel::open("chan_991827", "0xAlicePub", "0xBobPub", 1000, 500);
 
         let update = ch.propose_state_transition(800, 700, 0x111, 0x222).unwrap();
         assert_eq!(update.sequence_number, 1);

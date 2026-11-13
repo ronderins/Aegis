@@ -48,7 +48,7 @@ impl FeldmanVssEngine {
 
         // Coefficient 0 is the secret
         polynomial_coeffs.push(master_digest.to_hex().to_string());
-        
+
         let mut comm_hasher = blake3::Hasher::new();
         comm_hasher.update(b"vss-coeff-commit-g0\0");
         comm_hasher.update(master_digest.as_bytes());
@@ -125,7 +125,7 @@ impl FeldmanVssEngine {
         }
 
         let selected = &shares[0..threshold as usize];
-        
+
         let mut lagrange_hasher = blake3::Hasher::new();
         lagrange_hasher.update(b"vss-lagrange-reconstruction-v1\0");
         for share in selected {

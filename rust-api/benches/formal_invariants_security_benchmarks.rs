@@ -9,11 +9,11 @@
 //! - ZKVM JIT opcode dispatch and memory boundary validation
 
 use std::time::Instant;
+use zk_identity_api_rust::security::bulletproofs_plus_range::*;
+use zk_identity_api_rust::security::falcon_fips206::*;
 use zk_identity_api_rust::security::fhe_bfv_ckks::*;
 use zk_identity_api_rust::security::threshold_bls_aggregation::*;
 use zk_identity_api_rust::security::verifiable_delay_function::*;
-use zk_identity_api_rust::security::bulletproofs_plus_range::*;
-use zk_identity_api_rust::security::falcon_fips206::*;
 use zk_identity_api_rust::security::zkvm_jit_armor::*;
 
 pub fn benchmark_fhe_homomorphic_addition() -> u128 {

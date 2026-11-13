@@ -59,10 +59,7 @@ impl SpectreShield {
 
     /// Oblivious table lookup: accesses EVERY entry in the table uniformly to prevent
     /// cache-line address leakage to Prime+Probe or Flush+Reload microarchitectural probes.
-    pub fn oblivious_lookup_entry<T: Copy + Default>(
-        table: &[T],
-        target_index: usize,
-    ) -> T {
+    pub fn oblivious_lookup_entry<T: Copy + Default>(table: &[T], target_index: usize) -> T {
         let mut result = T::default();
         let target = black_box(target_index);
 

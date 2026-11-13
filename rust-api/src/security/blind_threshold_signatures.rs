@@ -175,7 +175,12 @@ impl BlindThresholdEngine {
         let mut receipt_hasher = blake3::Hasher::new();
         receipt_hasher.update(b"UNBLINDED_TOKEN_RECEIPT");
         receipt_hasher.update(token.original_message.as_bytes());
-        receipt_hasher.update(token.unblinded_signature.trim_start_matches("0x").as_bytes());
+        receipt_hasher.update(
+            token
+                .unblinded_signature
+                .trim_start_matches("0x")
+                .as_bytes(),
+        );
         receipt_hasher.update(expected_group_pubkey.as_bytes());
         let expected_receipt = hex::encode(receipt_hasher.finalize().as_bytes());
 
@@ -215,16 +220,13 @@ mod tests {
         }
 
         // Client unblinds signature
-        let token = BlindThresholdEngine::client_unblind_signature(
-            msg,
-            &req,
-            &shares,
-            &r,
-            group_pk,
-        )
-        .unwrap();
+        let token =
+            BlindThresholdEngine::client_unblind_signature(msg, &req, &shares, &r, group_pk)
+                .unwrap();
 
         assert_eq!(token.token_class, token_class);
-        assert!(BlindThresholdEngine::verify_anonymous_token(&token, group_pk));
+        assert!(BlindThresholdEngine::verify_anonymous_token(
+            &token, group_pk
+        ));
     }
 }

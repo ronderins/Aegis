@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 /// SPHINCS+ security parameters for SLH-DSA-SHAKE-128s
 pub const SPHINCS_N: usize = 16; // 128 bits of security
 pub const SPHINCS_H: usize = 64; // Total hypertree height
-pub const SPHINCS_D: usize = 8;  // Number of tree layers (each of height 8)
+pub const SPHINCS_D: usize = 8; // Number of tree layers (each of height 8)
 pub const SPHINCS_W: usize = 16; // Winternitz parameter w = 16 (log2(w) = 4)
 
 /// A WOTS+ public key or compressed leaf
@@ -119,7 +119,8 @@ impl SphincsEngine {
 
         let mut hypertree_nodes = Vec::new();
         for layer in 0..SPHINCS_D {
-            let layer_h = blake3::hash(format!("ht_layer_{}_{}", layer, sk.public_key.root[0]).as_bytes());
+            let layer_h =
+                blake3::hash(format!("ht_layer_{}_{}", layer, sk.public_key.root[0]).as_bytes());
             hypertree_nodes.push(format!("ht_{:x}", layer_h));
         }
 

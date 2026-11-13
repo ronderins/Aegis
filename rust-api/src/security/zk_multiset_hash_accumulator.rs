@@ -76,7 +76,13 @@ impl MultisetHashEngine {
         }
 
         let equal = acc_a.accumulated_product == acc_b.accumulated_product;
-        let proof_h = blake3::hash(format!("{}_{}_{}", acc_a.accumulated_product, acc_b.accumulated_product, gamma).as_bytes());
+        let proof_h = blake3::hash(
+            format!(
+                "{}_{}_{}",
+                acc_a.accumulated_product, acc_b.accumulated_product, gamma
+            )
+            .as_bytes(),
+        );
 
         Ok(MultisetEqualityProof {
             set_a_digest: acc_a.accumulated_product,
@@ -89,7 +95,9 @@ impl MultisetHashEngine {
 
     /// Verifier: Verifies multiset equality proof
     pub fn verify_equality(proof: &MultisetEqualityProof) -> bool {
-        proof.is_identical_multiset && proof.set_a_digest == proof.set_b_digest && !proof.proof_mac.is_empty()
+        proof.is_identical_multiset
+            && proof.set_a_digest == proof.set_b_digest
+            && !proof.proof_mac.is_empty()
     }
 }
 
@@ -108,7 +116,8 @@ mod tests {
         // Set B: [item3, item1, item2] (shuffled order)
         let set_b = vec![item3, item1, item2];
 
-        let proof = MultisetHashEngine::prove_multiset_equality(&set_a, &set_b, 0x1337_BEEF).unwrap();
+        let proof =
+            MultisetHashEngine::prove_multiset_equality(&set_a, &set_b, 0x1337_BEEF).unwrap();
         assert!(proof.is_identical_multiset);
         assert_eq!(proof.set_a_digest, proof.set_b_digest);
 

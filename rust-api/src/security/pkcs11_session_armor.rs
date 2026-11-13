@@ -91,7 +91,9 @@ impl Pkcs11SessionArmor {
     /// Authenticates user and transitions to ReadWriteUserSession
     pub fn c_login(&mut self, pin: &str) -> Result<u64, &'static str> {
         if self.current_state == HsmSlotState::PermanentlyLocked {
-            return Err("PKCS#11 Error: Token is permanently locked due to excessive failed PIN attempts");
+            return Err(
+                "PKCS#11 Error: Token is permanently locked due to excessive failed PIN attempts",
+            );
         }
 
         let entered_h = format!("{:x}", blake3::hash(pin.as_bytes()));

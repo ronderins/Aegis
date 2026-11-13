@@ -170,10 +170,7 @@ impl PlookupEngine {
     }
 
     /// Verifier checks the Plookup Grand Product argument.
-    pub fn verify_lookup(
-        table: &LookupTable,
-        proof: &PlookupProof,
-    ) -> bool {
+    pub fn verify_lookup(table: &LookupTable, proof: &PlookupProof) -> bool {
         if proof.table_id != table.table_id {
             return false;
         }

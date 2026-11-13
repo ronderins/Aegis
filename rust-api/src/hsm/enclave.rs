@@ -32,9 +32,15 @@ impl EnclaveAttestationVerifier {
     }
 
     /// Verifies that attestation quote originated from certified hardware
-    pub fn verify_quote(&self, quote: &EnclaveAttestationQuote, expected_nonce: &str) -> Result<bool, &'static str> {
+    pub fn verify_quote(
+        &self,
+        quote: &EnclaveAttestationQuote,
+        expected_nonce: &str,
+    ) -> Result<bool, &'static str> {
         // 1. Check PCR0 image measurement
-        if self.expected_pcr0 != "DEV_SIMULATION_MODE" && quote.pcr0_enclave_image_hash != self.expected_pcr0 {
+        if self.expected_pcr0 != "DEV_SIMULATION_MODE"
+            && quote.pcr0_enclave_image_hash != self.expected_pcr0
+        {
             return Err("PCR0 enclave image hash mismatch");
         }
 

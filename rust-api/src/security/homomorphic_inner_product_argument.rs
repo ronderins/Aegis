@@ -97,7 +97,10 @@ impl HomomorphicIpaEngine {
             round_idx += 1;
         }
 
-        let p_cm = format!("P_cm_{:x}", blake3::hash(format!("ipa_{}_{}", n, claim_c).as_bytes()));
+        let p_cm = format!(
+            "P_cm_{:x}",
+            blake3::hash(format!("ipa_{}_{}", n, claim_c).as_bytes())
+        );
 
         Ok(IpaProof {
             initial_dimension_n: n,

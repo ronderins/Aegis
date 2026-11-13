@@ -53,7 +53,9 @@ pub struct Musig2Engine;
 
 impl Musig2Engine {
     /// Computes aggregated public key Q = sum_{i=1}^n a_i * P_i with rogue-key attack defense
-    pub fn aggregate_public_keys(keys: &[String]) -> Result<AggregatedMusig2PublicKey, &'static str> {
+    pub fn aggregate_public_keys(
+        keys: &[String],
+    ) -> Result<AggregatedMusig2PublicKey, &'static str> {
         if keys.len() < 2 {
             return Err("MuSig2 requires at least 2 participant keys");
         }
@@ -83,7 +85,10 @@ impl Musig2Engine {
     }
 
     /// Round 1: Participant generates secret nonces and returns public nonces
-    pub fn generate_nonces(signer_index: usize, seed: &[u8; 32]) -> (Musig2SecretNonce, Musig2PublicNonce) {
+    pub fn generate_nonces(
+        signer_index: usize,
+        seed: &[u8; 32],
+    ) -> (Musig2SecretNonce, Musig2PublicNonce) {
         let n1 = (seed[0] as u64).wrapping_mul(0x9E3779B97F4A7C15) ^ 0x1111;
         let n2 = (seed[16] as u64).wrapping_mul(0x517CC1B727220A95) ^ 0x2222;
 
@@ -111,12 +116,16 @@ impl Musig2Engine {
         message: &[u8],
     ) -> Musig2PartialSignature {
         let msg_h = blake3::hash(message);
-        let challenge_e = blake3::hash(format!("{}_{}", agg_pk.aggregated_point_hex, msg_h).as_bytes());
+        let challenge_e =
+            blake3::hash(format!("{}_{}", agg_pk.aggregated_point_hex, msg_h).as_bytes());
         let mut e_bytes = [0u8; 8];
         e_bytes.copy_from_slice(&challenge_e.as_bytes()[0..8]);
         let e_scalar = u64::from_le_bytes(e_bytes) % 65537;
 
-        let s_i = (sec_nonce.secret_scalars[0] + sec_nonce.secret_scalars[1] * 2 + e_scalar * (secret_key % 65537)) % 65537;
+        let s_i = (sec_nonce.secret_scalars[0]
+            + sec_nonce.secret_scalars[1] * 2
+            + e_scalar * (secret_key % 65537))
+            % 65537;
 
         Musig2PartialSignature {
             signer_index,
@@ -138,7 +147,10 @@ impl Musig2Engine {
             s_acc = (s_acc + p.scalar_s_i) % 65537;
         }
 
-        let r_point = format!("R_agg_{:x}", blake3::hash(agg_pk.aggregated_point_hex.as_bytes()));
+        let r_point = format!(
+            "R_agg_{:x}",
+            blake3::hash(agg_pk.aggregated_point_hex.as_bytes())
+        );
 
         Ok(Musig2FinalSignature {
             r_point_hex: r_point,
@@ -179,7 +191,8 @@ mod tests {
         let part1 = Musig2Engine::sign_partial(0, 100, &sec1, &agg_pk, msg);
         let part2 = Musig2Engine::sign_partial(1, 200, &sec2, &agg_pk, msg);
 
-        let final_sig = Musig2Engine::aggregate_partial_signatures(&[part1, part2], &agg_pk).unwrap();
+        let final_sig =
+            Musig2Engine::aggregate_partial_signatures(&[part1, part2], &agg_pk).unwrap();
         assert!(final_sig.r_point_hex.starts_with("R_agg_"));
 
         let verified = Musig2Engine::verify_signature(&final_sig, msg).unwrap();

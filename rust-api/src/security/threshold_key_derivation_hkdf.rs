@@ -60,10 +60,7 @@ impl DistributedHkdfEngine {
     }
 
     /// Evaluates partial derivation share for a specific node in a distributed key committee.
-    pub fn node_derive_step(
-        node_share: &DhkdfNodeShare,
-        subpath: &str,
-    ) -> DerivationStepShare {
+    pub fn node_derive_step(node_share: &DhkdfNodeShare, subpath: &str) -> DerivationStepShare {
         let prk = Self::hkdf_extract(subpath.as_bytes(), &node_share.partial_key);
         let expanded = Self::hkdf_expand(&prk, b"D-HKDF-TREE-NODE-DERIVATION", 1);
 
@@ -132,10 +129,13 @@ mod tests {
             epoch_index: 100,
         };
 
-        let s1 = DistributedHkdfEngine::node_derive_step(&node1, "aegis/auth/session/token_signing");
-        let s2 = DistributedHkdfEngine::node_derive_step(&node2, "aegis/auth/session/token_signing");
+        let s1 =
+            DistributedHkdfEngine::node_derive_step(&node1, "aegis/auth/session/token_signing");
+        let s2 =
+            DistributedHkdfEngine::node_derive_step(&node2, "aegis/auth/session/token_signing");
 
-        let derived = DistributedHkdfEngine::combine_shares_and_ratchet(&[s1, s2], "key_session_42").unwrap();
+        let derived =
+            DistributedHkdfEngine::combine_shares_and_ratchet(&[s1, s2], "key_session_42").unwrap();
         assert_eq!(derived.subkey_bytes.len(), 32);
         assert!(!derived.derivation_receipt.is_empty());
     }

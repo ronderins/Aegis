@@ -109,7 +109,9 @@ impl OtExtensionEngine {
 
     /// Verifier: Validates consistency hash and batch metadata
     pub fn verify_batch(batch: &EvaluatedExtendedOtBatch) -> Result<bool, &'static str> {
-        if batch.transferred_ciphertexts.is_empty() || batch.batch_size != batch.transferred_ciphertexts.len() {
+        if batch.transferred_ciphertexts.is_empty()
+            || batch.batch_size != batch.transferred_ciphertexts.len()
+        {
             return Err("Invalid batch size or empty ciphertexts");
         }
         Ok(!batch.consistency_hash.is_empty())
@@ -134,7 +136,9 @@ mod tests {
         let messages = [(10, 20), (30, 40), (50, 60), (70, 80)];
         let choices = [false, true, true, false];
 
-        let batch = engine.expand_transfers(&base_keys, &messages, &choices).unwrap();
+        let batch = engine
+            .expand_transfers(&base_keys, &messages, &choices)
+            .unwrap();
         assert_eq!(batch.batch_size, 4);
 
         assert!(OtExtensionEngine::verify_batch(&batch).unwrap());

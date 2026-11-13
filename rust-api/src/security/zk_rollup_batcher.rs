@@ -106,7 +106,11 @@ impl ZkRollupBatcher {
         }
 
         // Check if already in pending mempool
-        if self.pending_tx_pool.iter().any(|t| t.nullifier == tx.nullifier || t.tx_id == tx.tx_id) {
+        if self
+            .pending_tx_pool
+            .iter()
+            .any(|t| t.nullifier == tx.nullifier || t.tx_id == tx.tx_id)
+        {
             return Err("Transaction or nullifier already present in pending pool".to_string());
         }
 
@@ -156,7 +160,9 @@ impl ZkRollupBatcher {
     /// Synthesizes and executes the state transition, producing a verifiable ZK batch receipt.
     pub fn seal_batch(&mut self) -> Result<RollupBatchReceipt, String> {
         if self.pending_tx_pool.is_empty() {
-            return Err("Cannot seal an empty batch: pending transaction pool is empty".to_string());
+            return Err(
+                "Cannot seal an empty batch: pending transaction pool is empty".to_string(),
+            );
         }
 
         let batch_txs: Vec<RollupVerificationTx> = self
@@ -173,7 +179,9 @@ impl ZkRollupBatcher {
         let mut state_diff = RollupStateDiff::default();
         for tx in &batch_txs {
             state_diff.nullifiers_added.push(tx.nullifier.clone());
-            state_diff.commitments_inserted.push(tx.commitment_root.clone());
+            state_diff
+                .commitments_inserted
+                .push(tx.commitment_root.clone());
             state_diff.total_fees_collected += tx.fee_micro_credits;
             state_diff.processed_tx_count += 1;
             self.spent_nullifiers.push(tx.nullifier.clone());

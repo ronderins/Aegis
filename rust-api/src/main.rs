@@ -55,20 +55,44 @@ async fn main() {
         .route("/api/v1/session", get(handlers::create_session))
         .route("/api/v1/verify", post(handlers::create_verify_proof))
         .route("/api/v1/verify-token", post(handlers::verify_token))
-        .route("/api/v1/verify-merkle", post(handlers::verify_merkle_inclusion))
+        .route(
+            "/api/v1/verify-merkle",
+            post(handlers::verify_merkle_inclusion),
+        )
         .route("/api/v1/proofs/:id", get(handlers::get_proof))
         .route("/api/v1/proofs", get(handlers::list_proofs))
         .route("/api/v1/ledger", get(handlers::get_ledger))
         .route("/api/v1/metrics", get(handlers::get_metrics))
         .route("/api/v1/stats", get(handlers::get_stats))
-        .route("/api/v1/security/overview", get(handlers::get_security_overview))
+        .route(
+            "/api/v1/security/overview",
+            get(handlers::get_security_overview),
+        )
         .route("/api/v1/security/rln-verify", post(handlers::rln_verify))
-        .route("/api/v1/security/sd-jwt-verify", post(handlers::sd_jwt_verify))
-        .route("/api/v1/security/enclave-attestation", post(handlers::enclave_attestation_verify))
-        .route("/api/v1/security/pq-dilithium-verify", post(handlers::pq_dilithium_verify))
-        .route("/api/v1/security/sanctions-psi", post(handlers::sanctions_psi_check))
-        .route("/api/v1/security/mmr-audit-verify", post(handlers::mmr_audit_verify))
-        .route("/api/v1/security/circuit-formal-check", post(handlers::circuit_formal_check))
+        .route(
+            "/api/v1/security/sd-jwt-verify",
+            post(handlers::sd_jwt_verify),
+        )
+        .route(
+            "/api/v1/security/enclave-attestation",
+            post(handlers::enclave_attestation_verify),
+        )
+        .route(
+            "/api/v1/security/pq-dilithium-verify",
+            post(handlers::pq_dilithium_verify),
+        )
+        .route(
+            "/api/v1/security/sanctions-psi",
+            post(handlers::sanctions_psi_check),
+        )
+        .route(
+            "/api/v1/security/mmr-audit-verify",
+            post(handlers::mmr_audit_verify),
+        )
+        .route(
+            "/api/v1/security/circuit-formal-check",
+            post(handlers::circuit_formal_check),
+        )
         .layer(cors)
         .with_state(state);
 

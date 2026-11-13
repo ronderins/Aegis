@@ -130,7 +130,9 @@ mod tests {
         assert!(alloc.trailing_guard_active);
         assert!(alloc.madv_dontdump_enforced);
 
-        armor.deallocate_guarded_buffer(alloc.allocation_id).unwrap();
+        armor
+            .deallocate_guarded_buffer(alloc.allocation_id)
+            .unwrap();
         assert_eq!(armor.allocations.len(), 0);
     }
 

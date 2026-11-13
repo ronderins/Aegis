@@ -26,7 +26,8 @@ impl CeremonyTranscript {
 
     /// Verifies the full chain of contributions from genesis to the final accumulator
     pub fn verify_entire_transcript(&self) -> bool {
-        let mut expected_prev_hash = "0000000000000000000000000000000000000000000000000000000000000000";
+        let mut expected_prev_hash =
+            "0000000000000000000000000000000000000000000000000000000000000000";
 
         for (idx, contrib) in self.contributions.iter().enumerate() {
             if contrib.sequence_number != (idx + 1) as u32 {

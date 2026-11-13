@@ -87,7 +87,8 @@ impl HypercubeSumcheckEngine {
     /// Proves that sum_{x in {0,1}^v} P(x) == claimed_sum using Sumcheck protocol
     pub fn prove_sumcheck(mle: &MultilinearExtension) -> SumcheckProof {
         let p = HYPERCUBE_FIELD_PRIME as u128;
-        let claimed_sum: u64 = (mle.evaluations.iter().map(|&x| x as u128).sum::<u128>() % p) as u64;
+        let claimed_sum: u64 =
+            (mle.evaluations.iter().map(|&x| x as u128).sum::<u128>() % p) as u64;
 
         let mut rounds = Vec::with_capacity(mle.num_variables);
         let mut challenges = Vec::with_capacity(mle.num_variables);

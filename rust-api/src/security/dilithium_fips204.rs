@@ -46,7 +46,11 @@ impl DilithiumPoly {
         let mut out = [0u32; POLYNOMIAL_DEGREE];
         for i in 0..POLYNOMIAL_DEGREE {
             let diff = self.coeffs[i] as i64 - other.coeffs[i] as i64;
-            let res = if diff < 0 { diff + ML_DSA_Q as i64 } else { diff };
+            let res = if diff < 0 {
+                diff + ML_DSA_Q as i64
+            } else {
+                diff
+            };
             out[i] = res as u32;
         }
         Self { coeffs: out }

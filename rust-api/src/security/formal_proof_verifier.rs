@@ -10,12 +10,26 @@ use std::collections::{HashMap, HashSet};
 /// Classification of circuit safety bugs detected by formal analysis.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum CircuitVulnerabilityKind {
-    UnderConstrainedSignal { wire_id: usize, signal_name: String },
-    UnconstrainedOutput { output_index: usize },
-    DivisionByZeroHazard { gate_index: usize, divisor_variable: String },
-    TrivialConstraint { gate_index: usize },
-    MissingNonZeroCheck { variable_name: String },
-    ProofMalleabilityWeakness { parameter_id: String },
+    UnderConstrainedSignal {
+        wire_id: usize,
+        signal_name: String,
+    },
+    UnconstrainedOutput {
+        output_index: usize,
+    },
+    DivisionByZeroHazard {
+        gate_index: usize,
+        divisor_variable: String,
+    },
+    TrivialConstraint {
+        gate_index: usize,
+    },
+    MissingNonZeroCheck {
+        variable_name: String,
+    },
+    ProofMalleabilityWeakness {
+        parameter_id: String,
+    },
 }
 
 /// An arithmetic constraint row: A * B = C
@@ -105,9 +119,8 @@ impl FormalCircuitVerifier {
         // 3. Scan output wires to ensure outputs cannot float freely
         for (idx, &out_w) in circuit.output_wires.iter().enumerate() {
             if !constrained_wires.contains(&out_w) {
-                vulnerabilities.push(CircuitVulnerabilityKind::UnconstrainedOutput {
-                    output_index: idx,
-                });
+                vulnerabilities
+                    .push(CircuitVulnerabilityKind::UnconstrainedOutput { output_index: idx });
             }
         }
 
@@ -116,10 +129,15 @@ impl FormalCircuitVerifier {
             // If constraint is x * inv = 1, check if x is guaranteed non-zero
             if constraint.linear_combination_c == vec![(0, 1)] {
                 // If A is single wire and B is single wire, but no non-zero condition proved
-                if constraint.linear_combination_a.len() == 1 && constraint.linear_combination_b.len() == 1 {
+                if constraint.linear_combination_a.len() == 1
+                    && constraint.linear_combination_b.len() == 1
+                {
                     let divisor_var = format!("wire_{}", constraint.linear_combination_a[0].0);
                     // Check if non-zero check exists; if not, flag hazard
-                    if !circuit.public_input_wires.contains(&constraint.linear_combination_a[0].0) {
+                    if !circuit
+                        .public_input_wires
+                        .contains(&constraint.linear_combination_a[0].0)
+                    {
                         // Flag as potential division hazard if not explicitly protected
                     }
                 }
@@ -133,7 +151,8 @@ impl FormalCircuitVerifier {
 
         let is_provably_sound = vulnerabilities.is_empty();
         let is_provably_complete = circuit.constraints.len() >= circuit.output_wires.len();
-        let zero_knowledge_holds = circuit.private_witness_wires.len() > circuit.public_input_wires.len();
+        let zero_knowledge_holds =
+            circuit.private_witness_wires.len() > circuit.public_input_wires.len();
 
         let smt_assertions = circuit.constraints.len() * 3 + circuit.total_wires;
 

@@ -12,9 +12,7 @@ use std::fmt;
 #[serde(tag = "type", content = "payload")]
 pub enum ApiError {
     /// Client failed authentication (missing or mismatched API key)
-    Unauthorized {
-        request_id: String,
-    },
+    Unauthorized { request_id: String },
 
     /// Request payload failed syntactic or semantic validation
     ValidationError {
@@ -31,16 +29,10 @@ pub enum ApiError {
     },
 
     /// Age threshold is outside of valid operating domain [0, 130]
-    InvalidAgeThreshold {
-        threshold: u32,
-        request_id: String,
-    },
+    InvalidAgeThreshold { threshold: u32, request_id: String },
 
     /// Zero-Knowledge verification circuit evaluation failed
-    VerificationFailed {
-        reason: String,
-        request_id: String,
-    },
+    VerificationFailed { reason: String, request_id: String },
 
     /// Requested proof record or commitment does not exist
     ProofNotFound {
@@ -56,16 +48,10 @@ pub enum ApiError {
     },
 
     /// In-memory SQLx SQLite database operation failure
-    DatabaseError {
-        message: String,
-        request_id: String,
-    },
+    DatabaseError { message: String, request_id: String },
 
     /// Unexpected internal server error
-    Internal {
-        message: String,
-        request_id: String,
-    },
+    Internal { message: String, request_id: String },
 }
 
 impl fmt::Display for ApiError {
@@ -77,7 +63,11 @@ impl fmt::Display for ApiError {
                 write!(f, "Invalid document hash format: {}", reason)
             }
             Self::InvalidAgeThreshold { threshold, .. } => {
-                write!(f, "Age threshold '{}' is outside valid range (0-130)", threshold)
+                write!(
+                    f,
+                    "Age threshold '{}' is outside valid range (0-130)",
+                    threshold
+                )
             }
             Self::VerificationFailed { reason, .. } => {
                 write!(f, "Zero-Knowledge verification failed: {}", reason)
@@ -85,7 +75,9 @@ impl fmt::Display for ApiError {
             Self::ProofNotFound { proof_id, .. } => {
                 write!(f, "The requested proof '{}' does not exist.", proof_id)
             }
-            Self::CryptoError { operation, message, .. } => {
+            Self::CryptoError {
+                operation, message, ..
+            } => {
                 write!(f, "Crypto error during '{}': {}", operation, message)
             }
             Self::DatabaseError { message, .. } => write!(f, "Database error: {}", message),

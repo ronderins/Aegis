@@ -56,7 +56,8 @@ impl BatchShuffleVerifier {
         }
 
         let transcript_digest = hasher.finalize();
-        let is_valid = !transcript_digest.as_bytes().is_empty() && opening.composite_response_scalar > 0;
+        let is_valid =
+            !transcript_digest.as_bytes().is_empty() && opening.composite_response_scalar > 0;
 
         Ok(is_valid)
     }

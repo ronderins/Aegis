@@ -50,7 +50,11 @@ pub struct TlsSessionTicketArmor {
 
 impl TlsSessionTicketArmor {
     /// Creates a new STEK manager with specified rotation interval (e.g. 3600s = 1 hr) and ticket lifetime (e.g. 7200s = 2 hrs).
-    pub fn new(rotation_period_secs: u64, ticket_lifetime_secs: u64, initial_seed: &[u8; 32]) -> Self {
+    pub fn new(
+        rotation_period_secs: u64,
+        ticket_lifetime_secs: u64,
+        initial_seed: &[u8; 32],
+    ) -> Self {
         let manager = Self {
             active_key_id: RwLock::new([0u8; 16]),
             key_ring: RwLock::new(HashMap::new()),
@@ -113,7 +117,10 @@ impl TlsSessionTicketArmor {
     }
 
     /// Encrypts and seals sensitive session state under the currently active STEK key.
-    pub fn seal_session_ticket(&self, plaintext_session: &[u8]) -> Result<SealedSessionTicket, &'static str> {
+    pub fn seal_session_ticket(
+        &self,
+        plaintext_session: &[u8],
+    ) -> Result<SealedSessionTicket, &'static str> {
         let active_id = *self.active_key_id.read().unwrap();
         let ring = self.key_ring.read().unwrap();
         let key_entry = ring.get(&active_id).ok_or("Active STEK key missing")?;
@@ -154,9 +161,14 @@ impl TlsSessionTicketArmor {
     }
 
     /// Unseals and decrypts a session ticket, resolving against any valid historical key in the keyring.
-    pub fn unseal_session_ticket(&self, ticket: &SealedSessionTicket) -> Result<Vec<u8>, &'static str> {
+    pub fn unseal_session_ticket(
+        &self,
+        ticket: &SealedSessionTicket,
+    ) -> Result<Vec<u8>, &'static str> {
         let ring = self.key_ring.read().unwrap();
-        let key_entry = ring.get(&ticket.key_id).ok_or("Session key expired or revoked (Forward Secrecy enforced)")?;
+        let key_entry = ring
+            .get(&ticket.key_id)
+            .ok_or("Session key expired or revoked (Forward Secrecy enforced)")?;
 
         // 1. Verify HMAC authentication tag
         let mut tag_hasher = blake3::Hasher::new_keyed(&key_entry.hmac_key);
@@ -223,11 +235,17 @@ mod tests {
         assert_eq!(armor.active_key_count(), 2);
 
         // Previous ticket should still be decryptable
-        assert_eq!(armor.unseal_session_ticket(&ticket_v1).unwrap(), b"session_v1");
+        assert_eq!(
+            armor.unseal_session_ticket(&ticket_v1).unwrap(),
+            b"session_v1"
+        );
 
         // New ticket encrypted under new key
         let ticket_v2 = armor.seal_session_ticket(b"session_v2").unwrap();
         assert_ne!(ticket_v1.key_id, ticket_v2.key_id);
-        assert_eq!(armor.unseal_session_ticket(&ticket_v2).unwrap(), b"session_v2");
+        assert_eq!(
+            armor.unseal_session_ticket(&ticket_v2).unwrap(),
+            b"session_v2"
+        );
     }
 }

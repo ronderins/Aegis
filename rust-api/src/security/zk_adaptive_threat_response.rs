@@ -72,7 +72,9 @@ impl AdaptiveThreatEngine {
     ) -> Result<ThreatSeverityLevel, &'static str> {
         // 1. Check if nullifier is already in quarantine
         if self.quarantined_nullifiers.contains_key(nullifier) {
-            return Err("Threat Shield: Target nullifier is quarantined due to suspected attack activity");
+            return Err(
+                "Threat Shield: Target nullifier is quarantined due to suspected attack activity",
+            );
         }
 
         self.request_counter_window += 1;
@@ -80,7 +82,8 @@ impl AdaptiveThreatEngine {
         // 2. Entropy degradation check (detects PRNG failures or deterministic side-channel probing)
         if sample_entropy < self.config.min_entropy_threshold_bits {
             self.current_threat_level = ThreatSeverityLevel::HighRisk;
-            self.quarantined_nullifiers.insert(nullifier.to_string(), 1775000000);
+            self.quarantined_nullifiers
+                .insert(nullifier.to_string(), 1775000000);
 
             self.anomaly_history.push(SecurityAnomalyEvent {
                 event_id: format!("anom_{:x}", blake3::hash(nullifier.as_bytes())),
@@ -130,7 +133,9 @@ mod tests {
         assert_eq!(engine.current_threat_level, ThreatSeverityLevel::Normal);
 
         // Degraded entropy (e.g. 5.1 bits instead of min 7.2)
-        let res = engine.evaluate_request("client_ip_1", "nullifier_bad_entropy", 5.1).unwrap();
+        let res = engine
+            .evaluate_request("client_ip_1", "nullifier_bad_entropy", 5.1)
+            .unwrap();
         assert_eq!(res, ThreatSeverityLevel::HighRisk);
 
         // Next attempt with same nullifier must be rejected
@@ -142,6 +147,9 @@ mod tests {
     fn test_emergency_trip() {
         let mut engine = AdaptiveThreatEngine::new();
         engine.trip_emergency_circuit_breaker("SUSPECTED_QUANTUM_ATTACK_VECTOR");
-        assert_eq!(engine.current_threat_level, ThreatSeverityLevel::EmergencyLockdown);
+        assert_eq!(
+            engine.current_threat_level,
+            ThreatSeverityLevel::EmergencyLockdown
+        );
     }
 }

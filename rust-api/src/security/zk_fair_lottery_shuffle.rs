@@ -70,8 +70,14 @@ impl FairLotteryShuffleEngine {
         }
 
         let perm_root = format!("{:x}", perm_hasher.finalize());
-        let challenge_c = format!("{:x}", blake3::hash(format!("{}_{}", perm_root, n).as_bytes()));
-        let response_s = format!("{:x}", blake3::hash(format!("{}_{}", challenge_c, rerandomization_factors[0]).as_bytes()));
+        let challenge_c = format!(
+            "{:x}",
+            blake3::hash(format!("{}_{}", perm_root, n).as_bytes())
+        );
+        let response_s = format!(
+            "{:x}",
+            blake3::hash(format!("{}_{}", challenge_c, rerandomization_factors[0]).as_bytes())
+        );
 
         Ok(NeffShuffleProof {
             input_ciphertexts: inputs.to_vec(),
@@ -94,7 +100,9 @@ impl FairLotteryShuffleEngine {
 
         let expected_c = format!(
             "{:x}",
-            blake3::hash(format!("{}_{}", proof.permutation_commitment_root, proof.batch_size).as_bytes())
+            blake3::hash(
+                format!("{}_{}", proof.permutation_commitment_root, proof.batch_size).as_bytes()
+            )
         );
 
         Ok(proof.multi_exponent_challenge_c == expected_c)
@@ -108,15 +116,25 @@ mod tests {
     #[test]
     fn test_neff_verifiable_shuffle() {
         let inputs = vec![
-            ShuffleElGamalCiphertext { c1_hex: "c1_a".into(), c2_hex: "c2_a".into() },
-            ShuffleElGamalCiphertext { c1_hex: "c1_b".into(), c2_hex: "c2_b".into() },
-            ShuffleElGamalCiphertext { c1_hex: "c1_c".into(), c2_hex: "c2_c".into() },
+            ShuffleElGamalCiphertext {
+                c1_hex: "c1_a".into(),
+                c2_hex: "c2_a".into(),
+            },
+            ShuffleElGamalCiphertext {
+                c1_hex: "c1_b".into(),
+                c2_hex: "c2_b".into(),
+            },
+            ShuffleElGamalCiphertext {
+                c1_hex: "c1_c".into(),
+                c2_hex: "c2_c".into(),
+            },
         ];
 
         let perm = vec![2, 0, 1]; // Secret permutation
         let r_factors = vec![11, 22, 33];
 
-        let proof = FairLotteryShuffleEngine::shuffle_and_prove(&inputs, &perm, &r_factors).unwrap();
+        let proof =
+            FairLotteryShuffleEngine::shuffle_and_prove(&inputs, &perm, &r_factors).unwrap();
         assert_eq!(proof.shuffled_ciphertexts.len(), 3);
 
         let verified = FairLotteryShuffleEngine::verify_shuffle(&proof).unwrap();

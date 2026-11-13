@@ -61,7 +61,8 @@ impl EcvrfEngine {
         let c_hex = format!("c_{:x}", c_h);
 
         // Response s = (k + c * SK) mod q
-        let s_h = blake3::hash(format!("{}_{}_{}", k_nonce, c_hex, self.secret_key_scalar).as_bytes());
+        let s_h =
+            blake3::hash(format!("{}_{}_{}", k_nonce, c_hex, self.secret_key_scalar).as_bytes());
         let s_hex = format!("s_{:x}", s_h);
 
         // Output hash Y = Hash(Gamma)
@@ -95,7 +96,10 @@ impl EcvrfEngine {
         }
 
         // Verify output Y matches Hash(Gamma)
-        let expected_y = format!("{:x}", blake3::hash(output.proof.gamma_point_hex.as_bytes()));
+        let expected_y = format!(
+            "{:x}",
+            blake3::hash(output.proof.gamma_point_hex.as_bytes())
+        );
         if expected_y != output.pseudorandom_output_hash {
             return Err("VRF output does not match Gamma hash");
         }
@@ -124,7 +128,8 @@ mod tests {
         assert!(!output.pseudorandom_output_hash.is_empty());
         assert!(output.proof.gamma_point_hex.starts_with("Gamma_"));
 
-        let is_valid = EcvrfEngine::verify_proof(&vrf.public_key_point, input_alpha, &output).unwrap();
+        let is_valid =
+            EcvrfEngine::verify_proof(&vrf.public_key_point, input_alpha, &output).unwrap();
         assert!(is_valid);
     }
 }

@@ -84,9 +84,13 @@ impl Soc2ComplianceEngine {
         };
         controls.push(Soc2ControlEvaluation {
             control_id: "CC6.1".to_string(),
-            description: "Logical access is restricted via mTLS certificates and cryptographic tokens".to_string(),
+            description:
+                "Logical access is restricted via mTLS certificates and cryptographic tokens"
+                    .to_string(),
             status: cc6_1_status,
-            cryptographic_evidence_hash: hex::encode(&blake3::hash(b"evidence_cc6_1_mtls").as_bytes()[..16]),
+            cryptographic_evidence_hash: hex::encode(
+                &blake3::hash(b"evidence_cc6_1_mtls").as_bytes()[..16],
+            ),
             verified_at_epoch_secs: now,
         });
 
@@ -98,9 +102,13 @@ impl Soc2ComplianceEngine {
         };
         controls.push(Soc2ControlEvaluation {
             control_id: "CC6.6".to_string(),
-            description: "Boundaries protected by strict HTTP headers and Linux seccomp-BPF syscall filters".to_string(),
+            description:
+                "Boundaries protected by strict HTTP headers and Linux seccomp-BPF syscall filters"
+                    .to_string(),
             status: cc6_6_status,
-            cryptographic_evidence_hash: hex::encode(&blake3::hash(b"evidence_cc6_6_seccomp").as_bytes()[..16]),
+            cryptographic_evidence_hash: hex::encode(
+                &blake3::hash(b"evidence_cc6_6_seccomp").as_bytes()[..16],
+            ),
             verified_at_epoch_secs: now,
         });
 
@@ -112,9 +120,13 @@ impl Soc2ComplianceEngine {
         };
         controls.push(Soc2ControlEvaluation {
             control_id: "CC6.7".to_string(),
-            description: "Data transmissions protected by TLS 1.3 and NIST FIPS 203 post-quantum hybrid keys".to_string(),
+            description:
+                "Data transmissions protected by TLS 1.3 and NIST FIPS 203 post-quantum hybrid keys"
+                    .to_string(),
             status: cc6_7_status,
-            cryptographic_evidence_hash: hex::encode(&blake3::hash(b"evidence_cc6_7_pq_kem").as_bytes()[..16]),
+            cryptographic_evidence_hash: hex::encode(
+                &blake3::hash(b"evidence_cc6_7_pq_kem").as_bytes()[..16],
+            ),
             verified_at_epoch_secs: now,
         });
 
@@ -126,9 +138,13 @@ impl Soc2ComplianceEngine {
         };
         controls.push(Soc2ControlEvaluation {
             control_id: "CC7.1".to_string(),
-            description: "Confidential witness memory scrubbed using volatile multi-pass zeroization on drop".to_string(),
+            description:
+                "Confidential witness memory scrubbed using volatile multi-pass zeroization on drop"
+                    .to_string(),
             status: cc7_1_status,
-            cryptographic_evidence_hash: hex::encode(&blake3::hash(b"evidence_cc7_1_zeroize").as_bytes()[..16]),
+            cryptographic_evidence_hash: hex::encode(
+                &blake3::hash(b"evidence_cc7_1_zeroize").as_bytes()[..16],
+            ),
             verified_at_epoch_secs: now,
         });
 
@@ -140,9 +156,13 @@ impl Soc2ComplianceEngine {
         };
         controls.push(Soc2ControlEvaluation {
             control_id: "CC8.1".to_string(),
-            description: "Verification events sealed in an append-only Blake3 hash-chained Merkle ledger".to_string(),
+            description:
+                "Verification events sealed in an append-only Blake3 hash-chained Merkle ledger"
+                    .to_string(),
             status: cc8_1_status,
-            cryptographic_evidence_hash: hex::encode(&blake3::hash(b"evidence_cc8_1_audit_chain").as_bytes()[..16]),
+            cryptographic_evidence_hash: hex::encode(
+                &blake3::hash(b"evidence_cc8_1_audit_chain").as_bytes()[..16],
+            ),
             verified_at_epoch_secs: now,
         });
 

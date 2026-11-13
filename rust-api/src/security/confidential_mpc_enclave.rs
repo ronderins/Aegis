@@ -107,7 +107,8 @@ impl ConfidentialEnclaveEngine {
             signature_r: hex::encode(&sig_digest[0..16]),
             signature_s: hex::encode(&sig_digest[16..32]),
             certificate_chain_pem: vec![
-                "-----BEGIN CERTIFICATE-----\nMIIC...AMD_KDS_ROOT_CA\n-----END CERTIFICATE-----".to_string(),
+                "-----BEGIN CERTIFICATE-----\nMIIC...AMD_KDS_ROOT_CA\n-----END CERTIFICATE-----"
+                    .to_string(),
             ],
             timestamp_utc: chrono::Utc::now().to_rfc3339(),
         }
@@ -135,7 +136,9 @@ impl ConfidentialEnclaveEngine {
 
         if let Some(ref expected_mr) = policy.expected_mr_enclave {
             if !crate::crypto::constant_time_eq(&quote.measurement.mr_enclave, expected_mr) {
-                return Err("MRENCLAVE measurement hash mismatch: unauthorized code loaded".to_string());
+                return Err(
+                    "MRENCLAVE measurement hash mismatch: unauthorized code loaded".to_string(),
+                );
             }
         }
 
@@ -148,17 +151,17 @@ impl ConfidentialEnclaveEngine {
         // Verify report data binds to expected caller challenge/key
         let expected_report_hex = hex::encode(Sha256::digest(expected_report_data));
         if !crate::crypto::constant_time_eq(&quote.measurement.report_data, &expected_report_hex) {
-            return Err("Report data does not match verifier challenge (replay or man-in-the-middle)".to_string());
+            return Err(
+                "Report data does not match verifier challenge (replay or man-in-the-middle)"
+                    .to_string(),
+            );
         }
 
         Ok(true)
     }
 
     /// Seals sensitive data to the hardware enclave's measurement key using AES-GCM-256 emulation.
-    pub fn seal_data(
-        secret_plaintext: &[u8],
-        mr_enclave: &str,
-    ) -> SealedEnclavePayload {
+    pub fn seal_data(secret_plaintext: &[u8], mr_enclave: &str) -> SealedEnclavePayload {
         let mut key_hasher = Sha256::new();
         key_hasher.update(b"AEGIS_ENCLAVE_SEALING_KEY_V1");
         key_hasher.update(mr_enclave.as_bytes());
@@ -200,7 +203,9 @@ impl ConfidentialEnclaveEngine {
         current_mr_enclave: &str,
     ) -> Result<Vec<u8>, String> {
         if !crate::crypto::constant_time_eq(&sealed.sealing_mr_enclave, current_mr_enclave) {
-            return Err("Cannot unseal: current MRENCLAVE does not match sealing identity".to_string());
+            return Err(
+                "Cannot unseal: current MRENCLAVE does not match sealing identity".to_string(),
+            );
         }
 
         let mut key_hasher = Sha256::new();
@@ -224,7 +229,9 @@ impl ConfidentialEnclaveEngine {
             diff |= sealed.auth_tag[i] ^ expected_tag[i];
         }
         if diff != 0 {
-            return Err("Sealed payload auth tag verification failed (ciphertext tampering)".to_string());
+            return Err(
+                "Sealed payload auth tag verification failed (ciphertext tampering)".to_string(),
+            );
         }
 
         let mut plaintext = Vec::with_capacity(sealed.ciphertext.len());
@@ -265,8 +272,10 @@ mod tests {
 
         // Test sealing and unsealing
         let sensitive_key = b"master_hsm_aes_256_root_key_payload";
-        let sealed = ConfidentialEnclaveEngine::seal_data(sensitive_key, &quote.measurement.mr_enclave);
-        let unsealed = ConfidentialEnclaveEngine::unseal_data(&sealed, &quote.measurement.mr_enclave).unwrap();
+        let sealed =
+            ConfidentialEnclaveEngine::seal_data(sensitive_key, &quote.measurement.mr_enclave);
+        let unsealed =
+            ConfidentialEnclaveEngine::unseal_data(&sealed, &quote.measurement.mr_enclave).unwrap();
 
         assert_eq!(unsealed, sensitive_key);
 

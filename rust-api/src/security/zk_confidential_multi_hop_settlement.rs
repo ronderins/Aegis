@@ -107,13 +107,8 @@ mod tests {
     #[test]
     fn test_multi_hop_htlc_settlement() {
         let preimage = b"Secret Preimage Alpha #99214";
-        let (lock, hash) = MultiHopSettlementEngine::create_htlc_lock(
-            preimage,
-            5000,
-            1000,
-            "0xAlice",
-            "0xDavid",
-        );
+        let (lock, hash) =
+            MultiHopSettlementEngine::create_htlc_lock(preimage, 5000, 1000, "0xAlice", "0xDavid");
         assert_eq!(lock.payment_hash_h, hash);
 
         let hops = vec![
@@ -140,7 +135,9 @@ mod tests {
             },
         ];
 
-        let receipt = MultiHopSettlementEngine::execute_atomic_settlement(&lock, preimage, 500, &hops).unwrap();
+        let receipt =
+            MultiHopSettlementEngine::execute_atomic_settlement(&lock, preimage, 500, &hops)
+                .unwrap();
         assert!(receipt.is_settled);
         assert_eq!(receipt.total_hops, 3);
     }

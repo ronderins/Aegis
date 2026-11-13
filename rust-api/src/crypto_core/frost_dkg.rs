@@ -85,7 +85,11 @@ pub struct FrostCoordinator {
 
 impl FrostCoordinator {
     /// Initializes coordinator for a $t$-of-$n$ threshold federation.
-    pub fn new(threshold: u32, total_participants: u32, local_id: u32) -> Result<Self, &'static str> {
+    pub fn new(
+        threshold: u32,
+        total_participants: u32,
+        local_id: u32,
+    ) -> Result<Self, &'static str> {
         if threshold == 0 || threshold > total_participants {
             return Err("Invalid threshold: must satisfy 1 <= t <= n");
         }
@@ -220,15 +224,36 @@ mod tests {
         assert!(coordinator.verify_vss_share(&share, &commitment));
 
         let nonces = vec![
-            SigningNonceCommitment { participant_id: 1, hiding_nonce_commitment: [1; 32], binding_nonce_commitment: [2; 32] },
-            SigningNonceCommitment { participant_id: 2, hiding_nonce_commitment: [3; 32], binding_nonce_commitment: [4; 32] },
-            SigningNonceCommitment { participant_id: 3, hiding_nonce_commitment: [5; 32], binding_nonce_commitment: [6; 32] },
+            SigningNonceCommitment {
+                participant_id: 1,
+                hiding_nonce_commitment: [1; 32],
+                binding_nonce_commitment: [2; 32],
+            },
+            SigningNonceCommitment {
+                participant_id: 2,
+                hiding_nonce_commitment: [3; 32],
+                binding_nonce_commitment: [4; 32],
+            },
+            SigningNonceCommitment {
+                participant_id: 3,
+                hiding_nonce_commitment: [5; 32],
+                binding_nonce_commitment: [6; 32],
+            },
         ];
 
         let shares = vec![
-            ThresholdSignatureShare { participant_id: 1, signature_response_z: [10; 32] },
-            ThresholdSignatureShare { participant_id: 2, signature_response_z: [20; 32] },
-            ThresholdSignatureShare { participant_id: 3, signature_response_z: [30; 32] },
+            ThresholdSignatureShare {
+                participant_id: 1,
+                signature_response_z: [10; 32],
+            },
+            ThresholdSignatureShare {
+                participant_id: 2,
+                signature_response_z: [20; 32],
+            },
+            ThresholdSignatureShare {
+                participant_id: 3,
+                signature_response_z: [30; 32],
+            },
         ];
 
         let msg = b"revoke_stolen_credential_root_0x99a";

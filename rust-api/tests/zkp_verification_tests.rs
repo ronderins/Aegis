@@ -1,8 +1,12 @@
 // Comprehensive Cryptographic and Circuit Verification Test Suite
 
 use zk_identity_microservice::circuits::age_circuit::{AgeVerificationCircuit, AgeWitness};
-use zk_identity_microservice::circuits::merkle_membership::{MerkleMembershipCircuit, MerkleMembershipWitness, MerklePathStep};
-use zk_identity_microservice::circuits::sanctions_non_membership::{NonMembershipWitness, SanctionsNonMembershipCircuit};
+use zk_identity_microservice::circuits::merkle_membership::{
+    MerkleMembershipCircuit, MerkleMembershipWitness, MerklePathStep,
+};
+use zk_identity_microservice::circuits::sanctions_non_membership::{
+    NonMembershipWitness, SanctionsNonMembershipCircuit,
+};
 use zk_identity_microservice::merkle::blake3_chain::Blake3MerkleTree;
 use zk_identity_microservice::merkle::sparse_tree::SparseMerkleTree;
 use zk_identity_microservice::security::audit_logger::CryptographicAuditLogger;
@@ -11,10 +15,14 @@ use zk_identity_microservice::security::entropy::EntropyEvaluator;
 use zk_identity_microservice::security::key_management::{KeyDerivation, KeyPair, SecretKey256};
 use zk_identity_microservice::security::rate_limiter::{RateLimitPolicy, RateLimiter};
 use zk_identity_microservice::zkp::bn254::{Fp, U256};
-use zk_identity_microservice::zkp::pedersen::{BlindingFactor, PedersenCommitment, PedersenGenerators};
+use zk_identity_microservice::zkp::pedersen::{
+    BlindingFactor, PedersenCommitment, PedersenGenerators,
+};
 use zk_identity_microservice::zkp::poseidon::{poseidon_hash_2, poseidon_hash_bytes};
 use zk_identity_microservice::zkp::r1cs::ConstraintSystem;
-use zk_identity_microservice::zkp::schnorr::{prove_knowledge, verify_knowledge, SchnorrPublicKey, SchnorrSecret};
+use zk_identity_microservice::zkp::schnorr::{
+    prove_knowledge, verify_knowledge, SchnorrPublicKey, SchnorrSecret,
+};
 
 #[test]
 fn test_bn254_field_addition_and_subtraction() {
@@ -50,8 +58,12 @@ fn test_r1cs_age_circuit_synthesis_and_verification() {
         user_salt: [0x5au8; 32],
     };
 
-    let table = circuit.generate_witness(&cs, &valid_witness).expect("Valid witness generation");
-    assert!(cs.is_satisfied(&table.values).expect("Constraint satisfaction check"));
+    let table = circuit
+        .generate_witness(&cs, &valid_witness)
+        .expect("Valid witness generation");
+    assert!(cs
+        .is_satisfied(&table.values)
+        .expect("Constraint satisfaction check"));
 
     let underage_witness = AgeWitness {
         birth_year: 2015,

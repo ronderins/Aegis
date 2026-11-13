@@ -34,14 +34,49 @@ pub struct IdentityDte;
 
 impl IdentityDte {
     const SAMPLE_FIRST_NAMES: &'static [&'static str] = &[
-        "James", "Mary", "Robert", "Patricia", "John", "Jennifer", "Michael", "Linda",
-        "David", "Elizabeth", "William", "Barbara", "Richard", "Susan", "Joseph", "Jessica",
-        "Thomas", "Sarah", "Charles", "Karen", "Christopher", "Nancy", "Daniel", "Lisa",
+        "James",
+        "Mary",
+        "Robert",
+        "Patricia",
+        "John",
+        "Jennifer",
+        "Michael",
+        "Linda",
+        "David",
+        "Elizabeth",
+        "William",
+        "Barbara",
+        "Richard",
+        "Susan",
+        "Joseph",
+        "Jessica",
+        "Thomas",
+        "Sarah",
+        "Charles",
+        "Karen",
+        "Christopher",
+        "Nancy",
+        "Daniel",
+        "Lisa",
     ];
 
     const SAMPLE_LAST_NAMES: &'static [&'static str] = &[
-        "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
-        "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas",
+        "Smith",
+        "Johnson",
+        "Williams",
+        "Brown",
+        "Jones",
+        "Garcia",
+        "Miller",
+        "Davis",
+        "Rodriguez",
+        "Martinez",
+        "Hernandez",
+        "Lopez",
+        "Gonzalez",
+        "Wilson",
+        "Anderson",
+        "Thomas",
     ];
 
     const SAMPLE_COUNTRIES: &'static [&'static str] = &[
@@ -115,7 +150,8 @@ impl HoneyEncryptionVault {
         let encoded_val = IdentityDte::encode(record);
 
         // Derive key stream using PBKDF2 / Blake3 key expansion
-        let mut key_hasher = blake3::Hasher::new_derive_key("AEGIS_HONEY_ENCRYPTION_KEY_DERIVATION_V1");
+        let mut key_hasher =
+            blake3::Hasher::new_derive_key("AEGIS_HONEY_ENCRYPTION_KEY_DERIVATION_V1");
         key_hasher.update(passphrase.as_bytes());
         key_hasher.update(salt);
         let key_bytes: [u8; 32] = *key_hasher.finalize().as_bytes();
@@ -139,7 +175,8 @@ impl HoneyEncryptionVault {
     ) -> Result<VaultIdentityRecord, String> {
         let salt = hex::decode(&ciphertext.salt).map_err(|e| format!("Invalid salt hex: {}", e))?;
 
-        let mut key_hasher = blake3::Hasher::new_derive_key("AEGIS_HONEY_ENCRYPTION_KEY_DERIVATION_V1");
+        let mut key_hasher =
+            blake3::Hasher::new_derive_key("AEGIS_HONEY_ENCRYPTION_KEY_DERIVATION_V1");
         key_hasher.update(attempted_passphrase.as_bytes());
         key_hasher.update(&salt);
         let key_bytes: [u8; 32] = *key_hasher.finalize().as_bytes();
@@ -182,10 +219,14 @@ mod tests {
         let vault = HoneyEncryptionVault::encrypt_identity(correct_pass, &real_identity, salt);
 
         // 1. Decrypt with correct password
-        let decrypted_correct = HoneyEncryptionVault::decrypt_identity(correct_pass, &vault).unwrap();
+        let decrypted_correct =
+            HoneyEncryptionVault::decrypt_identity(correct_pass, &vault).unwrap();
         assert_eq!(decrypted_correct.first_name, real_identity.first_name);
         assert_eq!(decrypted_correct.last_name, real_identity.last_name);
-        assert_eq!(decrypted_correct.residency_country, real_identity.residency_country);
+        assert_eq!(
+            decrypted_correct.residency_country,
+            real_identity.residency_country
+        );
 
         // 2. Decrypt with WRONG password: must return a PLAUSIBLE DECOY identity!
         let wrong_pass = "wrong-password-guess-12345";

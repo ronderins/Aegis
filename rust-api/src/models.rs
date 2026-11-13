@@ -198,7 +198,8 @@ pub struct RlnVerifyResponse {
     pub is_slashed: bool,
     pub epoch: u64,
     pub nullifier_hash: String,
-    pub slashing_evidence: Option<crate::security::zk_rate_limiter_anonymous::SlashedIdentityEvidence>,
+    pub slashing_evidence:
+        Option<crate::security::zk_rate_limiter_anonymous::SlashedIdentityEvidence>,
     pub message: String,
     pub timestamp: String,
 }
@@ -320,4 +321,3 @@ pub struct SecurityOverviewResponse {
     pub mmr_audit_tree_size: usize,
     pub timestamp: String,
 }
-

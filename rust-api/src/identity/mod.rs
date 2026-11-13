@@ -16,4 +16,4 @@ pub use anon_creds::{AnonCredentialPresentation, AnonCredentialSignature, AnonCr
 pub use did::{DidDocument, DidResolver, VerificationMethod};
 pub use nullifier_tree::{NullifierHash, NullifierNonMembershipProof, NullifierTree};
 pub use revocation::RevocationAccumulator;
-pub use w3c_vc::{SdJwtToken, W3cProofBlock, W3cVerifiableCredential, W3cVcEngine};
+pub use w3c_vc::{SdJwtToken, W3cProofBlock, W3cVcEngine, W3cVerifiableCredential};

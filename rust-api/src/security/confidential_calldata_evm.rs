@@ -9,9 +9,9 @@ use serde::{Deserialize, Serialize};
 /// Formatted EVM Calldata for a Groth16 Proof (a: G1, b: G2, c: G1, public_inputs: Vec<Fr>)
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Groth16EvmCalldata {
-    pub a: [String; 2],       // G1 point (X, Y)
-    pub b: [[String; 2]; 2],   // G2 point [[X0, X1], [Y0, Y1]]
-    pub c: [String; 2],       // G1 point (X, Y)
+    pub a: [String; 2],      // G1 point (X, Y)
+    pub b: [[String; 2]; 2], // G2 point [[X0, X1], [Y0, Y1]]
+    pub c: [String; 2],      // G1 point (X, Y)
     pub public_signals: Vec<String>,
     pub abi_packed_hex: String,
 }
@@ -97,12 +97,7 @@ mod tests {
     #[test]
     fn test_evm_calldata_groth16_encoding() {
         let inputs = [18, 1, 998877]; // Age >= 18, valid KYC, commitment
-        let calldata = EvmCalldataEncoder::encode_groth16(
-            11, 22,
-            33, 44, 55, 66,
-            77, 88,
-            &inputs,
-        );
+        let calldata = EvmCalldataEncoder::encode_groth16(11, 22, 33, 44, 55, 66, 77, 88, &inputs);
 
         assert_eq!(calldata.public_signals.len(), 3);
         assert!(calldata.abi_packed_hex.starts_with("0x"));

@@ -73,7 +73,16 @@ impl GraphSanitizationEngine {
         let spectral_gap = (edges.len() as f64) / (total_nodes as f64 + 1.0);
         let spectral_valid = spectral_gap >= self.policy.laplacian_spectral_bound;
 
-        let proof_h = blake3::hash(format!("{}_{}_{}_{}", graph_id, min_degree, edges.len(), spectral_gap).as_bytes());
+        let proof_h = blake3::hash(
+            format!(
+                "{}_{}_{}_{}",
+                graph_id,
+                min_degree,
+                edges.len(),
+                spectral_gap
+            )
+            .as_bytes(),
+        );
 
         Ok(GraphSanitizationReceipt {
             graph_id: graph_id.to_string(),
@@ -103,12 +112,26 @@ mod tests {
 
         // Triangular graph (each node has degree 2)
         let edges = vec![
-            SanitizedGraphEdge { source_masked: "A".into(), target_masked: "B".into(), noisy_weight: 10 },
-            SanitizedGraphEdge { source_masked: "B".into(), target_masked: "C".into(), noisy_weight: 10 },
-            SanitizedGraphEdge { source_masked: "C".into(), target_masked: "A".into(), noisy_weight: 10 },
+            SanitizedGraphEdge {
+                source_masked: "A".into(),
+                target_masked: "B".into(),
+                noisy_weight: 10,
+            },
+            SanitizedGraphEdge {
+                source_masked: "B".into(),
+                target_masked: "C".into(),
+                noisy_weight: 10,
+            },
+            SanitizedGraphEdge {
+                source_masked: "C".into(),
+                target_masked: "A".into(),
+                noisy_weight: 10,
+            },
         ];
 
-        let receipt = engine.evaluate_and_certify("graph_kyc_network_001", &edges, 3).unwrap();
+        let receipt = engine
+            .evaluate_and_certify("graph_kyc_network_001", &edges, 3)
+            .unwrap();
         assert_eq!(receipt.evaluated_k_anonymity, 2);
         assert!(receipt.spectral_gap_valid);
     }

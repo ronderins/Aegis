@@ -26,7 +26,8 @@ pub struct CryptographicAuditLogger {
 }
 
 impl CryptographicAuditLogger {
-    pub const GENESIS_HASH: &'static str = "0000000000000000000000000000000000000000000000000000000000000000";
+    pub const GENESIS_HASH: &'static str =
+        "0000000000000000000000000000000000000000000000000000000000000000";
 
     pub fn new(hmac_key: SecretKey256) -> Self {
         Self {
@@ -38,8 +39,14 @@ impl CryptographicAuditLogger {
 
     /// Logs and cryptographically signs a new security event
     pub fn record_event(&self, event_type: &str, payload: &[u8]) -> SignedAuditEntry {
-        let mut seq_guard = self.current_sequence.lock().unwrap_or_else(|e| e.into_inner());
-        let mut last_hash_guard = self.last_entry_hash.lock().unwrap_or_else(|e| e.into_inner());
+        let mut seq_guard = self
+            .current_sequence
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
+        let mut last_hash_guard = self
+            .last_entry_hash
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
 
         *seq_guard += 1;
         let seq = *seq_guard;

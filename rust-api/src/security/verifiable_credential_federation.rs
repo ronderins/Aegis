@@ -93,7 +93,9 @@ impl CredentialFederationEngine {
         target: &str,
         cred_digest: &str,
     ) -> Result<FederatedBridgeProof, &'static str> {
-        if !self.registered_anchors.contains_key(source) || !self.registered_anchors.contains_key(target) {
+        if !self.registered_anchors.contains_key(source)
+            || !self.registered_anchors.contains_key(target)
+        {
             return Err("Unregistered trust domains");
         }
 
@@ -119,7 +121,11 @@ mod tests {
         let cred_digest = "0x98127398127398127391823";
 
         let proof = engine
-            .issue_bridge_proof("eu.eidas.trust.registry", "us.gov.nist80063.registry", cred_digest)
+            .issue_bridge_proof(
+                "eu.eidas.trust.registry",
+                "us.gov.nist80063.registry",
+                cred_digest,
+            )
             .unwrap();
 
         assert!(engine.verify_federated_credential(&proof).unwrap());

@@ -6,8 +6,8 @@
 //! 3. HyperPlonk Multilinear Zero-Knowledge Constraint Verification
 //! 4. Full Cryptographic Pipeline End-to-End Regression Protection
 
-use zk_identity_api_rust::security::zk_confidential_ot_extension::*;
 use zk_identity_api_rust::security::hardware_tee_keystore::*;
+use zk_identity_api_rust::security::zk_confidential_ot_extension::*;
 use zk_identity_api_rust::security::zk_plonk_hyperplonk_prover::*;
 
 #[test]
@@ -21,16 +21,12 @@ fn test_tier8_ot_extension_batch() {
     }
 
     let engine = OtExtensionEngine::new(5, vec![false; OT_EXTENSION_KAPPA]);
-    let target_pairs = [
-        (100, 200),
-        (300, 400),
-        (500, 600),
-        (700, 800),
-        (900, 1000),
-    ];
+    let target_pairs = [(100, 200), (300, 400), (500, 600), (700, 800), (900, 1000)];
     let choices = [true, false, true, true, false];
 
-    let batch = engine.expand_transfers(&base_keys, &target_pairs, &choices).unwrap();
+    let batch = engine
+        .expand_transfers(&base_keys, &target_pairs, &choices)
+        .unwrap();
     assert_eq!(batch.batch_size, 5);
     assert!(OtExtensionEngine::verify_batch(&batch).unwrap());
 }
@@ -38,7 +34,9 @@ fn test_tier8_ot_extension_batch() {
 #[test]
 fn test_tier8_tee_keystore_multi_enclave() {
     let mut amdsnp = HardwareTeeKeystore::new(HardwareTeeType::AmdSevSnp);
-    let slot = amdsnp.allocate_key_slot(10, "identity_key_sec", &[0x77; 32]).unwrap();
+    let slot = amdsnp
+        .allocate_key_slot(10, "identity_key_sec", &[0x77; 32])
+        .unwrap();
     assert_eq!(slot.slot_index, 10);
 
     let quote = amdsnp.generate_attestation_quote("session_challenge_44");
