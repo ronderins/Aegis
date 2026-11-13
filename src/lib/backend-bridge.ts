@@ -3,8 +3,7 @@
  * Checks for RUST_API_URL or defaults to local embedded cryptographic engine.
  */
 
-export const RUST_API_BASE =
-  process.env.RUST_API_URL?.trim() || "http://127.0.0.1:8080";
+export const RUST_API_BASE = process.env.RUST_API_URL?.trim() || "";
 
 export async function proxyToRust(
   path: string,
@@ -14,6 +13,10 @@ export async function proxyToRust(
     body?: unknown;
   }
 ): Promise<{ success: boolean; data?: any; status: number; headers?: Headers }> {
+  if (!RUST_API_BASE) {
+    return { success: false, status: 503 };
+  }
+
   try {
     const targetUrl = `${RUST_API_BASE}${path}`;
     const controller = new AbortController();
