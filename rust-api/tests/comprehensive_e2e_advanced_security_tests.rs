@@ -123,7 +123,11 @@ fn test_tier4_w3c_sd_jwt_decoy_protection() {
     let credential =
         SdJwtEngine::issue_credential("https://issuer.aegis", "user_9918", claims, 3600, 5, signing_key)
             .unwrap();
-    assert!(credential.decoy_digests.len() >= 5);
+    assert!(
+        credential.decoy_digests.len() >= 5,
+        "expected at least 5 decoy digests, got {}",
+        credential.decoy_digests.len()
+    );
 
     let presentation =
         SdJwtEngine::create_presentation(&credential, &["age_over_18"], "nonce-1").unwrap();
