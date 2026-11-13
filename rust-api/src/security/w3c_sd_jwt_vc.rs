@@ -105,9 +105,10 @@ impl SdJwtEngine {
             disclosures.push(disclosure);
         }
 
-        // Generate decoys to resist frequency analysis
-        let mut decoy_digests = Vec::with_capacity(decoy_count);
-        for d in 0..decoy_count {
+        // Generate decoys to resist frequency analysis (minimum 5 decoys enforced)
+        let effective_decoy_count = decoy_count.max(5);
+        let mut decoy_digests = Vec::with_capacity(effective_decoy_count);
+        for d in 0..effective_decoy_count {
             let mut decoy_hasher = Sha256::new();
             decoy_hasher.update(b"AEGIS_SD_JWT_DECOY_DIGEST");
             decoy_hasher.update(&d.to_be_bytes());
