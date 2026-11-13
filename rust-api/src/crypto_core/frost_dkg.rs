@@ -21,11 +21,32 @@ pub struct ParticipantIdentifier {
     pub public_verification_key: [u8; 32],
 }
 
+mod serde_u8_64 {
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+
+    pub fn serialize<S>(data: &[u8; 64], serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        data.as_slice().serialize(serializer)
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<[u8; 64], D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let vec = Vec::<u8>::deserialize(deserializer)?;
+        vec.try_into()
+            .map_err(|v: Vec<u8>| serde::de::Error::invalid_length(v.len(), &"64 bytes"))
+    }
+}
+
 /// Round 1: Feldman Verifiable Secret Sharing (VSS) Commitment
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DkgRound1Commitment {
     pub sender_id: u32,
     pub commitment_coefficients: Vec<[u8; 32]>,
+    #[serde(with = "serde_u8_64")]
     pub proof_of_knowledge: [u8; 64],
 }
 

@@ -136,9 +136,30 @@ impl ThresholdScalar {
     }
 }
 
+mod serde_u8_33 {
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+
+    pub fn serialize<S>(data: &[u8; 33], serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        data.as_slice().serialize(serializer)
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<[u8; 33], D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let vec = Vec::<u8>::deserialize(deserializer)?;
+        vec.try_into()
+            .map_err(|v: Vec<u8>| serde::de::Error::invalid_length(v.len(), &"33 bytes"))
+    }
+}
+
 /// A simulated Elliptic Curve point in compressed 33-byte format.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CurvePoint {
+    #[serde(with = "serde_u8_33")]
     pub compressed: [u8; 33],
 }
 

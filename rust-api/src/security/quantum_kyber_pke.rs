@@ -24,6 +24,33 @@ pub struct RingPolynomial {
     pub coeffs: [i16; KYBER_N],
 }
 
+impl Serialize for RingPolynomial {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        self.coeffs.as_slice().serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for RingPolynomial {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let vec = Vec::<i16>::deserialize(deserializer)?;
+        if vec.len() != KYBER_N {
+            return Err(serde::de::Error::invalid_length(
+                vec.len(),
+                &"256 coefficients",
+            ));
+        }
+        let mut coeffs = [0i16; KYBER_N];
+        coeffs.copy_from_slice(&vec);
+        Ok(Self { coeffs })
+    }
+}
+
 impl Default for RingPolynomial {
     fn default() -> Self {
         Self {

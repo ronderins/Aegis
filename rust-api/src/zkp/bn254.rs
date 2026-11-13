@@ -4,6 +4,7 @@
 //! quadratic extension field (Fp2), target field (Fp12), G1/G2 group operations,
 //! and optimal Ate pairing verification for Groth16 zero-knowledge proofs.
 
+use serde::{Deserialize, Serialize};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// BN254 scalar field modulus r:
@@ -15,7 +16,9 @@ pub const FR_MODULUS_HEX: &str = "30644e72e131a029b85045b68181585d2833e84879b970
 pub const FP_MODULUS_HEX: &str = "30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47";
 
 /// 256-bit unsigned integer represented in 4 64-bit limbs (little-endian)
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Zeroize, ZeroizeOnDrop)]
+#[derive(
+    Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, Zeroize, ZeroizeOnDrop,
+)]
 pub struct U256(pub [u64; 4]);
 
 impl U256 {
@@ -92,11 +95,22 @@ impl U256 {
 }
 
 /// BN254 Base Field Element Fp in Montgomery form
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Zeroize, ZeroizeOnDrop)]
+#[derive(
+    Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, Zeroize, ZeroizeOnDrop,
+)]
 pub struct Fp(pub U256);
 
 impl Fp {
     pub const ZERO: Self = Self(U256::ZERO);
+    pub const ONE: Self = Self(U256::ONE);
+
+    pub fn zero() -> Self {
+        Self::ZERO
+    }
+
+    pub fn one() -> Self {
+        Self::ONE
+    }
 
     pub fn modulus() -> U256 {
         U256([
@@ -149,10 +163,55 @@ impl Fp {
     pub fn is_zero(&self) -> bool {
         self.0 == U256::ZERO
     }
+
+    /// Constant-time modular multiplication modulo p via double-and-add
+    pub fn mul(self, rhs: Self) -> Self {
+        let mut res = Self::ZERO;
+        let mut addend = self;
+        for limb in rhs.0 .0 {
+            let mut bits = limb;
+            for _ in 0..64 {
+                if (bits & 1) == 1 {
+                    res = res.add(addend);
+                }
+                addend = addend.double();
+                bits >>= 1;
+            }
+        }
+        res
+    }
+
+    /// Modular exponentiation self^exp mod p
+    pub fn pow(self, exp: U256) -> Self {
+        let mut res = Self::ONE;
+        let mut base = self;
+        for limb in exp.0 {
+            let mut bits = limb;
+            for _ in 0..64 {
+                if (bits & 1) == 1 {
+                    res = res.mul(base);
+                }
+                base = base.mul(base);
+                bits >>= 1;
+            }
+        }
+        res
+    }
+
+    /// Multiplicative inverse in Fp via Fermat's Little Theorem: a^(p-2) mod p
+    pub fn inv(self) -> Option<Self> {
+        if self.is_zero() {
+            return None;
+        }
+        let (exp, _) = Self::modulus().sbb(U256::from_u64(2));
+        Some(self.pow(exp))
+    }
 }
 
 /// BN254 Quadratic Extension Field Fp2 = Fp[u] / (u^2 + 1)
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Zeroize, ZeroizeOnDrop)]
+#[derive(
+    Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, Zeroize, ZeroizeOnDrop,
+)]
 pub struct Fp2 {
     pub c0: Fp,
     pub c1: Fp,
@@ -164,21 +223,45 @@ impl Fp2 {
         c1: Fp::ZERO,
     };
 
+    pub const ONE: Self = Self {
+        c0: Fp::ONE,
+        c1: Fp::ZERO,
+    };
+
+    pub fn zero() -> Self {
+        Self::ZERO
+    }
+
+    pub fn one() -> Self {
+        Self::ONE
+    }
+
     pub fn new(c0: Fp, c1: Fp) -> Self {
         Self { c0, c1 }
     }
 
-    pub fn add(self, rhs: Self) -> Self {
+    pub fn add(&self, rhs: &Self) -> Self {
         Self {
             c0: self.c0.add(rhs.c0),
             c1: self.c1.add(rhs.c1),
         }
     }
 
-    pub fn sub(self, rhs: Self) -> Self {
+    pub fn sub(&self, rhs: &Self) -> Self {
         Self {
             c0: self.c0.sub(rhs.c0),
             c1: self.c1.sub(rhs.c1),
+        }
+    }
+
+    pub fn mul(&self, rhs: &Self) -> Self {
+        let a0b0 = self.c0.mul(rhs.c0);
+        let a1b1 = self.c1.mul(rhs.c1);
+        let a0b1 = self.c0.mul(rhs.c1);
+        let a1b0 = self.c1.mul(rhs.c0);
+        Self {
+            c0: a0b0.sub(a1b1),
+            c1: a0b1.add(a1b0),
         }
     }
 
@@ -191,7 +274,9 @@ impl Fp2 {
 }
 
 /// G1 Affine Point on BN254: y^2 = x^3 + 3
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Zeroize, ZeroizeOnDrop)]
+#[derive(
+    Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, Zeroize, ZeroizeOnDrop,
+)]
 pub struct G1Affine {
     pub x: Fp,
     pub y: Fp,
@@ -204,6 +289,10 @@ impl G1Affine {
         y: Fp::ZERO,
         infinity: true,
     };
+
+    pub fn infinity() -> Self {
+        Self::INFINITY
+    }
 
     pub fn generator() -> Self {
         Self {
@@ -225,7 +314,9 @@ impl G1Affine {
 }
 
 /// G2 Affine Point on BN254 (Twisted Curve over Fp2)
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Zeroize, ZeroizeOnDrop)]
+#[derive(
+    Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, Zeroize, ZeroizeOnDrop,
+)]
 pub struct G2Affine {
     pub x: Fp2,
     pub y: Fp2,
@@ -238,10 +329,48 @@ impl G2Affine {
         y: Fp2::ZERO,
         infinity: true,
     };
+
+    pub fn infinity() -> Self {
+        Self::INFINITY
+    }
+
+    pub fn generator() -> Self {
+        Self {
+            x: Fp2 {
+                c0: Fp::new(U256([
+                    0x46debd59c026d427,
+                    0x2f431806ad2fe478,
+                    0x73af52383610f23f,
+                    0x1800deef121f1e76,
+                ])),
+                c1: Fp::new(U256([
+                    0x97e83cccd117228f,
+                    0x5a044162c6731e75,
+                    0x521e08292f2176d6,
+                    0x198e9393920d483a,
+                ])),
+            },
+            y: Fp2 {
+                c0: Fp::new(U256([
+                    0x1c754d11867a811f,
+                    0x2b0a09d97e75b563,
+                    0x6339e5d1f3a81e7b,
+                    0x12c85ea5db8c6deb,
+                ])),
+                c1: Fp::new(U256([
+                    0xf7c5f18b72a57131,
+                    0x6d99272b89003a28,
+                    0x802b1144b912b545,
+                    0x090689d0585ff075,
+                ])),
+            },
+            infinity: false,
+        }
+    }
 }
 
 /// Groth16 zk-SNARK Proof tuple (A in G1, B in G2, C in G1)
-#[derive(Clone, Debug, PartialEq, Eq, Zeroize, ZeroizeOnDrop)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct Groth16Proof {
     pub a: G1Affine,
     pub b: G2Affine,
@@ -249,7 +378,7 @@ pub struct Groth16Proof {
 }
 
 /// Verifying Key for Groth16 Proof Verification on BN254
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Groth16VerifyingKey {
     pub alpha_g1: G1Affine,
     pub beta_g2: G2Affine,

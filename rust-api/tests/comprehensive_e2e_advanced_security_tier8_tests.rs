@@ -6,9 +6,9 @@
 //! 3. HyperPlonk Multilinear Zero-Knowledge Constraint Verification
 //! 4. Full Cryptographic Pipeline End-to-End Regression Protection
 
-use zk_identity_api_rust::security::hardware_tee_keystore::*;
-use zk_identity_api_rust::security::zk_confidential_ot_extension::*;
-use zk_identity_api_rust::security::zk_plonk_hyperplonk_prover::*;
+use zk_identity_microservice::security::hardware_tee_keystore::*;
+use zk_identity_microservice::security::zk_confidential_ot_extension::*;
+use zk_identity_microservice::security::zk_plonk_hyperplonk_prover::*;
 
 #[test]
 fn test_tier8_ot_extension_batch() {

@@ -110,9 +110,30 @@ pub struct FalconSecretKey {
     pub g: FalconPolynomial,
 }
 
+mod serde_u8_40 {
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+
+    pub fn serialize<S>(data: &[u8; 40], serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        data.as_slice().serialize(serializer)
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<[u8; 40], D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let vec = Vec::<u8>::deserialize(deserializer)?;
+        vec.try_into()
+            .map_err(|v: Vec<u8>| serde::de::Error::invalid_length(v.len(), &"40 bytes"))
+    }
+}
+
 /// Falcon Post-Quantum Signature: (r, s2) where r is 40-byte salt and s2 is small polynomial
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FalconSignature {
+    #[serde(with = "serde_u8_40")]
     pub nonce_salt: [u8; 40],
     pub s2: FalconPolynomial,
 }

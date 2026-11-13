@@ -40,7 +40,7 @@ impl MerkleInclusionGadget {
             let mut c = LinearCombination::zero();
             c.add(parent_hash, Fp::from_u64(1));
 
-            cs.enforce(a, b, c);
+            cs.enforce(a, b, c, Some("merkle_level_hash"));
             current_hash = parent_hash;
         }
 
@@ -52,6 +52,6 @@ impl MerkleInclusionGadget {
         let mut c = LinearCombination::zero();
         c.add(expected_root, Fp::from_u64(1));
 
-        cs.enforce(a, b, c);
+        cs.enforce(a, b, c, Some("merkle_root_match"));
     }
 }

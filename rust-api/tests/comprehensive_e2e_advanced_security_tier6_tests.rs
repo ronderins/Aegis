@@ -8,12 +8,12 @@
 //! 5. Multiset Hash Accumulators & Order-Independent Equality
 //! 6. TCG DICE Hardware Identity Certificate Chains
 
-use zk_identity_api_rust::security::blake3_incremental_streaming_tree::*;
-use zk_identity_api_rust::security::dice_hardware_identity_pki::*;
-use zk_identity_api_rust::security::smt_circuit_solver_bridge::*;
-use zk_identity_api_rust::security::threshold_schnorr_blind_sig::*;
-use zk_identity_api_rust::security::zk_attribute_based_encryption::*;
-use zk_identity_api_rust::security::zk_multiset_hash_accumulator::*;
+use zk_identity_microservice::security::blake3_incremental_streaming_tree::*;
+use zk_identity_microservice::security::dice_hardware_identity_pki::*;
+use zk_identity_microservice::security::smt_circuit_solver_bridge::*;
+use zk_identity_microservice::security::threshold_schnorr_blind_sig::*;
+use zk_identity_microservice::security::zk_attribute_based_encryption::*;
+use zk_identity_microservice::security::zk_multiset_hash_accumulator::*;
 
 #[test]
 fn test_tier6_smt_circuit_verification() {

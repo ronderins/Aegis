@@ -8,9 +8,30 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
+mod serde_i32_128 {
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+
+    pub fn serialize<S>(data: &[i32; 128], serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        data.as_slice().serialize(serializer)
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<[i32; 128], D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let vec = Vec::<i32>::deserialize(deserializer)?;
+        vec.try_into()
+            .map_err(|v: Vec<i32>| serde::de::Error::invalid_length(v.len(), &"128 elements"))
+    }
+}
+
 /// Fixed 128-dimensional biometric embedding vector with automatic memory scrubbing.
 #[derive(Clone, Debug, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct BiometricEmbedding128 {
+    #[serde(with = "serde_i32_128")]
     pub values: [i32; 128], // Quantized fixed-point coordinates in [-1000, 1000]
 }
 

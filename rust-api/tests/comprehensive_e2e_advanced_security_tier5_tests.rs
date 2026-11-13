@@ -12,16 +12,16 @@
 //! 9. Single-Server Private Information Retrieval (PIR)
 //! 10. ZK Compliance Decision Tree & AML Risk Traversal
 
-use zk_identity_api_rust::security::differential_privacy_advanced::*;
-use zk_identity_api_rust::security::enclave_protected_channel::*;
-use zk_identity_api_rust::security::homomorphic_vector_commitments::*;
-use zk_identity_api_rust::security::musig2_schnorr_threshold::*;
-use zk_identity_api_rust::security::path_oram_memory_engine::*;
-use zk_identity_api_rust::security::plonkish_logup_multi_table::*;
-use zk_identity_api_rust::security::single_server_private_information_retrieval::*;
-use zk_identity_api_rust::security::threshold_key_recovery_engine::*;
-use zk_identity_api_rust::security::zk_compliance_decision_tree::*;
-use zk_identity_api_rust::security::zk_verifiable_shuffle_prover::*;
+use zk_identity_microservice::security::differential_privacy_advanced::*;
+use zk_identity_microservice::security::enclave_protected_channel::*;
+use zk_identity_microservice::security::homomorphic_vector_commitments::*;
+use zk_identity_microservice::security::musig2_schnorr_threshold::*;
+use zk_identity_microservice::security::path_oram_memory_engine::*;
+use zk_identity_microservice::security::plonkish_logup_multi_table::*;
+use zk_identity_microservice::security::single_server_private_information_retrieval::*;
+use zk_identity_microservice::security::threshold_key_recovery_engine::*;
+use zk_identity_microservice::security::zk_compliance_decision_tree::*;
+use zk_identity_microservice::security::zk_verifiable_shuffle_prover::*;
 
 #[test]
 fn test_tier5_verifiable_shuffle_argument() {

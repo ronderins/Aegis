@@ -33,6 +33,9 @@ pub struct EidasDisclosedClaim {
     pub issuer_signature_s: String,
 }
 
+/// Qualified Electronic Attestation of Attributes (QEAA) Credential alias
+pub type EidasQeaaCredential = EidasDisclosedClaim;
+
 pub struct EidasComplianceSuite;
 
 impl EidasComplianceSuite {

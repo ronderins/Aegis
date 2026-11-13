@@ -4,6 +4,23 @@
 //! and phase 2 (circuit-specific Groth16 CRS setup) using BLS12-381 / BN254 pairings transcripts.
 
 use serde::{Deserialize, Serialize};
+use zeroize::{Zeroize, ZeroizeOnDrop};
+
+#[derive(Clone, Debug, Zeroize, ZeroizeOnDrop)]
+pub struct ContributorSecret {
+    pub tau_share: [u8; 32],
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct MpcContribution {
+    pub contributor_id: String,
+    pub sequence_number: u32,
+    pub tau_g1_powers: Vec<String>,
+    pub tau_g2_powers: Vec<String>,
+    pub public_key_signature: String,
+    pub previous_hash: String,
+    pub contribution_hash: String,
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CeremonyContribution {
@@ -25,9 +42,52 @@ pub struct CeremonyTranscript {
     pub final_beacon_hash: String,
 }
 
-pub struct MpcCoordinator;
+pub struct MpcCoordinator {
+    pub max_constraints: usize,
+    pub current_sequence: u32,
+    pub last_hash: String,
+}
 
 impl MpcCoordinator {
+    pub const GENESIS_MPC_HASH: &'static str =
+        "0000000000000000000000000000000000000000000000000000000000000000";
+
+    pub fn new(max_constraints: usize) -> Self {
+        Self {
+            max_constraints,
+            current_sequence: 0,
+            last_hash: Self::GENESIS_MPC_HASH.to_string(),
+        }
+    }
+
+    /// Accepts and chains an MPC ceremony contribution
+    pub fn accept_contribution(&mut self, contrib: &MpcContribution) -> Result<(), &'static str> {
+        if contrib.sequence_number != self.current_sequence + 1 {
+            return Err("Invalid sequence number in MPC contribution");
+        }
+        if contrib.previous_hash != self.last_hash {
+            return Err("Contribution chain break: previous hash mismatch");
+        }
+
+        let mut hasher = blake3::Hasher::new();
+        hasher.update(b"zk-mpc-contribution-v1\0");
+        hasher.update(&contrib.sequence_number.to_le_bytes());
+        hasher.update(contrib.contributor_id.as_bytes());
+        hasher.update(contrib.previous_hash.as_bytes());
+        for g1 in &contrib.tau_g1_powers {
+            hasher.update(g1.as_bytes());
+        }
+        let computed = hasher.finalize().to_hex().to_string();
+
+        if computed != contrib.contribution_hash {
+            return Err("Invalid MPC contribution digest");
+        }
+
+        self.current_sequence = contrib.sequence_number;
+        self.last_hash = contrib.contribution_hash.clone();
+        Ok(())
+    }
+
     /// Validates an incoming contribution transcript sequentially
     pub fn verify_contribution(
         prev_hash: &str,

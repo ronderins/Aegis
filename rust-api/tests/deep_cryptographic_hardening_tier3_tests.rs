@@ -12,16 +12,16 @@
 //! 9. Homomorphic Vector Inner-Product Arguments (IPA) Logarithmic Verification
 //! 10. ZK Graph Sanitization & Differential Privacy Degree Distribution Bounds
 
-use zk_identity_api_rust::security::asynchronous_vss_dkg::*;
-use zk_identity_api_rust::security::enclave_key_sealing::*;
-use zk_identity_api_rust::security::encrypted_identity_graph::*;
-use zk_identity_api_rust::security::homomorphic_inner_product_argument::*;
-use zk_identity_api_rust::security::plonkish_custom_gate_matrix::*;
-use zk_identity_api_rust::security::psi_cardinality_paillier::*;
-use zk_identity_api_rust::security::sphincs_plus_fips205::*;
-use zk_identity_api_rust::security::verifiable_random_function_ecvrf::*;
-use zk_identity_api_rust::security::zk_fair_lottery_shuffle::*;
-use zk_identity_api_rust::security::zk_graph_sanitization::*;
+use zk_identity_microservice::security::asynchronous_vss_dkg::*;
+use zk_identity_microservice::security::enclave_key_sealing::*;
+use zk_identity_microservice::security::encrypted_identity_graph::*;
+use zk_identity_microservice::security::homomorphic_inner_product_argument::*;
+use zk_identity_microservice::security::plonkish_custom_gate_matrix::*;
+use zk_identity_microservice::security::psi_cardinality_paillier::*;
+use zk_identity_microservice::security::sphincs_plus_fips205::*;
+use zk_identity_microservice::security::verifiable_random_function_ecvrf::*;
+use zk_identity_microservice::security::zk_fair_lottery_shuffle::*;
+use zk_identity_microservice::security::zk_graph_sanitization::*;
 
 #[test]
 fn test_tier3_avss_bivariate_cross_verification() {

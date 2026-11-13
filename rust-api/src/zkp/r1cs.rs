@@ -3,6 +3,7 @@
 //! Provides the mathematical infrastructure for expressing Zero-Knowledge
 //! circuits in the standard form: (A * z) o (B * z) = (C * z)
 
+use crate::zkp::bn254::Fp;
 use std::collections::HashMap;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
@@ -12,6 +13,10 @@ pub struct Variable(pub usize);
 
 impl Variable {
     pub const ONE: Self = Self(0); // Constant 1 wire
+
+    pub fn one() -> Self {
+        Self::ONE
+    }
 }
 
 /// Linear combination of variables: sum(coeff_i * var_i)
@@ -40,6 +45,12 @@ impl LinearCombination {
     pub fn add_term(&mut self, var: Variable, coeff: u64) {
         if coeff != 0 {
             self.terms.push((var, coeff));
+        }
+    }
+
+    pub fn add(&mut self, var: Variable, coeff: Fp) {
+        if !coeff.is_zero() {
+            self.terms.push((var, coeff.0 .0[0]));
         }
     }
 
@@ -92,6 +103,11 @@ impl ConstraintSystem {
         }
         self.num_variables += 1;
         var
+    }
+
+    /// Allocates an anonymous private witness variable
+    pub fn alloc_private(&mut self) -> Variable {
+        self.alloc_variable(None)
     }
 
     /// Allocates a public instance variable

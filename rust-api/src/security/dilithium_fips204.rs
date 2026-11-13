@@ -20,9 +20,31 @@ pub const GAMMA_1: i32 = 131_072;
 /// Rejection sampling bound \gamma_2 = (q - 1) / 88 = 95_232
 pub const GAMMA_2: i32 = 95_232;
 
+mod serde_u32_256 {
+    use super::POLYNOMIAL_DEGREE;
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+
+    pub fn serialize<S>(data: &[u32; POLYNOMIAL_DEGREE], serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        data.as_slice().serialize(serializer)
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<[u32; POLYNOMIAL_DEGREE], D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let vec = Vec::<u32>::deserialize(deserializer)?;
+        vec.try_into()
+            .map_err(|v: Vec<u32>| serde::de::Error::invalid_length(v.len(), &"256 coefficients"))
+    }
+}
+
 /// Polynomial over ring R_q with 256 coefficients in [0, q-1]
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct DilithiumPoly {
+    #[serde(with = "serde_u32_256")]
     pub coeffs: [u32; POLYNOMIAL_DEGREE],
 }
 

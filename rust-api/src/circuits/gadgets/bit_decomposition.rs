@@ -19,7 +19,7 @@ impl BitDecompositionGadget {
         b.add(var, Fp::zero().sub(Fp::from_u64(1)));
 
         let c = LinearCombination::zero();
-        cs.enforce(a, b, c);
+        cs.enforce(a, b, c, Some("boolean_bit"));
     }
 
     /// Decomposes `val` into `num_bits` binary variables and enforces sum equality
@@ -47,7 +47,7 @@ impl BitDecompositionGadget {
         let mut c = LinearCombination::zero();
         c.add(val, Fp::from_u64(1));
 
-        cs.enforce(a, b, c);
+        cs.enforce(a, b, c, Some("bit_decomposition_sum"));
 
         bits
     }

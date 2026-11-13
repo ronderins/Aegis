@@ -25,7 +25,7 @@ impl ComparatorGadget {
         let mut c = LinearCombination::zero();
         c.add(diff_var, Fp::from_u64(1));
 
-        cs.enforce(a, b, c);
+        cs.enforce(a, b, c, Some("less_or_equal_diff"));
 
         // Decompose diff into 64 bits ensuring diff >= 0 in field
         BitDecompositionGadget::decompose_and_constrain(cs, diff_var, 64);
@@ -46,7 +46,12 @@ impl ComparatorGadget {
         let mut lc_eq = LinearCombination::zero();
         lc_eq.add(is_eq, Fp::from_u64(1));
 
-        cs.enforce(lc_diff, lc_eq, LinearCombination::zero());
+        cs.enforce(
+            lc_diff,
+            lc_eq,
+            LinearCombination::zero(),
+            Some("is_equal_check"),
+        );
 
         is_eq
     }

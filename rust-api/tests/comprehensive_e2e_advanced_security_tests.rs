@@ -12,16 +12,16 @@
 //! 9. W3C Selective Disclosure JWT (SD-JWT) Decoy Disclosure Resilience
 //! 10. Memory Canary & Guard Page Integrity Protection
 
-use zk_identity_api_rust::security::circuit_tamper_proofing::*;
-use zk_identity_api_rust::security::fault_injection_armor::*;
-use zk_identity_api_rust::security::hardware_canary::*;
-use zk_identity_api_rust::security::quantum_kyber_pke::*;
-use zk_identity_api_rust::security::rate_limiter_distributed::*;
-use zk_identity_api_rust::security::safe_memory_allocator::*;
-use zk_identity_api_rust::security::seccomp_sandbox::*;
-use zk_identity_api_rust::security::side_channel_defenses::*;
-use zk_identity_api_rust::security::w3c_sd_jwt_vc::*;
-use zk_identity_api_rust::security::zk_dos_shield::*;
+use zk_identity_microservice::security::circuit_tamper_proofing::*;
+use zk_identity_microservice::security::fault_injection_armor::*;
+use zk_identity_microservice::security::hardware_canary::*;
+use zk_identity_microservice::security::quantum_kyber_pke::*;
+use zk_identity_microservice::security::rate_limiter_distributed::*;
+use zk_identity_microservice::security::safe_memory_allocator::*;
+use zk_identity_microservice::security::seccomp_sandbox::*;
+use zk_identity_microservice::security::side_channel_defenses::*;
+use zk_identity_microservice::security::w3c_sd_jwt_vc::*;
+use zk_identity_microservice::security::zk_dos_shield::*;
 
 #[test]
 fn test_tier4_fault_injection_dual_rail_execution() {

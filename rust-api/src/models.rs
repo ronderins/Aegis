@@ -321,3 +321,38 @@ pub struct SecurityOverviewResponse {
     pub mmr_audit_tree_size: usize,
     pub timestamp: String,
 }
+
+/// SDK Proof Mode selector
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ProofMode {
+    AgeOnly,
+    NationalityInclusion,
+    SanctionsExclusion,
+    FullCompliance,
+}
+
+/// SDK Proof Generation Request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VerifyProofRequest {
+    pub proof_mode: ProofMode,
+    pub session_id: Option<String>,
+    pub birth_year: Option<u32>,
+    pub current_year: Option<u32>,
+    pub threshold: Option<u32>,
+    pub nationality: Option<String>,
+    pub allowed_countries: Option<Vec<String>>,
+    pub sanctions_merkle_root: Option<String>,
+    pub document_type: Option<String>,
+    pub user_salt_hex: Option<String>,
+    pub simulate_tampering: Option<bool>,
+}
+
+/// SDK Session Response alias
+pub type SessionResponse = BlindQrSession;
+
+/// SDK Proof Verification Response
+pub type VerifyProofResponse = VerifyResponse;
+
+/// SDK Proof Receipt alias
+pub type ProofReceipt = ProofResponse;

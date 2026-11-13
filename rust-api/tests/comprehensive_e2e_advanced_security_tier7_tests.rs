@@ -7,11 +7,11 @@
 //! 4. Cross-Domain Verifiable Credential Federation & eIDAS/NIST Bridge
 //! 5. Post-Quantum Dual-Hybrid Key Exchange Handshake & Forward Secrecy
 
-use zk_identity_api_rust::security::confidential_calldata_evm::*;
-use zk_identity_api_rust::security::pq_session_key_exchange::*;
-use zk_identity_api_rust::security::proactive_secret_sharing::*;
-use zk_identity_api_rust::security::verifiable_credential_federation::*;
-use zk_identity_api_rust::security::zk_batch_shuffle_verifier::*;
+use zk_identity_microservice::security::confidential_calldata_evm::*;
+use zk_identity_microservice::security::pq_session_key_exchange::*;
+use zk_identity_microservice::security::proactive_secret_sharing::*;
+use zk_identity_microservice::security::verifiable_credential_federation::*;
+use zk_identity_microservice::security::zk_batch_shuffle_verifier::*;
 
 #[test]
 fn test_tier7_batch_shuffle_verifier() {

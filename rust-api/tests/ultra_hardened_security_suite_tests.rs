@@ -27,31 +27,31 @@
 //! 24. Fuzzy Biometric Commitment Scheme (Juels-Wattenberg) Error-Correction
 //! 25. Adaptive Threat Response & Automated Circuit-Breaker Quarantine
 
-use zk_identity_api_rust::security::blind_zk_threshold_credentials::*;
-use zk_identity_api_rust::security::bulletproofs_plus_range::*;
-use zk_identity_api_rust::security::confidential_query_guard::*;
-use zk_identity_api_rust::security::dynamic_vector_accumulator::*;
-use zk_identity_api_rust::security::falcon_fips206::*;
-use zk_identity_api_rust::security::fhe_bfv_ckks::*;
-use zk_identity_api_rust::security::homomorphic_secret_sharing::*;
-use zk_identity_api_rust::security::kernel_memory_armor::*;
-use zk_identity_api_rust::security::oblivious_keyword_search::*;
-use zk_identity_api_rust::security::oprf_blind_tokens::*;
-use zk_identity_api_rust::security::pkcs11_session_armor::*;
-use zk_identity_api_rust::security::ring_signatures_clsag::*;
-use zk_identity_api_rust::security::stark_fri_engine::*;
-use zk_identity_api_rust::security::threshold_bls_aggregation::*;
-use zk_identity_api_rust::security::threshold_oblivious_transfer_psi::*;
-use zk_identity_api_rust::security::verifiable_delay_function::*;
-use zk_identity_api_rust::security::w3c_did_vp_engine::*;
-use zk_identity_api_rust::security::zk_adaptive_threat_response::*;
-use zk_identity_api_rust::security::zk_confidential_state_channels::*;
-use zk_identity_api_rust::security::zk_cross_chain_relayer::*;
-use zk_identity_api_rust::security::zk_fuzzy_commitment_biometrics::*;
-use zk_identity_api_rust::security::zk_kyc_compliance_matrix::*;
-use zk_identity_api_rust::security::zk_plonk_fri_composer::*;
-use zk_identity_api_rust::security::zk_plonk_hypercube::*;
-use zk_identity_api_rust::security::zkvm_jit_armor::*;
+use zk_identity_microservice::security::blind_zk_threshold_credentials::*;
+use zk_identity_microservice::security::bulletproofs_plus_range::*;
+use zk_identity_microservice::security::confidential_query_guard::*;
+use zk_identity_microservice::security::dynamic_vector_accumulator::*;
+use zk_identity_microservice::security::falcon_fips206::*;
+use zk_identity_microservice::security::fhe_bfv_ckks::*;
+use zk_identity_microservice::security::homomorphic_secret_sharing::*;
+use zk_identity_microservice::security::kernel_memory_armor::*;
+use zk_identity_microservice::security::oblivious_keyword_search::*;
+use zk_identity_microservice::security::oprf_blind_tokens::*;
+use zk_identity_microservice::security::pkcs11_session_armor::*;
+use zk_identity_microservice::security::ring_signatures_clsag::*;
+use zk_identity_microservice::security::stark_fri_engine::*;
+use zk_identity_microservice::security::threshold_bls_aggregation::*;
+use zk_identity_microservice::security::threshold_oblivious_transfer_psi::*;
+use zk_identity_microservice::security::verifiable_delay_function::*;
+use zk_identity_microservice::security::w3c_did_vp_engine::*;
+use zk_identity_microservice::security::zk_adaptive_threat_response::*;
+use zk_identity_microservice::security::zk_confidential_state_channels::*;
+use zk_identity_microservice::security::zk_cross_chain_relayer::*;
+use zk_identity_microservice::security::zk_fuzzy_commitment_biometrics::*;
+use zk_identity_microservice::security::zk_kyc_compliance_matrix::*;
+use zk_identity_microservice::security::zk_plonk_fri_composer::*;
+use zk_identity_microservice::security::zk_plonk_hypercube::*;
+use zk_identity_microservice::security::zkvm_jit_armor::*;
 
 #[test]
 fn test_e2e_fhe_homomorphic_pipeline() {
